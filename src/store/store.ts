@@ -1,15 +1,16 @@
 
-import { adminApi } from '@/services/adminApi'
+
+import { authApi } from '@/services/authApi'
 import {configureStore} from '@reduxjs/toolkit'
 
 // set up the store
 export const makeStore = () => {
   return configureStore({
     reducer: {
-      [adminApi.reducerPath]: adminApi.reducer
+      [authApi.reducerPath]: authApi.reducer
     },
     middleware: (getDefaultMiddleware) => 
-      getDefaultMiddleware().concat(adminApi.middleware)
+      getDefaultMiddleware().concat(authApi.middleware)
     
   }) 
 }
