@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ActionButton } from "@/components/ui-kit/Button";
 
-/**
- * Suspend, disable and close all persist a reason into the audit log, so the
- * action is blocked until one is written. Nothing is destructive by accident.
- */
+
 export function ReasonDialog({
   title,
   description,
@@ -23,13 +21,30 @@ export function ReasonDialog({
 }) {
   const [reason, setReason] = useState("");
 
-  return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-        <h2 className="text-lg font-semibold text-neutral-900">{title}</h2>
-        <p className="mt-1 text-sm text-neutral-500">{description}</p>
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => event.key === "Escape" && onCancel();
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
 
-        <label className="mt-5 block text-sm font-medium text-neutral-700" htmlFor="reason">
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onCancel]);
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-end bg-foreground/30 backdrop-blur-sm p-0 sm:place-items-center sm:p-4">
+      {/* Full width sheet on a phone, centred card from sm up */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className="w-full rounded-t-2xl border border-border bg-card p-6 shadow-xl sm:max-w-md sm:rounded-2xl"
+      >
+        <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+
+        <label className="mt-5 block text-sm font-medium text-foreground" htmlFor="reason">
           Reason
         </label>
         <textarea
@@ -38,26 +53,19 @@ export function ReasonDialog({
           value={reason}
           autoFocus
           onChange={(event) => setReason(event.target.value)}
-          placeholder="This is recorded in the audit log"
-          className="mt-1.5 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-green-600"
+          placeholder="Recorded in the audit log"
+          className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-brand"
         />
 
-        <div className="mt-6 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-full border border-neutral-300 px-5 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
+        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <ActionButton onClick={onCancel}>Cancel</ActionButton>
+          <ActionButton
+            variant="primary"
             disabled={!reason.trim() || busy}
             onClick={() => onConfirm(reason.trim())}
-            className="rounded-full bg-green-700 px-5 py-2 text-sm font-medium text-white transition hover:bg-green-800 disabled:opacity-50"
           >
             {busy ? "Working..." : confirmLabel}
-          </button>
+          </ActionButton>
         </div>
       </div>
     </div>

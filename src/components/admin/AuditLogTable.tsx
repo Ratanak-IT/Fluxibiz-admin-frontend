@@ -48,23 +48,23 @@ export function AuditLogTable({
 
   return (
     <main className="px-8 py-7">
-      <nav className="mb-6 text-[15px] text-neutral-400">
-        <Link href="/dashboard" className="hover:text-neutral-600">
+      <nav className="mb-6 text-[15px] text-muted-foreground">
+        <Link href="/dashboard" className="hover:text-muted-foreground">
           Dashboard
         </Link>
         <span className="px-2">/</span>
-        <Link href="/audit-logs" className="hover:text-neutral-600">
+        <Link href="/audit-logs" className="hover:text-muted-foreground">
           Audit
         </Link>
         <span className="px-2">/</span>
-        <span className="text-neutral-700">{breadcrumb}</span>
+        <span className="text-foreground">{breadcrumb}</span>
       </nav>
 
-      <h1 className="text-3xl font-bold text-neutral-900">{title}</h1>
-      <p className="mt-1 text-[15px] text-neutral-500">{subtitle}</p>
+      <h1 className="text-3xl font-bold text-foreground">{title}</h1>
+      <p className="mt-1 text-[15px] text-muted-foreground">{subtitle}</p>
 
       <div className="relative mt-7 max-w-md">
-        <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
+        <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <input
           value={keyword}
           onChange={(event) => {
@@ -72,13 +72,13 @@ export function AuditLogTable({
             setPage(0);
           }}
           placeholder="Search by target, admin or reason"
-          className="w-full rounded-full border border-neutral-200 py-2.5 pl-11 pr-4 text-sm outline-none focus:border-green-600"
+          className="w-full rounded-full border border-border py-2.5 pl-11 pr-4 text-sm outline-none focus:border-brand"
         />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-neutral-200">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border">
         <table className="w-full text-left">
-          <thead className="bg-neutral-50 text-sm font-semibold text-neutral-800">
+          <thead className="bg-muted/60 text-sm font-semibold text-foreground">
             <tr>
               <th className="px-6 py-4">When</th>
               <th className="px-6 py-4">Administrator</th>
@@ -88,10 +88,10 @@ export function AuditLogTable({
               <th className="px-6 py-4">Reason</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-100">
+          <tbody className="divide-y divide-border">
             {isLoading && (
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-sm text-neutral-500">
+                <td colSpan={6} className="px-6 py-12 text-center text-sm text-muted-foreground">
                   Loading audit log...
                 </td>
               </tr>
@@ -107,28 +107,28 @@ export function AuditLogTable({
 
             {!isLoading && !error && rows.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-sm text-neutral-500">
+                <td colSpan={6} className="px-6 py-12 text-center text-sm text-muted-foreground">
                   Nothing recorded yet. Take an action and it will appear here.
                 </td>
               </tr>
             )}
 
             {rows.map((log) => (
-              <tr key={log.id} className="align-top hover:bg-neutral-50/60">
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-neutral-600">
+              <tr key={log.id} className="align-top hover:bg-muted/40">
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                   {new Date(log.createdAt).toLocaleString()}
                 </td>
-                <td className="px-6 py-4 text-sm text-neutral-800">{log.actorUsername}</td>
-                <td className="px-6 py-4 text-sm text-neutral-800">
+                <td className="px-6 py-4 text-sm text-foreground">{log.actorUsername}</td>
+                <td className="px-6 py-4 text-sm text-foreground">
                   {ACTION_LABELS[log.actionType] ?? log.actionType}
                 </td>
-                <td className="px-6 py-4 text-sm text-neutral-600">{log.targetLabel ?? "—"}</td>
-                <td className="px-6 py-4 text-sm text-neutral-500">
+                <td className="px-6 py-4 text-sm text-muted-foreground">{log.targetLabel ?? "—"}</td>
+                <td className="px-6 py-4 text-sm text-muted-foreground">
                   {log.previousState || log.newState
                     ? `${log.previousState ?? "—"} → ${log.newState ?? "—"}`
                     : "—"}
                 </td>
-                <td className="max-w-xs px-6 py-4 text-sm text-neutral-600">{log.reason ?? "—"}</td>
+                <td className="max-w-xs px-6 py-4 text-sm text-muted-foreground">{log.reason ?? "—"}</td>
               </tr>
             ))}
           </tbody>
@@ -136,7 +136,7 @@ export function AuditLogTable({
       </div>
 
       {data && data.totalPages > 1 && (
-        <div className="mt-5 flex items-center justify-between text-sm text-neutral-600">
+        <div className="mt-5 flex items-center justify-between text-sm text-muted-foreground">
           <span>
             Page {data.number + 1} of {data.totalPages} · {data.totalElements} entries
           </span>
@@ -145,7 +145,7 @@ export function AuditLogTable({
               type="button"
               disabled={data.number === 0}
               onClick={() => setPage((value) => Math.max(0, value - 1))}
-              className="rounded-full border border-neutral-200 px-4 py-2 disabled:opacity-40"
+              className="rounded-full border border-border px-4 py-2 disabled:opacity-40"
             >
               Previous
             </button>
@@ -153,7 +153,7 @@ export function AuditLogTable({
               type="button"
               disabled={data.number + 1 >= data.totalPages}
               onClick={() => setPage((value) => value + 1)}
-              className="rounded-full border border-neutral-200 px-4 py-2 disabled:opacity-40"
+              className="rounded-full border border-border px-4 py-2 disabled:opacity-40"
             >
               Next
             </button>

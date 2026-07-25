@@ -113,7 +113,7 @@ export default function OverviewPage() {
         <span className="text-neutral-700">Overview</span>
       </nav>
 
-      <h1 className="text-3xl font-bold text-neutral-900">Platform overview</h1>
+      <h1 className="text-3xl font-bold text-neutral-900 ">Platform overview</h1>
       <p className="mt-1 text-[15px] text-neutral-500">
         How many shops are on the platform, and how that is changing.
       </p>

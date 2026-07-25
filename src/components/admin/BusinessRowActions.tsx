@@ -64,8 +64,8 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
       key={label}
       type="button"
       onClick={onClick}
-      className={`block w-full px-4 py-2.5 text-left text-sm transition hover:bg-neutral-50 ${
-        danger ? "text-red-600" : "text-neutral-700"
+      className={`block w-full px-4 py-2.5 text-left text-sm transition hover:bg-accent ${
+        danger ? "text-red-600" : "text-foreground"
       }`}
     >
       {label}
@@ -79,7 +79,7 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
           type="button"
           aria-label={`Actions for ${business.name}`}
           onClick={() => setOpen((value) => !value)}
-          className="rounded-full p-2 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+          className="rounded-full p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           <MoreVertical className="size-5 " />
         </button>
@@ -87,7 +87,7 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
         {open && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-            <div className="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-xl border border-neutral-200 bg-white py-1 shadow-lg">
+            <div className="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-xl border border-border bg-white py-1 shadow-lg">
               {business.status !== "ACTIVE" &&
                 item("Activate", async () => {
                   await activate(business.id);
@@ -110,10 +110,10 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
                   })
                 : item("Close shop", () => setDialog("close"))}
 
-              <div className="my-1 h-px bg-neutral-100" />
+              <div className="my-1 h-px bg-muted" />
 
               {item(
-                "Delete",
+ "Delete",
                 async () => {
                   if (confirm(`Delete ${business.name}? This marks the account as deleted.`)) {
                     await remove(business.id);

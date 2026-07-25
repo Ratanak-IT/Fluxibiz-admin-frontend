@@ -1,7 +1,6 @@
 import { ModuleSidebar, type SidebarItem } from "@/components/admin/ModuleSidebar";
 
-// Sub pages narrow the same log by target, so the module stays about auditing
-// only rather than borrowing navigation from other modules.
+
 const ITEMS: SidebarItem[] = [
   { label: "All activity", href: "/audit-logs", icon: "audit" },
   { label: "Businesses", href: "/audit-logs/businesses", icon: "business" },

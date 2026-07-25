@@ -1,18 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Bell, ChevronDown, LogOut } from "lucide-react";
 import { logout } from "@/lib/auth/keycloak";
 import { decodeToken } from "@/lib/auth/session";
 import { tokenStore } from "@/lib/auth/tokenStore";
+import { ThemeToggle } from "./ThemeToggle";
 import Image from "next/image";
 
 export function AdminHeader() {
   const [open, setOpen] = useState(false);
-  const claims = decodeToken(tokenStore.getAccessToken() ?? "");
+  const [name, setName] = useState("Administrator");
 
-  const name = claims?.name ?? claims?.preferred_username ?? "Administrator";
+  useEffect(() => {
+    const claims = decodeToken(tokenStore.getAccessToken() ?? "");
+    setName(claims?.name ?? claims?.preferred_username ?? "Administrator");
+  }, []);
+
   const initials = name
     .split(/[\s._-]+/)
     .slice(0, 2)
@@ -20,22 +25,25 @@ export function AdminHeader() {
     .join("");
 
   return (
-    <header className="flex items-center justify-between px-8">
-      <Link href="/dashboard" className="flex items-center gap-2">
+    <header className="sticky top-0 z-40 flex h-[var(--header-height)] items-center justify-between gap-3 border-b border-border bg-background/85 px-4 backdrop-blur-md sm:px-6 lg:px-8">
+      <Link href="/dashboard" className="flex shrink-0 items-center">
   <Image
     src="/logo.jpg"
-    alt="Logo"
-    width={100}
-    height={100}
+    alt="IPOS"
+    width={160}
+    height={64}
     priority
+    className="h-15 w-auto sm:h-20"
   />
 </Link>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-1 sm:gap-2">
+        <ThemeToggle />
+
         <button
           type="button"
           aria-label="Notifications"
-          className="relative rounded-full p-2 text-neutral-500 transition hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+          className="relative rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           <Bell className="size-5" />
         </button>
@@ -45,31 +53,51 @@ export function AdminHeader() {
             type="button"
             onClick={() => setOpen((value) => !value)}
             aria-expanded={open}
-            className="flex items-center gap-3 rounded-full border border-neutral-200 py-1.5 pl-1.5 pr-3 transition hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+            aria-haspopup="menu"
+            className="flex items-center gap-2 rounded-full border border-border p-1 transition hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:gap-3 sm:pl-1.5 sm:pr-3"
           >
-            <span className="grid size-9 place-items-center rounded-full bg-green-600 text-sm font-semibold text-white">
+            <span className="grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-brand-foreground sm:size-9 sm:text-sm">
               {initials || "AD"}
             </span>
-            <span className="text-left leading-tight">
-              <span className="block text-sm font-semibold text-neutral-900">{name}</span>
-              <span className="block text-[11px] uppercase tracking-wide text-neutral-500">
+            <span className="hidden text-left leading-tight sm:block">
+              <span className="block max-w-40 truncate text-sm font-semibold text-foreground">
+                {name}
+              </span>
+              <span className="block text-[11px] uppercase tracking-wide text-muted-foreground">
                 Super admin
               </span>
             </span>
-            <ChevronDown className="size-4 text-neutral-400" />
+            <ChevronDown className="hidden size-4 text-muted-foreground sm:block" />
           </button>
 
           {open && (
-            <div className="absolute right-0 z-10 mt-2 w-48 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg">
-              <button
-                type="button"
-                onClick={logout}
-                className="flex w-full items-center gap-2 px-4 py-3 text-sm text-neutral-700 transition hover:bg-neutral-50"
+            <>
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setOpen(false)}
+              />
+              <div
+                role="menu"
+                className="absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg"
               >
-                <LogOut className="size-4" />
-                Sign out
-              </button>
-            </div>
+                <div className="border-b border-border px-4 py-3 sm:hidden">
+                  <p className="truncate text-sm font-medium text-foreground">
+                    {name}
+                  </p>
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                    Super admin
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="flex w-full items-center gap-2 px-4 py-3 text-sm text-foreground transition hover:bg-accent"
+                >
+                  <LogOut className="size-4" />
+                  Sign out
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>

@@ -49,19 +49,19 @@ export default function CategoriesPage() {
   };
 
   return (
-    <main className="px-8 py-7">
-      <nav className="mb-6 text-[15px] text-neutral-400">
-        <Link href="/dashboard" className="hover:text-neutral-600">
+    <main className="px-4 py-6 sm:px-8 sm:py-7">
+      <nav className="mb-6 text-[15px] text-neutral-400 dark:text-neutral-500">
+        <Link href="/dashboard" className="hover:text-neutral-600 dark:text-neutral-400 dark:text-neutral-500">
           Dashboard
         </Link>
         <span className="px-2">/</span>
-        <span className="text-neutral-700">Categories</span>
+        <span className="text-neutral-700 dark:text-neutral-300">Categories</span>
       </nav>
 
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">Categories</h1>
-          <p className="mt-1 text-[15px] text-neutral-500">
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">Categories</h1>
+          <p className="mt-1 text-[15px] text-neutral-500 dark:text-neutral-400 dark:text-neutral-500">
             The list shop owners pick from when they set up their business.
           </p>
         </div>
@@ -76,26 +76,26 @@ export default function CategoriesPage() {
         </button>
       </div>
 
-      {isLoading && <p className="mt-8 text-sm text-neutral-500">Loading categories...</p>}
+      {isLoading && <p className="mt-8 text-sm text-neutral-500 dark:text-neutral-400 dark:text-neutral-500">Loading categories...</p>}
       {error && (
-        <p className="mt-8 text-sm text-red-600">
+        <p className="mt-8 text-sm text-red-600 dark:text-red-400">
           Request failed{"status" in error ? ` with status ${error.status}` : ""}.
         </p>
       )}
 
       {!isLoading && !error && categories.length === 0 && (
-        <p className="mt-8 text-sm text-neutral-500">
+        <p className="mt-8 text-sm text-neutral-500 dark:text-neutral-400 dark:text-neutral-500">
           No category yet. Add the first one so shop owners have something to choose.
         </p>
       )}
 
       <div className="mt-7 space-y-3">
         {categories.map((parent) => (
-          <div key={parent.id} className="rounded-2xl border border-neutral-200">
+          <div key={parent.id} className="rounded-2xl border border-neutral-200 dark:border-neutral-800">
             <div className="flex items-center justify-between px-5 py-4">
               <div>
-                <span className="font-medium text-neutral-900">{parent.name}</span>
-                <span className="ml-2 text-xs text-neutral-400">/{parent.slug}</span>
+                <span className="font-medium text-neutral-900 dark:text-neutral-100">{parent.name}</span>
+                <span className="ml-2 text-xs text-neutral-400 dark:text-neutral-500">/{parent.slug}</span>
               </div>
 
               <div className="flex items-center gap-1">
@@ -103,7 +103,7 @@ export default function CategoriesPage() {
                   type="button"
                   title="Add sub category"
                   onClick={() => setEditor({ mode: "create", name: "", parentId: parent.id })}
-                  className="rounded-full p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
+                  className="rounded-full p-2 text-neutral-400 dark:text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-700 dark:text-neutral-300"
                 >
                   <Plus className="size-4" />
                 </button>
@@ -113,7 +113,7 @@ export default function CategoriesPage() {
                   onClick={() =>
                     setEditor({ mode: "edit", categoryId: parent.id, name: parent.name, parentId: null })
                   }
-                  className="rounded-full p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
+                  className="rounded-full p-2 text-neutral-400 dark:text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-700 dark:text-neutral-300"
                 >
                   <Pencil className="size-4" />
                 </button>
@@ -121,7 +121,7 @@ export default function CategoriesPage() {
                   type="button"
                   title="Delete"
                   onClick={() => confirmDelete(parent.id, parent.name)}
-                  className="rounded-full p-2 text-neutral-400 hover:bg-red-50 hover:text-red-600"
+                  className="rounded-full p-2 text-neutral-400 dark:text-neutral-500 hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-600 dark:text-red-400"
                 >
                   <Trash2 className="size-4" />
                 </button>
@@ -129,13 +129,13 @@ export default function CategoriesPage() {
             </div>
 
             {parent.subCategories?.length > 0 && (
-              <ul className="border-t border-neutral-100">
+              <ul className="border-t border-neutral-100 dark:border-neutral-800">
                 {parent.subCategories.map((child) => (
                   <li
                     key={child.id}
                     className="flex items-center justify-between px-5 py-3 pl-10 text-sm"
                   >
-                    <span className="flex items-center gap-2 text-neutral-700">
+                    <span className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
                       <ChevronRight className="size-3.5 text-neutral-300" aria-hidden />
                       {child.name}
                     </span>
@@ -152,7 +152,7 @@ export default function CategoriesPage() {
                             parentId: parent.id,
                           })
                         }
-                        className="rounded-full p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
+                        className="rounded-full p-2 text-neutral-400 dark:text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-700 dark:text-neutral-300"
                       >
                         <Pencil className="size-4" />
                       </button>
@@ -160,7 +160,7 @@ export default function CategoriesPage() {
                         type="button"
                         title="Delete"
                         onClick={() => confirmDelete(child.id, child.name)}
-                        className="rounded-full p-2 text-neutral-400 hover:bg-red-50 hover:text-red-600"
+                        className="rounded-full p-2 text-neutral-400 dark:text-neutral-500 hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-600 dark:text-red-400"
                       >
                         <Trash2 className="size-4" />
                       </button>
@@ -175,8 +175,8 @@ export default function CategoriesPage() {
 
       {editor && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <h2 className="text-lg font-semibold text-neutral-900">
+          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-neutral-900 p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
               {editor.mode === "create"
                 ? editor.parentId
                   ? "New sub category"
@@ -184,7 +184,7 @@ export default function CategoriesPage() {
                 : "Rename category"}
             </h2>
 
-            <label className="mt-5 block text-sm font-medium text-neutral-700" htmlFor="categoryName">
+            <label className="mt-5 block text-sm font-medium text-neutral-700 dark:text-neutral-300" htmlFor="categoryName">
               Name
             </label>
             <input
@@ -193,9 +193,9 @@ export default function CategoriesPage() {
               autoFocus
               onChange={(event) => setEditor({ ...editor, name: event.target.value })}
               onKeyDown={(event) => event.key === "Enter" && save()}
-              className="mt-1.5 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-green-600"
+              className="mt-1.5 w-full rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-sm outline-none focus:border-green-600"
             />
-            <p className="mt-2 text-xs text-neutral-500">
+            <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400 dark:text-neutral-500">
               The web address is generated from the name.
             </p>
 
@@ -203,7 +203,7 @@ export default function CategoriesPage() {
               <button
                 type="button"
                 onClick={() => setEditor(null)}
-                className="rounded-full border border-neutral-300 px-5 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
+                className="rounded-full border border-neutral-300 dark:border-neutral-700 px-5 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900"
               >
                 Cancel
               </button>
