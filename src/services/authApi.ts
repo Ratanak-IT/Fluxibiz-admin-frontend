@@ -1,13 +1,18 @@
+import { LoginResponse, LoginRequest } from './../lib/types/loginType';
 
-// Need to use the React-specific entry point to import createApi
+
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_URL }),
   endpoints: (builder) => ({
-    login: builder.mutation<string, string>({
-      query: (name) => `pokemon/${name}`,
+    login: builder.mutation<LoginResponse, LoginRequest>({
+      query: (credentials) => ({
+        url: '/api/v1/auth/login',
+        method: 'POST',
+        body: credentials,
+      }),
     }),
   }),
 })

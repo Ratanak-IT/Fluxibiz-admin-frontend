@@ -1,15 +1,13 @@
+import { AdminHeader } from "@/components/admin/Header";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
-// use for Admin Sidebar & Header Navigation Layout
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return(
-    <>
-    <div>
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthGuard>
+      <div className="min-h-screen bg-white">
+        <AdminHeader />
         {children}
-    </div>
-    </>
-  )
+      </div>
+    </AuthGuard>
+  );
 }
