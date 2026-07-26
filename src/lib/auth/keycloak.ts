@@ -106,3 +106,7 @@ export function logout() {
 
   window.location.assign(`${realmBase()}/logout?${params.toString()}`);
 }
+
+export function accountConsoleUrl(): string {
+  return `${KEYCLOAK_URL}/realms/${REALM}/account`;
+}

@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "IPOS Admin Console",
+  title: "IPOS-Platform",
   description: "Platform administration for IPOS",
 };
 
@@ -30,7 +30,6 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      // The bootstrap script edits this element before React hydrates.
       suppressHydrationWarning
       className={cn(
         "h-full",

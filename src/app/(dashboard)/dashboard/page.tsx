@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ADMIN_MODULES, type AdminModule } from "@/lib/adminModules";
 import { decodeToken, tokenStore } from "@/lib/auth/tokenStore";
+import { SUPER_ADMIN_ROLE } from "@/lib/permissionCatalog";
 
 function ModuleTile({ module }: { module: AdminModule }) {
   const Icon = module.icon;
@@ -49,13 +50,16 @@ function ModuleTile({ module }: { module: AdminModule }) {
 }
 
 export default function DashboardPage() {
-  const claims = decodeToken(tokenStore.getAccessToken() ?? "");
-  const firstName = (claims?.name ?? claims?.preferred_username ?? "").split(/[\s._-]+/)[0];
+  const roles = decodeToken(tokenStore.getAccessToken() ?? "")?.realm_access?.roles ?? [];
+const isSuperAdmin = roles.includes(SUPER_ADMIN_ROLE);
 
+const visibleModules = ADMIN_MODULES.filter(
+  (module) => !module.requires || isSuperAdmin || roles.includes(module.requires),
+);
   return (
     <main className="mx-auto max-w-5xl px-8 pb-16 pt-6">
       <div className="mt-12 grid grid-cols-2 justify-items-center gap-x-8 gap-y-12 sm:grid-cols-3 lg:grid-cols-4">
-        {ADMIN_MODULES.map((module) => (
+        {visibleModules.map((module) => (
           <ModuleTile key={module.key} module={module} />
         ))}
       </div>

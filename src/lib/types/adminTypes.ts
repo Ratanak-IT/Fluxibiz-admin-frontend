@@ -117,3 +117,31 @@ export interface BusinessCategoryUpsertRequest {
   parentId?: string | null;
   icon?: string | null;
 }
+
+export interface RealmRoleResponse {
+  id: string;
+  name: string;
+  description: string | null;
+  protectedRole: boolean;
+}
+
+export interface PlatformUserResponse {
+  id: string;
+  username: string;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  enabled: boolean;
+  emailVerified: boolean;
+  roles: string[];
+  createdAt: string | null;
+}
+
+export interface PlatformUserRequest {
+  username: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  temporaryPassword?: string;
+  roles: string[];
+}
