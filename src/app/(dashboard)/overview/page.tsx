@@ -14,7 +14,6 @@ function StatCard({
   hint,
   href,
   accent,
-  money,
 }: {
   label: string;
   value: number;

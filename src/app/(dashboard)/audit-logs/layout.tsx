@@ -10,7 +10,7 @@ const ITEMS: SidebarItem[] = [
 
 export default function AuditLogsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-[calc(100vh-76px)] border-t border-neutral-200">
+    <div className="flex min-h-[calc(100vh-var(--header-height))] flex-col border-t border-border lg:flex-row">
       <ModuleSidebar title={"Audit\nLog"} icon="audit" items={ITEMS} />
       <div className="min-w-0 flex-1">{children}</div>
     </div>

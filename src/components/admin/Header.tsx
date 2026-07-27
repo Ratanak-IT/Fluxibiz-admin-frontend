@@ -25,17 +25,17 @@ export function AdminHeader() {
     .join("");
 
   return (
-    <header className="sticky top-0 z-40 flex h-[var(--header-height)] items-center justify-between gap-3 border-b border-border bg-background/85 px-4 backdrop-blur-md sm:px-6 lg:px-8">
-      <Link href="/dashboard" className="flex shrink-0 items-center">
-  <Image
-    src="/logo.jpg"
-    alt="IPOS"
-    width={160}
-    height={64}
-    priority
-    className="h-15 w-auto sm:h-20"
-  />
-</Link>
+    <header className="sticky top-0 z-40 flex h-[var(--header-height)] items-center justify-between gap-3 border-b border-border bg-background/90 px-3 backdrop-blur-md sm:px-6 lg:px-8">
+      <Link href="/dashboard" className="flex shrink-0 items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+        <Image
+          src="/logo.jpg"
+          alt="IPOS"
+          width={160}
+          height={64}
+          priority
+          className="h-12 w-auto sm:h-14 lg:h-16"
+        />
+      </Link>
 
       <div className="flex items-center gap-1 sm:gap-2">
         <ThemeToggle />
@@ -54,7 +54,7 @@ export function AdminHeader() {
             onClick={() => setOpen((value) => !value)}
             aria-expanded={open}
             aria-haspopup="menu"
-            className="flex items-center gap-2 rounded-full border border-border p-1 transition hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:gap-3 sm:pl-1.5 sm:pr-3"
+            className="flex items-center gap-2 rounded-full border border-border bg-background/60 p-1 transition hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:gap-3 sm:pl-1.5 sm:pr-3"
           >
             <span className="grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-brand-foreground sm:size-9 sm:text-sm">
               {initials || "AD"}

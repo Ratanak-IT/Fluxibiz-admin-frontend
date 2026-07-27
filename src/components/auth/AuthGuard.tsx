@@ -46,9 +46,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (state === "checking") {
     return (
-      <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
-        Checking your session...
-      </div>
+<></>
     );
   }
 

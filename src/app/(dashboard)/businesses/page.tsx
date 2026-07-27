@@ -36,23 +36,25 @@ export default function BusinessesPage() {
   const rows = data?.content ?? [];
 
   return (
-    <main className="px-8 py-7">
-      <nav className="mb-6 text-[15px] text-neutral-400">
-        <Link href="/dashboard" className="hover:text-neutral-600">
+    <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <nav className="mb-5 flex flex-wrap items-center text-sm text-muted-foreground">
+        <Link href="/dashboard" className="transition hover:text-foreground">
           Dashboard
         </Link>
-        <span className="px-2">/</span>
-        <span className="text-neutral-700">Businesses</span>
+        <span className="px-2 text-muted-foreground/60">/</span>
+        <span className="text-foreground">Businesses</span>
       </nav>
 
-      <h1 className="text-3xl font-bold text-neutral-900">Businesses</h1>
-      <p className="mt-1 text-[15px] text-neutral-500">
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+        Businesses
+      </h1>
+      <p className="mt-1.5 text-sm text-muted-foreground sm:text-[15px]">
         Every shop registered on the platform, and the controls to moderate them.
       </p>
 
       <div className="mt-7 flex flex-wrap items-center gap-3">
         <div className="relative min-w-[280px] flex-1">
-          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={keyword}
             onChange={(event) => {
@@ -60,12 +62,12 @@ export default function BusinessesPage() {
               setPage(0);
             }}
             placeholder="Search by name, city or description"
-            className="w-full rounded-full border border-neutral-200 py-2.5 pl-11 pr-4 text-sm outline-none focus:border-green-600"
+            className="w-full rounded-full border border-border bg-background py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-brand"
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="size-4 text-neutral-400" aria-hidden />
+        <div className="flex flex-wrap items-center gap-2">
+          <SlidersHorizontal className="size-4 text-muted-foreground" aria-hidden />
           {STATUS_FILTERS.map((filter) => (
             <button
               key={filter.value}
@@ -77,8 +79,8 @@ export default function BusinessesPage() {
               className={[
                 "rounded-full border px-4 py-2 text-sm transition",
                 status === filter.value
-                  ? "border-green-700 bg-green-700 text-white"
-                  : "border-neutral-200 text-neutral-700 hover:bg-neutral-50",
+                  ? "border-green-600 bg-green-600 text-white dark:border-green-500 dark:bg-green-500 dark:text-neutral-950"
+                  : "border-border text-foreground hover:bg-accent",
               ].join(" ")}
             >
               {filter.label}
