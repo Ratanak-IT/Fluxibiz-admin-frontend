@@ -77,7 +77,8 @@ export function AuditLogTable({
       </div>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-border">
-        <table className="w-full text-left">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[72rem] text-left">
           <thead className="bg-muted/60 text-sm font-semibold text-foreground">
             <tr>
               <th className="px-6 py-4">When</th>
@@ -132,7 +133,8 @@ export function AuditLogTable({
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
 
       {data && data.totalPages > 1 && (
