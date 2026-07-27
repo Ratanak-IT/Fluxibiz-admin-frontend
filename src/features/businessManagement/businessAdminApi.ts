@@ -1,6 +1,7 @@
 import { baseApi } from "@/lib/baseApi";
 import type {
   AdminAuditLogResponse,
+  BusinessChannelResponse,
   BusinessCategoryResponse,
   BusinessCategoryUpsertRequest,
   BusinessQuery,
@@ -20,6 +21,11 @@ export const businessAdminApi = baseApi.injectEndpoints({
     getPlatformDashboard: builder.query<PlatformDashboardResponse, void>({
       query: () => `${ADMIN}/dashboard`,
       providesTags: ["Dashboard"],
+    }),
+
+    getBusinessChannels: builder.query<BusinessChannelResponse[], void>({
+      query: () => `${ADMIN}/channels`,
+      providesTags: ["Business"],
     }),
 
     getBusinesses: builder.query<Page<BusinessResponse>, BusinessQuery | void>({
@@ -134,6 +140,7 @@ export const businessAdminApi = baseApi.injectEndpoints({
 
 export const {
   useGetPlatformDashboardQuery,
+  useGetBusinessChannelsQuery,
   useGetBusinessesQuery,
   useGetBusinessQuery,
   useActivateBusinessMutation,

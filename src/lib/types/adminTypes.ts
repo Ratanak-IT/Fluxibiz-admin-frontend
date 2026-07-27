@@ -64,6 +64,17 @@ export interface MonthlyCountResponse {
   count: number;
 }
 
+export interface ActiveBusinessResponse {
+  businessId: string;
+  businessName: string;
+  orders: number;
+  itemsSold: number;
+}
+
+/**
+ * Platform health for the operator. Carries no money on purpose: what a shop
+ * earns is its own business, so the console reports activity and configuration.
+ */
 export interface PlatformDashboardResponse {
   totalBusinesses: number;
   newBusinessesLast30Days: number;
@@ -71,8 +82,37 @@ export interface PlatformDashboardResponse {
   suspendedBusinesses: number;
   deletedBusinesses: number;
   closedBusinesses: number;
+
+  ordersPaidLast30Days: number;
+  tradingBusinessesLast30Days: number;
+  storefrontsPublished: number;
+  telegramBotsConnected: number;
+
   businessesByCategory: CategoryCountResponse[];
   businessGrowth: MonthlyCountResponse[];
+  orderTrend: MonthlyCountResponse[];
+  mostActiveBusinesses: ActiveBusinessResponse[];
+}
+
+/** How one shop reaches its customers. Configuration only, no secrets. */
+export interface BusinessChannelResponse {
+  businessId: string;
+  businessName: string;
+  slug: string;
+
+  storefrontPublished: boolean;
+  storefrontUrl: string | null;
+  website: string | null;
+
+  telegramConnected: boolean;
+  telegramBotUsername: string | null;
+  telegramBotId: number | null;
+  telegramActive: boolean;
+
+  bakongConfigured: boolean;
+  bakongActive: boolean;
+
+  registeredAt: string | null;
 }
 
 export type AdminActionType =

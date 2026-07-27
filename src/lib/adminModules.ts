@@ -57,6 +57,15 @@ export const ADMIN_MODULES: AdminModule[] = [
     requires: "UNIT_READ",
   },
   {
+    key: "channels",
+    label: "Shop\nChannels",
+    href: "/channels",
+    icon: Building2,
+    available: true,
+    hint: "Storefronts, bots and payment setup",
+    requires: "CHANNEL_READ",
+  },
+  {
     key: "audit",
     label: "Audit\nLog",
     href: "/audit-logs",
