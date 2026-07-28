@@ -1,6 +1,8 @@
 import { baseApi } from "@/lib/baseApi";
 import type {
   AdminAuditLogResponse,
+  BusinessFeatureResponse,
+  FeatureToggleRequest,
   BusinessChannelResponse,
   BusinessCategoryResponse,
   BusinessCategoryUpsertRequest,
@@ -8,6 +10,8 @@ import type {
   BusinessResponse,
   Page,
   PlatformDashboardResponse,
+  PlatformFeatureResponse,
+  PlatformFeatureToggleRequest,
   StatusActionRequest,
 } from "@/lib/types/adminTypes";
 
@@ -118,6 +122,38 @@ export const businessAdminApi = baseApi.injectEndpoints({
       invalidatesTags: ["BusinessCategory", "AuditLog"],
     }),
 
+    getBusinessFeatures: builder.query<BusinessFeatureResponse[], string>({
+      query: (businessId) => `${ADMIN}/businesses/${businessId}/features`,
+      providesTags: ["BusinessFeature"],
+    }),
+
+    toggleBusinessFeature: builder.mutation<
+      BusinessFeatureResponse[],
+      { businessId: string } & FeatureToggleRequest
+    >({
+      query: ({ businessId, ...body }) => ({
+        url: `${ADMIN}/businesses/${businessId}/features`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["BusinessFeature", "Business", "AuditLog"],
+    }),
+
+    getPlatformFeatures: builder.query<PlatformFeatureResponse[], void>({
+      query: () => `${ADMIN}/platform-features`,
+      providesTags: ["PlatformFeature"],
+    }),
+
+    togglePlatformFeature: builder.mutation<PlatformFeatureResponse[], PlatformFeatureToggleRequest>({
+      query: ({ feature, ...body }) => ({
+        url: `${ADMIN}/platform-features/${feature}`,
+        method: "PATCH",
+        body,
+      }),
+
+      invalidatesTags: ["PlatformFeature", "BusinessFeature", "Business", "AuditLog"],
+    }),
+
     getAuditLogs: builder.query<
       Page<AdminAuditLogResponse>,
       {
@@ -151,6 +187,10 @@ export const {
   useReopenBusinessMutation,
   useDeleteBusinessMutation,
   useGetAuditLogsQuery,
+  useGetBusinessFeaturesQuery,
+  useToggleBusinessFeatureMutation,
+  useGetPlatformFeaturesQuery,
+  useTogglePlatformFeatureMutation,
   useGetBusinessCategoriesQuery,
   useCreateBusinessCategoryMutation,
   useUpdateBusinessCategoryMutation,

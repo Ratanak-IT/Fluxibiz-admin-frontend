@@ -10,6 +10,7 @@ import {
   Menu,
   Ruler,
   ScrollText,
+  SlidersHorizontal,
   UserCog,
   X,
   type LucideIcon,
@@ -22,6 +23,7 @@ const ICONS = {
   unit: Ruler,
   overview: LayoutGrid,
   account: UserCog,
+  settings: SlidersHorizontal,
 } satisfies Record<string, LucideIcon>;
 
 export type IconKey = keyof typeof ICONS;

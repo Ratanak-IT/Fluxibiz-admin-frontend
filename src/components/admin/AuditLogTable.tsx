@@ -20,6 +20,8 @@ const ACTION_LABELS: Record<AdminActionType, string> = {
   UNIT_CREATED: "Unit created",
   UNIT_UPDATED: "Unit updated",
   UNIT_DELETED: "Unit deleted",
+  BUSINESS_FEATURE_ENABLED: "Feature switched on",
+  BUSINESS_FEATURE_DISABLED: "Feature switched off",
 };
 
 const PAGE_SIZE = 15;

@@ -8,7 +8,9 @@ import {
   useGetBusinessQuery,
 } from "@/features/businessManagement/businessAdminApi";
 import { BusinessRowActions } from "@/components/admin/BusinessRowActions";
+import { FeatureToggleCard } from "@/components/admin/FeatureToggleCard";
 import { Flag, StatusPill } from "@/components/admin/StatusPill";
+import Image from "next/image";
 
 function Field({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -20,7 +22,6 @@ function Field({ label, value }: { label: string; value?: string | null }) {
 }
 
 export default function BusinessDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  // Route params arrive as a promise in this Next version.
   const { id } = use(params);
 
   const { data: business, isLoading, error } = useGetBusinessQuery(id);
@@ -61,11 +62,12 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
       <div className="flex items-start justify-between gap-6">
         <div className="flex items-start gap-4">
           {business.logo ? (
-            // Plain img keeps this working without configuring remote image hosts.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+
+            <Image
               src={business.logo}
-              alt=""
+              width={100}
+              height={100}
+              alt="Logo"
               className="size-16 rounded-2xl border border-neutral-200 object-cover"
             />
           ) : (
@@ -143,6 +145,10 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
             )}
           </ul>
         </section>
+      </div>
+
+      <div className="mt-6">
+        <FeatureToggleCard businessId={id} />
       </div>
 
       <section className="mt-6 rounded-2xl border border-neutral-200 p-6">

@@ -44,6 +44,7 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithAuth,
   tagTypes: ["Business", "AuditLog", "Unit", "BusinessCategory", "Dashboard",
-           "Role", "PlatformUser", "MyBusiness", "ShopRole", "ShopStaff"],
+           "Role", "PlatformUser", "MyBusiness", "ShopRole", "ShopStaff",
+           "BusinessFeature", "PlatformFeature"],
   endpoints: () => ({}),
 });

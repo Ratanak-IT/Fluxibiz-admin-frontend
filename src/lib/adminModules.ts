@@ -4,6 +4,7 @@ import {
   LayoutGrid,
   Ruler,
   ScrollText,
+  SlidersHorizontal,
   UserCircle,
   UserCog,
   type LucideIcon,
@@ -82,6 +83,15 @@ export const ADMIN_MODULES: AdminModule[] = [
     available: true,
     hint: "Colleagues who work in this console",
     requires: "USER_READ",
+  },
+  {
+    key: "settings",
+    label: "Settings",
+    href: "/settings/platform-features",
+    icon: SlidersHorizontal,
+    available: true,
+    hint: "Platform-wide feature switches and staff roles",
+    requires: "PLATFORM_FEATURE_WRITE",
   },
   {
     key: "account",

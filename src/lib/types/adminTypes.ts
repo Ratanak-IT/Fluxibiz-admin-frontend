@@ -71,10 +71,6 @@ export interface ActiveBusinessResponse {
   itemsSold: number;
 }
 
-/**
- * Platform health for the operator. Carries no money on purpose: what a shop
- * earns is its own business, so the console reports activity and configuration.
- */
 export interface PlatformDashboardResponse {
   totalBusinesses: number;
   newBusinessesLast30Days: number;
@@ -128,14 +124,16 @@ export type AdminActionType =
   | "BUSINESS_CATEGORY_DELETED"
   | "UNIT_CREATED"
   | "UNIT_UPDATED"
-  | "UNIT_DELETED";
+  | "UNIT_DELETED"
+  | "BUSINESS_FEATURE_ENABLED"
+  | "BUSINESS_FEATURE_DISABLED";
 
 export interface AdminAuditLogResponse {
   id: string;
   actorId: string;
   actorUsername: string;
   actionType: AdminActionType;
-  targetType: "BUSINESS" | "BUSINESS_CATEGORY" | "UNIT";
+  targetType: "BUSINESS" | "BUSINESS_CATEGORY" | "UNIT" | "BUSINESS_FEATURE";
   targetId: string;
   targetLabel?: string | null;
   previousState?: string | null;
@@ -184,4 +182,45 @@ export interface PlatformUserRequest {
   lastName?: string;
   temporaryPassword?: string;
   roles: string[];
+}
+
+export type BusinessFeature = "STOREFRONT" | "TELEGRAM_BOT" | "KHQR_PAYMENT";
+
+/** One switch the platform holds over a shop. Absent row means enabled. */
+export interface BusinessFeatureResponse {
+  feature: BusinessFeature;
+  label: string;
+  description: string;
+  enabled: boolean;
+  disabledReason: string | null;
+  disabledBy: string | null;
+  disabledAt: string | null;
+}
+
+export interface FeatureToggleRequest {
+  feature: BusinessFeature;
+  enabled: boolean;
+  reason?: string;
+}
+
+/**
+ * Platform-wide switch for a feature, independent of any single shop.
+ * When off, the feature is unavailable to every business regardless of
+ * that business's own BusinessFeatureResponse.enabled value — the
+ * effective availability is platformEnabled && businessEnabled.
+ */
+export interface PlatformFeatureResponse {
+  feature: BusinessFeature;
+  label: string;
+  description: string;
+  enabled: boolean;
+  disabledReason: string | null;
+  disabledBy: string | null;
+  disabledAt: string | null;
+}
+
+export interface PlatformFeatureToggleRequest {
+  feature: BusinessFeature;
+  enabled: boolean;
+  reason?: string;
 }

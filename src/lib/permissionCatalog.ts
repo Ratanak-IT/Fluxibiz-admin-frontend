@@ -48,13 +48,13 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
       { role: "USER_WRITE", label: "Manage staff", hint: "Create colleagues and change their permissions" },
       { role: "ROLE_READ", label: "View roles", hint: "See the permission names that exist" },
       { role: "ROLE_WRITE", label: "Manage roles", hint: "Add or remove permission names themselves" },
+      { role: "PLATFORM_FEATURE_WRITE", label: "Platform-wide feature switches", hint: "Turn a feature off for every shop at once" },
     ],
   },
 ];
 
 export const SUPER_ADMIN_ROLE = "SUPER_ADMIN";
 
-/** Roles Keycloak or the shop side owns; never offered as a platform permission. */
 export const HIDDEN_ROLES = [
   "USER",
   "offline_access",
@@ -78,7 +78,6 @@ export function labelForRole(role: string): string {
   return role;
 }
 
-/** Flat list, handy for spotting which names Keycloak is still missing. */
 export function allPermissionRoles(): string[] {
   return PERMISSION_GROUPS.flatMap((group) => group.options.map((option) => option.role));
 }

@@ -3,7 +3,10 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, Search, Send } from "lucide-react";
-import { useGetBusinessChannelsQuery } from "@/features/businessManagement/businessAdminApi";
+import {
+  useGetBusinessChannelsQuery,
+  useGetPlatformFeaturesQuery,
+} from "@/features/businessManagement/businessAdminApi";
 import type { BusinessChannelResponse } from "@/lib/types/adminTypes";
 
 type Filter = "all" | "storefront" | "telegram" | "bakong" | "none";
@@ -16,7 +19,6 @@ const FILTERS: Array<{ label: string; value: Filter }> = [
   { label: "Nothing set up", value: "none" },
 ];
 
-/** A small on/off marker. Muted when off so the eye skips it. */
 function Badge({ on, label }: { on: boolean; label: string }) {
   return (
     <span
@@ -53,9 +55,15 @@ export default function ChannelsPage() {
   const [filter, setFilter] = useState<Filter>("all");
 
   const { data: channels = [], isLoading, error } = useGetBusinessChannelsQuery();
+  const { data: platformFeatures = [] } = useGetPlatformFeaturesQuery();
 
-  // The endpoint returns every shop at once, so filtering stays on the client
-  // and the field responds without a round trip on each keystroke.
+  const telegramOffPlatformWide = platformFeatures.some(
+    (row) => row.feature === "TELEGRAM_BOT" && !row.enabled,
+  );
+  const bakongOffPlatformWide = platformFeatures.some(
+    (row) => row.feature === "KHQR_PAYMENT" && !row.enabled,
+  );
+
   const rows = useMemo(() => {
     const needle = keyword.trim().toLowerCase();
 
@@ -198,7 +206,16 @@ export default function ChannelsPage() {
                   <td className="px-6 py-4">
                     {row.telegramConnected ? (
                       <>
-                        <Badge on={row.telegramActive} label={row.telegramActive ? "Active" : "Paused"} />
+                        <Badge
+                          on={row.telegramActive && !telegramOffPlatformWide}
+                          label={
+                            telegramOffPlatformWide
+                              ? "Off (platform-wide)"
+                              : row.telegramActive
+                                ? "Active"
+                                : "Paused"
+                          }
+                        />
                         <span className="mt-1.5 flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">
                           <Send className="size-3" aria-hidden />
                           @{row.telegramBotUsername ?? "unknown"}
@@ -211,7 +228,16 @@ export default function ChannelsPage() {
 
                   <td className="px-6 py-4">
                     {row.bakongConfigured ? (
-                      <Badge on={row.bakongActive} label={row.bakongActive ? "Active" : "Configured"} />
+                      <Badge
+                        on={row.bakongActive && !bakongOffPlatformWide}
+                        label={
+                          bakongOffPlatformWide
+                            ? "Off (platform-wide)"
+                            : row.bakongActive
+                              ? "Active"
+                              : "Configured"
+                        }
+                      />
                     ) : (
                       <Badge on={false} label="Not set up" />
                     )}
