@@ -1,6 +1,6 @@
 import UserProfileForm from "@/components/profile/UserProfileForm";
 
-export default function AccountPage() {
+export default function ProfilePage() {
   return (
     <div className="py-4">
       <div className="mb-6">

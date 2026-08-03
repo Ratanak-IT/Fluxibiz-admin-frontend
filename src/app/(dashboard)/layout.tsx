@@ -1,13 +1,17 @@
-import { AdminHeader } from "@/components/admin/Header";
-import { AuthGuard } from "@/components/auth/AuthGuard";
+import { headers } from "next/headers";
+import AppShell from "@/components/layout/AppShell";
+import { auth } from "@/lib/auth/auth";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth.api.getSession({ headers: await headers() });
+
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-background text-foreground">
-        <AdminHeader />
-        {children}
-      </div>
-    </AuthGuard>
+    <AppShell managerName={session?.user.name || "Administrator"}>
+      {children}
+    </AppShell>
   );
 }
