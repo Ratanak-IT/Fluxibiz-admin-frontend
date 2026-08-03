@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { LogOut, UserRound, ChevronDown } from "lucide-react";
 import { useGetUserProfileQuery } from "@/services/userProfileApi";
+import { tokenStore } from "@/lib/auth/tokenStore";
 
 function initialsOf(name: string) {
   return (
@@ -85,6 +86,7 @@ export default function UserMenu({ name }: { name: string }) {
                 type="button"
                 onClick={() => {
                   setOpen(false);
+                  tokenStore.clear();
                   signOutForm.current?.requestSubmit();
                 }}
                 className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[14px] font-medium text-[#d14341] transition-colors hover:bg-[#fdeceb]"
