@@ -59,10 +59,14 @@ export interface CategoryCountResponse {
   businessCount: number;
 }
 
-export interface MonthlyCountResponse {
-  month: string;
+export interface TrendCountResponse {
+  day?: string;
+  date?: string;
+  month?: string;
   count: number;
 }
+
+export type MonthlyCountResponse = TrendCountResponse;
 
 export interface ActiveBusinessResponse {
   businessId: string;
@@ -85,8 +89,8 @@ export interface PlatformDashboardResponse {
   telegramBotsConnected: number;
 
   businessesByCategory: CategoryCountResponse[];
-  businessGrowth: MonthlyCountResponse[];
-  orderTrend: MonthlyCountResponse[];
+  businessGrowth: TrendCountResponse[];
+  orderTrend: TrendCountResponse[];
   mostActiveBusinesses: ActiveBusinessResponse[];
 }
 

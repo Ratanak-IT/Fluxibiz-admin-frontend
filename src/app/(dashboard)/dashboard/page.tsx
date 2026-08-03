@@ -22,7 +22,7 @@ function ModuleTile({ module }: { module: AdminModule }) {
   );
 
   const label = (
-    <span className="mt-3 block whitespace-pre-line text-center text-[15px] leading-snug text-neutral-800">
+    <span className="mt-3 block whitespace-pre-line text-center text-[15px] dark:text-gray-300 leading-snug text-neutral-800">
       {module.label}
     </span>
   );

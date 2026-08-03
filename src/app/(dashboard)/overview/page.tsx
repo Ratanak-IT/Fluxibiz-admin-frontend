@@ -1,12 +1,36 @@
 "use client";
 
 import Link from "next/link";
+import { Bar, BarChart as RechartsBarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
 import { useGetPlatformDashboardQuery } from "@/features/businessManagement/businessAdminApi";
 import type {
   CategoryCountResponse,
-  MonthlyCountResponse,
+  TrendCountResponse,
   ActiveBusinessResponse,
 } from "@/lib/types/adminTypes";
+
+function trendLabel(point: TrendCountResponse) {
+  return point.day ?? point.date ?? point.month ?? "";
+}
+
+function formatTrendLabel(value: unknown) {
+  const label = String(value);
+  const dayMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(label);
+
+  if (dayMatch) {
+    return `${dayMatch[2]}-${dayMatch[3]}`;
+  }
+
+  return label;
+}
 
 function StatCard({
   label,
@@ -48,32 +72,41 @@ function BarChart({ data }: { data: Array<{ label: string; value: number }> }) {
     );
   }
 
-  const max = Math.max(...data.map((point) => point.value), 1);
+  const chartConfig = {
+    value: {
+      label: "Count",
+      color: "var(--brand)",
+    },
+  } satisfies ChartConfig;
 
   return (
-    <div className="mt-6 flex items-end gap-3 overflow-x-auto pb-2">
-      {data.map((point) => {
-        const heightPercent = (point.value / max) * 100;
-
-        return (
-          <div key={point.label} className="flex min-w-14 flex-1 flex-col items-center gap-2">
-            <span className="text-xs tabular-nums text-neutral-500 dark:text-neutral-400">
-              {point.value}
-            </span>
-            <div className="flex h-32 w-full items-end">
-              <div
-                className="w-full rounded-t-md bg-gradient-to-t from-green-700 to-green-400 dark:from-green-600 dark:to-green-500"
-                style={{ height: `${Math.max(heightPercent, 3)}%` }}
-                role="img"
-                aria-label={`${point.value} in ${point.label}`}
+    <div className="mt-6 overflow-x-auto">
+      <ChartContainer
+        config={chartConfig}
+        className="min-h-[200px] min-w-[28rem] w-full"
+      >
+        <RechartsBarChart accessibilityLayer data={data}>
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="label"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            minTickGap={12}
+            tickFormatter={formatTrendLabel}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={
+              <ChartTooltipContent
+                labelFormatter={formatTrendLabel}
               />
-            </div>
-            <span className="whitespace-nowrap text-xs text-neutral-400 dark:text-neutral-500">
-              {point.label}
-            </span>
-          </div>
-        );
-      })}
+            }
+          />
+          <ChartLegend content={<ChartLegendContent />} />
+          <Bar dataKey="value" fill="var(--color-value)" radius={4} maxBarSize={56} />
+        </RechartsBarChart>
+      </ChartContainer>
     </div>
   );
 }
@@ -239,17 +272,17 @@ export default function OverviewPage() {
             <StatCard label="Deleted" value={data.deletedBusinesses} hint="Marked deleted, data retained" />
           </div>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-5">
+          {/* <div className="mt-6 grid gap-6 lg:grid-cols-5">
             <section className="rounded-2xl border border-neutral-200 p-6 lg:col-span-3 dark:border-neutral-800">
               <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
-                Orders by month
+                Orders by day
               </h2>
               <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
-                Sales completed across the platform in each of the last months.
+                Sales completed across the platform each day.
               </p>
               <BarChart
-                data={(data.orderTrend ?? []).map((point: MonthlyCountResponse) => ({
-                  label: point.month,
+                data={(data.orderTrend ?? []).map((point: TrendCountResponse) => ({
+                  label: trendLabel(point),
                   value: point.count,
                 }))}
               />
@@ -269,14 +302,14 @@ export default function OverviewPage() {
           <div className="mt-6 grid gap-6 lg:grid-cols-5">
             <section className="rounded-2xl border border-neutral-200 p-6 lg:col-span-3 dark:border-neutral-800">
               <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
-                Sign ups by month
+                Sign ups by day
               </h2>
               <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
-                New businesses registered in each of the last months.
+                New businesses registered each day.
               </p>
               <BarChart
-                data={(data.businessGrowth ?? []).map((point: MonthlyCountResponse) => ({
-                  label: point.month,
+                data={(data.businessGrowth ?? []).map((point: TrendCountResponse) => ({
+                  label: trendLabel(point),
                   value: point.count,
                 }))}
               />
@@ -291,7 +324,7 @@ export default function OverviewPage() {
               </p>
               <CategoryBreakdown data={data.businessesByCategory ?? []} />
             </section>
-          </div>
+          </div> */}
         </>
       )}
     </main>

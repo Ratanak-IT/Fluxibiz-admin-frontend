@@ -96,11 +96,11 @@ export default function AccountPage() {
             Session
           </h2>
 
-          <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
+          {/* <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
             {expiresAt
               ? `This token expires at ${expiresAt.toLocaleTimeString()}. It renews on its own while the tab stays open.`
               : "No active session found."}
-          </p>
+          </p> */}
 
           <a
             href={accountConsoleUrl()}
