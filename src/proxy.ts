@@ -6,6 +6,11 @@ const protectedRoutes = [
   "/dashboard",
   "/overview",
   "/businesses",
+  "/business-owners",
+  "/subscriptions",
+  "/logs",
+  "/staff",
+  "/profile",
   "/categories",
   "/units",
   "/channels",
@@ -14,20 +19,21 @@ const protectedRoutes = [
   "/settings",
   "/account",
 ];
-const authRoutes = ["/login", "/callback"];
+
+const publicRoutes = ["/login", "/callback"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = getSessionCookie(request);
 
+  if (publicRoutes.includes(pathname)) {
+    return NextResponse.next();
+  }
+
   if (protectedRoutes.some((route) => pathname.startsWith(route))) {
     if (!sessionCookie) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
-  }
-
-  if (authRoutes.includes(pathname) && sessionCookie) {
-    return NextResponse.redirect(new URL("/apps", request.url));
   }
 
   return NextResponse.next();
@@ -42,6 +48,11 @@ export const config = {
     "/dashboard/:path*",
     "/overview/:path*",
     "/businesses/:path*",
+    "/business-owners/:path*",
+    "/subscriptions/:path*",
+    "/logs/:path*",
+    "/staff/:path*",
+    "/profile/:path*",
     "/categories/:path*",
     "/units/:path*",
     "/channels/:path*",

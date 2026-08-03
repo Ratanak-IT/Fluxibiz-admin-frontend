@@ -15,22 +15,33 @@ const keycloakIssuer =
 
 export const auth = betterAuth({
   appName: "IPOS Admin Platform",
+
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+
+
   trustedOrigins: [
     "https://administrator.fluxibiz.store",
     "http://localhost:3000",
     "http://localhost:3001",
   ],
   secret: process.env.BETTER_AUTH_SECRET,
+
+  advanced: {
+    useSecureCookies: process.env.NODE_ENV === "production",
+  },
+
   plugins: [
     genericOAuth({
       config: [
-        keycloak({
-          clientId: keycloakClientId,
-          clientSecret: process.env.KEYCLOAK_CLIENT_SECRET ?? "",
-          issuer: keycloakIssuer,
-          pkce: true,
-        }),
+        {
+          ...keycloak({
+            clientId: keycloakClientId,
+            clientSecret: process.env.KEYCLOAK_CLIENT_SECRET ?? "",
+            issuer: keycloakIssuer,
+            pkce: true,
+          }),
+          prompt: "login",
+        },
       ],
     }),
     nextCookies(),
