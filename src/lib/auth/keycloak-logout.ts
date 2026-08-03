@@ -3,7 +3,12 @@ const DISCOVERY_PATH = "/.well-known/openid-configuration";
 let cachedEndSessionEndpoint: string | undefined;
 
 function issuerUrl() {
-  return process.env.KEYCLOAK_ISSUER?.trim().replace(/\/+$/, "");
+  const issuer =
+    process.env.KEYCLOAK_ISSUER ||
+    (process.env.NEXT_PUBLIC_KEYCLOAK_URL && process.env.NEXT_PUBLIC_KEYCLOAK_REALM
+      ? `${process.env.NEXT_PUBLIC_KEYCLOAK_URL.replace(/\/+$/, "")}/realms/${process.env.NEXT_PUBLIC_KEYCLOAK_REALM.replace(/^\/+|\/+$/g, "")}`
+      : "https://auth.chanchhay.site/realms/istad-fluxipos-auth");
+  return issuer.replace(/\/+$/, "");
 }
 
 async function endSessionEndpoint(issuer: string) {
@@ -44,10 +49,15 @@ export async function keycloakLogoutUrl({
   const url = new URL(await endSessionEndpoint(issuer));
   url.searchParams.set("post_logout_redirect_uri", postLogoutRedirectUri);
 
+  const clientId =
+    process.env.KEYCLOAK_CLIENT_ID ||
+    process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID ||
+    "fluxipos-client";
+
   if (idToken) {
     url.searchParams.set("id_token_hint", idToken);
-  } else if (process.env.KEYCLOAK_CLIENT_ID) {
-    url.searchParams.set("client_id", process.env.KEYCLOAK_CLIENT_ID);
+  } else {
+    url.searchParams.set("client_id", clientId);
   }
 
   return url.toString();
