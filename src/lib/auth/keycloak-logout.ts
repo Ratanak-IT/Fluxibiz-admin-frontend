@@ -1,6 +1,7 @@
 const DISCOVERY_PATH = "/.well-known/openid-configuration";
 
 let cachedEndSessionEndpoint: string | undefined;
+//
 
 function issuerUrl() {
   const issuer =
