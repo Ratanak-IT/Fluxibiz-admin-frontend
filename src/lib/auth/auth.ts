@@ -13,6 +13,14 @@ const keycloakIssuer =
     ? `${process.env.NEXT_PUBLIC_KEYCLOAK_URL.replace(/\/+$/, "")}/realms/${process.env.NEXT_PUBLIC_KEYCLOAK_REALM.replace(/^\/+|\/+$/g, "")}`
     : "https://auth.chanchhay.site/realms/istad-fluxipos-auth");
 
+const betterAuthSecret = process.env.BETTER_AUTH_SECRET;
+if (!betterAuthSecret) {
+  throw new Error(
+    "BETTER_AUTH_SECRET is not set. Set it as an environment variable " +
+      "(never hardcode it in source) before starting the app."
+  );
+}
+
 export const auth = betterAuth({
   appName: "IPOS Admin Platform",
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
@@ -21,25 +29,16 @@ export const auth = betterAuth({
     "http://localhost:3000",
     "http://localhost:3001",
   ],
-  secret: process.env.BETTER_AUTH_SECRET || "2e20f532482fdc58c4cd0007433f0e782aee26da25ed49bfbe1e74dd3b130e55",
+  secret: betterAuthSecret,
   plugins: [
     genericOAuth({
       config: [
-        // Manual config instead of the keycloak() helper: the helper's
-        // KeycloakOptions type doesn't expose `prompt`, but the underlying
-        // GenericOAuthConfig does, and providerId "keycloak" must stay the
-        // same string the rest of the app (readIdToken, etc.) already uses.
         {
           providerId: "keycloak",
           clientId: keycloakClientId,
           clientSecret: process.env.KEYCLOAK_CLIENT_SECRET ?? "",
           issuer: keycloakIssuer,
-          // The keycloak() helper used to derive this from `issuer`
-          // automatically; a manual config needs it spelled out or the
-          // plugin can't resolve authorization_endpoint/token_endpoint
-          // and throws "Invalid OAuth configuration".
           discoveryUrl: `${keycloakIssuer}/.well-known/openid-configuration`,
-       
           scopes: ["openid", "profile", "email"],
           pkce: true,
           prompt: "login",

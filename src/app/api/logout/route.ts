@@ -10,16 +10,8 @@ async function readIdToken(requestHeaders: Headers) {
       body: { providerId: "keycloak" },
     });
 
-    if (!tokens.idToken) {
-      console.warn(
-        "[logout] getAccessToken returned no idToken — Keycloak end-session " +
-          "will fall back to client_id only, which may not fully kill the SSO session."
-      );
-    }
-
     return tokens.idToken ?? undefined;
-  } catch (error) {
-    console.error("[logout] getAccessToken failed:", error);
+  } catch {
     return undefined;
   }
 }
