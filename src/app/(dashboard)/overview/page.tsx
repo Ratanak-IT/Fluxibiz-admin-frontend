@@ -272,7 +272,7 @@ export default function OverviewPage() {
             <StatCard label="Deleted" value={data.deletedBusinesses} hint="Marked deleted, data retained" />
           </div>
 
-          {/* <div className="mt-6 grid gap-6 lg:grid-cols-5">
+          <div className="mt-6 grid gap-6 lg:grid-cols-5">
             <section className="rounded-2xl border border-neutral-200 p-6 lg:col-span-3 dark:border-neutral-800">
               <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
                 Orders by day
@@ -324,7 +324,7 @@ export default function OverviewPage() {
               </p>
               <CategoryBreakdown data={data.businessesByCategory ?? []} />
             </section>
-          </div> */}
+          </div>
         </>
       )}
     </main>

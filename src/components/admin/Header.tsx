@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Bell, ChevronDown, LogOut } from "lucide-react";
 import { logout } from "@/lib/auth/keycloak";
@@ -11,12 +11,10 @@ import Image from "next/image";
 
 export function AdminHeader() {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("Administrator");
-
-  useEffect(() => {
+  const [name] = useState(() => {
     const claims = decodeToken(tokenStore.getAccessToken() ?? "");
-    setName(claims?.name ?? claims?.preferred_username ?? "Administrator");
-  }, []);
+    return claims?.name ?? claims?.preferred_username ?? "Administrator";
+  });
 
   const initials = name
     .split(/[\s._-]+/)

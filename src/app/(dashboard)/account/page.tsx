@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ExternalLink, LogOut, ShieldCheck } from "lucide-react";
 import { accountConsoleUrl, logout } from "@/lib/auth/keycloak";
@@ -20,17 +20,13 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 export default function AccountPage() {
-  const [claims, setClaims] = useState<KeycloakClaims | null>(null);
-
-  useEffect(() => {
-    setClaims(decodeToken(tokenStore.getAccessToken() ?? ""));
-  }, []);
+  const [claims] = useState<KeycloakClaims | null>(() =>
+    decodeToken(tokenStore.getAccessToken() ?? "")
+  );
 
   const roles = (claims?.realm_access?.roles ?? []).filter(
     (role) => !NOISE_ROLES.some((noise) => role.startsWith(noise)),
   );
-
-  const expiresAt = claims?.exp ? new Date(claims.exp * 1000) : null;
 
   return (
     <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">

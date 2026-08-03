@@ -45,10 +45,14 @@ export function ModuleSidebar({
 }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setDrawerOpen(false);
+  }
+
   const TitleIcon = ICONS[icon];
   const rootHref = items[0]?.href;
-
-  useEffect(() => setDrawerOpen(false), [pathname]);
 
   useEffect(() => {
     if (!drawerOpen) return;

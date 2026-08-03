@@ -14,6 +14,7 @@ export interface KeycloakClaims {
   email?: string;
   name?: string;
   realm_access?: { roles: string[] };
+  resource_access?: Record<string, { roles?: string[] }>;
 }
 
 const isBrowser = () => typeof window !== "undefined";

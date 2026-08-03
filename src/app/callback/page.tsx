@@ -25,28 +25,29 @@ function getDisplayName() {
 
 export default function CallbackPage() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    const params = new URLSearchParams(window.location.search);
+    const authError = params.get("error");
+    if (authError) {
+      return params.get("error_description") ?? authError;
+    }
+    if (!params.get("code") || !params.get("state")) {
+      return "Missing authorization code.";
+    }
+    return null;
+  });
   const [displayName, setDisplayName] = useState<string | null>(null);
   const handled = useRef(false);
 
   useEffect(() => {
-    if (handled.current) return;
+    if (handled.current || error) return;
     handled.current = true;
 
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     const state = params.get("state");
-    const authError = params.get("error");
-
-    if (authError) {
-      setError(params.get("error_description") ?? authError);
-      return;
-    }
-
-    if (!code || !state) {
-      setError("Missing authorization code.");
-      return;
-    }
+    if (!code || !state) return;
 
     exchangeCodeForTokens(code, state)
       .then((tokens) => {
@@ -58,7 +59,7 @@ export default function CallbackPage() {
         window.setTimeout(() => router.replace(nextRoute), DASHBOARD_REDIRECT_DELAY_MS);
       })
       .catch((exception: Error) => setError(exception.message));
-  }, [router]);
+  }, [router, error]);
 
   if (error) {
     return (

@@ -114,7 +114,7 @@ export function PlatformFeatureToggleCard() {
         </h2>
         <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
           Switching something off here takes it away from every business
-          immediately, no matter what that business's own feature toggle says.
+          immediately, no matter what that business&apos;s own feature toggle says.
         </p>
 
         {isLoading && (
