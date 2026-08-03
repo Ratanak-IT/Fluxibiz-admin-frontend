@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
-import { genericOAuth, keycloak } from "better-auth/plugins/generic-oauth";
+import { genericOAuth } from "better-auth/plugins/generic-oauth";
 
 const keycloakClientId =
   process.env.KEYCLOAK_CLIENT_ID ||
@@ -25,13 +25,25 @@ export const auth = betterAuth({
   plugins: [
     genericOAuth({
       config: [
-        keycloak({
+        // Manual config instead of the keycloak() helper: the helper's
+        // KeycloakOptions type doesn't expose `prompt`, but the underlying
+        // GenericOAuthConfig does, and providerId "keycloak" must stay the
+        // same string the rest of the app (readIdToken, etc.) already uses.
+        {
+          providerId: "keycloak",
           clientId: keycloakClientId,
           clientSecret: process.env.KEYCLOAK_CLIENT_SECRET ?? "",
           issuer: keycloakIssuer,
+          // The keycloak() helper used to derive this from `issuer`
+          // automatically; a manual config needs it spelled out or the
+          // plugin can't resolve authorization_endpoint/token_endpoint
+          // and throws "Invalid OAuth configuration".
+          discoveryUrl: `${keycloakIssuer}/.well-known/openid-configuration`,
+       
+          scopes: ["openid", "profile", "email"],
           pkce: true,
           prompt: "login",
-        }),
+        },
       ],
     }),
     nextCookies(),
