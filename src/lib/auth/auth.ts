@@ -30,6 +30,7 @@ export const auth = betterAuth({
           clientSecret: process.env.KEYCLOAK_CLIENT_SECRET ?? "",
           issuer: keycloakIssuer,
           pkce: true,
+          prompt: "login",
         }),
       ],
     }),

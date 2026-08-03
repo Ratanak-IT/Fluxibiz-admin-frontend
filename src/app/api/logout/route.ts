@@ -10,8 +10,16 @@ async function readIdToken(requestHeaders: Headers) {
       body: { providerId: "keycloak" },
     });
 
+    if (!tokens.idToken) {
+      console.warn(
+        "[logout] getAccessToken returned no idToken — Keycloak end-session " +
+          "will fall back to client_id only, which may not fully kill the SSO session."
+      );
+    }
+
     return tokens.idToken ?? undefined;
-  } catch {
+  } catch (error) {
+    console.error("[logout] getAccessToken failed:", error);
     return undefined;
   }
 }
@@ -52,15 +60,31 @@ export async function POST(request: NextRequest) {
     response.headers.append("set-cookie", cookie);
   }
 
-  const cookiesToClear = [
+  const requestCookies = request.cookies.getAll();
+  const cookiesToClear = new Set<string>([
     "better-auth.session_token",
     "__Secure-better-auth.session_token",
     "better-auth.session_data",
     "__Secure-better-auth.session_data",
+    "better-auth.account_data",
+    "__Secure-better-auth.account_data",
+    "better-auth.account_data.0",
+    "__Secure-better-auth.account_data.0",
+    "better-auth.account_data.1",
+    "__Secure-better-auth.account_data.1",
+    "better-auth.account_data.2",
+    "__Secure-better-auth.account_data.2",
     "better-auth.dont_remember",
     "__Secure-better-auth.dont_remember",
     "ipos_token",
-  ];
+    "ipos_welcome",
+  ]);
+
+  for (const c of requestCookies) {
+    if (c.name.includes("better-auth") || c.name.includes("ipos")) {
+      cookiesToClear.add(c.name);
+    }
+  }
 
   for (const cookieName of cookiesToClear) {
     response.headers.append(
