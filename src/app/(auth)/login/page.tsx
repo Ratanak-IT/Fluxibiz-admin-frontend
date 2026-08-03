@@ -1,41 +1,38 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
-import { LoginIllustration } from "@/components/auth/login-illustration";
-import { LoginFormType } from "@/lib/schemas/loginSchema";
-import { LoginForm } from "@/components/auth/loginForm";
-import { useLoginMutation } from "@/services/authApi";
-
-
+import { useEffect, useState } from "react";
+import { authClient } from "@/lib/auth/auth-client";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [login, { isLoading, error }] = useLoginMutation();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleLogin = async (values: LoginFormType) => {
-    try {
-      const result = await login(values).unwrap();
-      router.push("/dashboard");
-    } catch (err) {
-      
-    }
-  };
+  useEffect(() => {
+    document.cookie = "ipos_welcome=1; path=/; max-age=600; samesite=lax";
+
+    void authClient.signIn
+      .oauth2({
+        providerId: "keycloak",
+        callbackURL: "/apps",
+        errorCallbackURL: "/login",
+      })
+      .then(({ error }) => {
+        if (error) {
+          setErrorMessage(error.message ?? "Unable to start login");
+        }
+      });
+  }, []);
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-[420px]">
-          <LoginForm onSubmit={handleLogin} isSubmitting={isLoading} />
-          {error && (
-            <p className="mt-4 text-center text-sm text-red-500">
-              Invalid email or password
-            </p>
-          )}
-        </div>
+    <main className="flex min-h-screen items-center justify-center bg-[#f5f5f5] px-6">
+      <div className="w-full max-w-sm space-y-4 text-center">
+        <BrandLogo variant="stacked" className="mx-auto w-40" preload />
+        <h1 className="text-xl font-semibold text-[#16181c]">Redirecting to login</h1>
+        <p className="text-sm text-[#5c6660]">You are being sent to Keycloak.</p>
+        {errorMessage ? (
+          <p className="text-sm text-[#d14341]">{errorMessage}</p>
+        ) : null}
       </div>
-
-      <LoginIllustration />
-    </div>
+    </main>
   );
 }

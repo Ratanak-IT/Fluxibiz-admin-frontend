@@ -1,0 +1,18 @@
+import { ModuleSidebar, type SidebarItem } from "@/components/admin/ModuleSidebar";
+
+
+const ITEMS: SidebarItem[] = [
+  { label: "All activity", href: "/audit-logs", icon: "audit" },
+  { label: "Businesses", href: "/audit-logs/businesses", icon: "business" },
+  { label: "Categories", href: "/audit-logs/categories", icon: "category" },
+  { label: "Units", href: "/audit-logs/units", icon: "unit" },
+];
+
+export default function AuditLogsLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-h-[calc(100vh-var(--header-height))] flex-col border-t border-border lg:flex-row">
+      <ModuleSidebar title={"Audit\nLog"} icon="audit" items={ITEMS} />
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}

@@ -1,15 +1,17 @@
+import { headers } from "next/headers";
+import AppShell from "@/components/layout/AppShell";
+import { auth } from "@/lib/auth/auth";
 
-// use for Admin Sidebar & Header Navigation Layout
-export default function RootLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return(
-    <>
-    <div>
-        {children}
-    </div>
-    </>
-  )
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  return (
+    <AppShell managerName={session?.user.name || "Administrator"}>
+      {children}
+    </AppShell>
+  );
 }
