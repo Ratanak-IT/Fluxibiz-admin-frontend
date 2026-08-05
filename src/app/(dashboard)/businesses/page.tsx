@@ -4,13 +4,14 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, SlidersHorizontal, Plus } from "lucide-react";
 import {
-  useGetBusinessesQuery,
+  useGetBusinessesInfiniteQuery,
   useGetBusinessCategoriesQuery,
   useCreateBusinessMutation,
 } from "@/features/businessManagement/businessAdminApi";
 import { BusinessRowActions } from "@/components/admin/BusinessRowActions";
 import { Flag, StatusPill } from "@/components/admin/StatusPill";
 import type { BusinessOwnerStatus } from "@/lib/types/adminTypes";
+import { useInfiniteScroll } from "@/lib/hook/useInfiniteScroll";
 
 const STATUS_FILTERS: Array<{ label: string; value: BusinessOwnerStatus | "ALL" }> = [
   { label: "All", value: "ALL" },
@@ -19,7 +20,7 @@ const STATUS_FILTERS: Array<{ label: string; value: BusinessOwnerStatus | "ALL" 
   { label: "Deleted", value: "DELETED" },
 ];
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 interface CreateFormState {
   firstName: string;
@@ -50,7 +51,14 @@ export default function BusinessesPage() {
     [keyword, status, page],
   );
 
-  const { data, isLoading, isFetching, error } = useGetBusinessesQuery(query);
+  const { data, isLoading, isFetching, error } = useGetBusinessesInfiniteQuery(query);
+
+  const { sentinelRef, loadMore, hasMore } = useInfiniteScroll({
+    data,
+    isFetching,
+    page,
+    setPage,
+  });
   const { data: categories = [] } = useGetBusinessCategoriesQuery();
   const [createBusiness, createResult] = useCreateBusinessMutation();
 
@@ -248,31 +256,30 @@ export default function BusinessesPage() {
         </table>
       </div>
 
-      {data && data.totalPages > 1 && (
-        <div className="mt-5 flex items-center justify-between text-sm text-neutral-600">
-          <span>
-            Page {data.number + 1} of {data.totalPages} · {data.totalElements} businesses
+      {/* scroll sentinel + status footer */}
+      <div ref={sentinelRef} className="mt-5 flex flex-col items-center gap-3 py-6 text-sm">
+        {isFetching && !isLoading && (
+          <span className="text-muted-foreground">Loading more businesses...</span>
+        )}
+
+        {!isFetching && hasMore && (
+          <button
+            type="button"
+            onClick={loadMore}
+            className="rounded-full border border-border px-5 py-2 text-foreground transition hover:bg-accent"
+          >
+            Load more
+          </button>
+        )}
+
+        {data && rows.length > 0 && (
+          <span className="text-muted-foreground">
+            Showing {rows.length}
+            {data.totalElements >= 0 ? ` of ${data.totalElements}` : ""} businesses
+            {!hasMore && !isFetching ? " · end of list" : ""}
           </span>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              disabled={data.number === 0 || isFetching}
-              onClick={() => setPage((value) => Math.max(0, value - 1))}
-              className="rounded-full border border-neutral-200 px-4 py-2 disabled:opacity-40"
-            >
-              Previous
-            </button>
-            <button
-              type="button"
-              disabled={data.number + 1 >= data.totalPages || isFetching}
-              onClick={() => setPage((value) => value + 1)}
-              className="rounded-full border border-neutral-200 px-4 py-2 disabled:opacity-40"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {createForm && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 overflow-y-auto">
@@ -392,4 +399,3 @@ export default function BusinessesPage() {
     </main>
   );
 }
-

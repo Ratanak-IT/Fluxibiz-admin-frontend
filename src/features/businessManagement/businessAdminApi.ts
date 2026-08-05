@@ -1,4 +1,9 @@
 import { baseApi } from "@/lib/baseApi";
+import {
+  infiniteEndpoint,
+  DEFAULT_PAGE_SIZE,
+  type InfinitePage,
+} from "@/lib/api/infinitePage";
 import type {
   AdminAuditLogResponse,
   BusinessFeatureResponse,
@@ -17,6 +22,15 @@ import type {
   CreateSalesChannelRequest,
   UpdateSalesChannelRequest,
 } from "@/lib/types/adminTypes";
+
+export interface AuditLogQuery {
+  targetId?: string;
+  targetType?: string;
+  actionType?: string;
+  keyword?: string;
+  page?: number;
+  size?: number;
+}
 
 const ADMIN = "/api/v1/admin";
 
@@ -40,6 +54,22 @@ export const businessAdminApi = baseApi.injectEndpoints({
         url: `${ADMIN}/businesses`,
         params: toParams({ size: 20, ...(query ?? {}) }),
       }),
+      providesTags: ["Business"],
+    }),
+
+    getBusinessesInfinite: builder.query<InfinitePage<BusinessResponse>, BusinessQuery | void>({
+      query: (query) => ({
+        url: `${ADMIN}/businesses`,
+        params: toParams({ page: 0, size: DEFAULT_PAGE_SIZE, ...(query ?? {}) }),
+      }),
+      ...infiniteEndpoint<BusinessResponse, BusinessQuery>([
+        "keyword",
+        "status",
+        "categoryId",
+        "isEnabled",
+        "isClosed",
+        "size",
+      ]),
       providesTags: ["Business"],
     }),
 
@@ -175,6 +205,21 @@ export const businessAdminApi = baseApi.injectEndpoints({
       providesTags: ["AuditLog"],
     }),
 
+    getAuditLogsInfinite: builder.query<InfinitePage<AdminAuditLogResponse>, AuditLogQuery | void>({
+      query: (query) => ({
+        url: `${ADMIN}/audit-logs`,
+        params: toParams({ page: 0, size: DEFAULT_PAGE_SIZE, ...(query ?? {}) }),
+      }),
+      ...infiniteEndpoint<AdminAuditLogResponse, AuditLogQuery>([
+        "keyword",
+        "targetType",
+        "targetId",
+        "actionType",
+        "size",
+      ]),
+      providesTags: ["AuditLog"],
+    }),
+
     getSalesChannels: builder.query<SalesChannelResponse[], void>({
       query: () => "/api/v1/sales-channels?all=true",
       providesTags: ["SalesChannel"],
@@ -235,6 +280,7 @@ export const {
   useGetPlatformDashboardQuery,
   useGetBusinessChannelsQuery,
   useGetBusinessesQuery,
+  useGetBusinessesInfiniteQuery,
   useGetBusinessQuery,
   useActivateBusinessMutation,
   useSuspendBusinessMutation,
@@ -244,6 +290,7 @@ export const {
   useReopenBusinessMutation,
   useDeleteBusinessMutation,
   useGetAuditLogsQuery,
+  useGetAuditLogsInfiniteQuery,
   useGetBusinessFeaturesQuery,
   useToggleBusinessFeatureMutation,
   useGetPlatformFeaturesQuery,
