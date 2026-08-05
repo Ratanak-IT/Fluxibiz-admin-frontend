@@ -176,7 +176,7 @@ export const businessAdminApi = baseApi.injectEndpoints({
     }),
 
     getSalesChannels: builder.query<SalesChannelResponse[], void>({
-      query: () => "/api/v1/sales-channels",
+      query: () => "/api/v1/sales-channels?all=true",
       providesTags: ["SalesChannel"],
     }),
 
