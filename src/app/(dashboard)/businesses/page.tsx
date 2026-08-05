@@ -2,8 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, SlidersHorizontal } from "lucide-react";
-import { useGetBusinessesQuery } from "@/features/businessManagement/businessAdminApi";
+import { Search, SlidersHorizontal, Plus } from "lucide-react";
+import {
+  useGetBusinessesQuery,
+  useGetBusinessCategoriesQuery,
+  useCreateBusinessMutation,
+} from "@/features/businessManagement/businessAdminApi";
 import { BusinessRowActions } from "@/components/admin/BusinessRowActions";
 import { Flag, StatusPill } from "@/components/admin/StatusPill";
 import type { BusinessOwnerStatus } from "@/lib/types/adminTypes";
@@ -17,10 +21,24 @@ const STATUS_FILTERS: Array<{ label: string; value: BusinessOwnerStatus | "ALL" 
 
 const PAGE_SIZE = 10;
 
+interface CreateFormState {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  phone: string;
+  businessName: string;
+  businessCategoryId: string;
+  businessAddress: string;
+}
+
 export default function BusinessesPage() {
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<BusinessOwnerStatus | "ALL">("ALL");
   const [page, setPage] = useState(0);
+
+  const [createForm, setCreateForm] = useState<CreateFormState | null>(null);
 
   const query = useMemo(
     () => ({
@@ -33,7 +51,50 @@ export default function BusinessesPage() {
   );
 
   const { data, isLoading, isFetching, error } = useGetBusinessesQuery(query);
+  const { data: categories = [] } = useGetBusinessCategoriesQuery();
+  const [createBusiness, createResult] = useCreateBusinessMutation();
+
   const rows = data?.content ?? [];
+
+  const subCategories = useMemo(() => {
+    return categories.flatMap((cat) => cat.subCategories ?? []);
+  }, [categories]);
+
+  const handleCreate = async () => {
+    if (!createForm) return;
+    if (createForm.password !== createForm.confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+    try {
+      await createBusiness({
+        username: createForm.email,
+        password: createForm.password,
+        confirmPassword: createForm.confirmPassword,
+        email: createForm.email,
+        firstName: createForm.firstName,
+        lastName: createForm.lastName,
+        phoneNumber: createForm.phone,
+        gender: "UNSPECIFIED",
+        businessName: createForm.businessName,
+        businessAddress: createForm.businessAddress,
+        businessCategoryId: createForm.businessCategoryId,
+      }).unwrap();
+      setCreateForm(null);
+    } catch (err: any) {
+      const msg =
+        err?.data?.message ||
+        err?.data?.error ||
+        err?.data?.detail ||
+        "Registration failed. Please check your information and try again.";
+      alert(msg);
+    }
+  };
+
+  const inputCls =
+    "mt-1.5 w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3 py-2 text-sm outline-none focus:border-green-600";
+  const labelCls =
+    "block text-sm font-medium text-neutral-700 dark:text-neutral-300";
 
   return (
     <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
@@ -45,12 +106,37 @@ export default function BusinessesPage() {
         <span className="text-foreground">Businesses</span>
       </nav>
 
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-        Businesses
-      </h1>
-      <p className="mt-1.5 text-sm text-muted-foreground sm:text-[15px]">
-        Every shop registered on the platform, and the controls to moderate them.
-      </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            Businesses
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground sm:text-[15px]">
+            Every shop registered on the platform, and the controls to moderate them.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() =>
+            setCreateForm({
+              firstName: "",
+              lastName: "",
+              email: "",
+              password: "",
+              confirmPassword: "",
+              phone: "",
+              businessName: "",
+              businessCategoryId: subCategories[0]?.id ?? "",
+              businessAddress: "",
+            })
+          }
+          className="flex items-center gap-2 rounded-full bg-green-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-green-800"
+        >
+          <Plus className="size-4" />
+          Create Business
+        </button>
+      </div>
 
       <div className="mt-7 flex flex-wrap items-center gap-3">
         <div className="relative min-w-[280px] flex-1">
@@ -187,6 +273,123 @@ export default function BusinessesPage() {
           </div>
         </div>
       )}
+
+      {createForm && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 overflow-y-auto">
+          <div className="w-full max-w-lg rounded-2xl bg-white dark:bg-neutral-900 p-6 shadow-xl border border-neutral-200 dark:border-neutral-800 my-8">
+            <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Register New Business</h2>
+            <p className="mt-1 text-sm text-neutral-500">Create a Keycloak user account and provision a new business.</p>
+
+            <div className="mt-5 space-y-4">
+              {/* ── Owner Info ── */}
+              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Owner Account</p>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls} htmlFor="firstName">First Name</label>
+                  <input id="firstName" value={createForm.firstName} placeholder="Sokha"
+                    onChange={(e) => setCreateForm({ ...createForm, firstName: e.target.value })}
+                    className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls} htmlFor="lastName">Last Name</label>
+                  <input id="lastName" value={createForm.lastName} placeholder="Seng"
+                    onChange={(e) => setCreateForm({ ...createForm, lastName: e.target.value })}
+                    className={inputCls} />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelCls} htmlFor="ownerEmail">Email</label>
+                <input id="ownerEmail" type="email" value={createForm.email} placeholder="merchant@gmail.com"
+                  onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
+                  className={inputCls} />
+              </div>
+
+              <div>
+                <label className={labelCls} htmlFor="ownerPhone">Phone Number</label>
+                <input id="ownerPhone" value={createForm.phone} placeholder="+855 12 345 678"
+                  onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
+                  className={inputCls} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls} htmlFor="ownerPassword">Password</label>
+                  <input id="ownerPassword" type="password" value={createForm.password} placeholder="Min 8 characters"
+                    onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
+                    className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls} htmlFor="ownerConfirmPassword">Confirm Password</label>
+                  <input id="ownerConfirmPassword" type="password" value={createForm.confirmPassword} placeholder="Re-type password"
+                    onChange={(e) => setCreateForm({ ...createForm, confirmPassword: e.target.value })}
+                    className={inputCls} />
+                </div>
+              </div>
+
+              {/* ── Business Info ── */}
+              <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">Business Details</p>
+
+              <div>
+                <label className={labelCls} htmlFor="bizName">Business Name</label>
+                <input id="bizName" value={createForm.businessName} placeholder="e.g. My Awesome Shop"
+                  onChange={(e) => setCreateForm({ ...createForm, businessName: e.target.value })}
+                  className={inputCls} />
+              </div>
+
+              <div>
+                <label className={labelCls} htmlFor="bizCategory">Business Type</label>
+                <select id="bizCategory" value={createForm.businessCategoryId}
+                  onChange={(e) => setCreateForm({ ...createForm, businessCategoryId: e.target.value })}
+                  className={inputCls}>
+                  {subCategories.map((sub) => (
+                    <option key={sub.id} value={sub.id}>{sub.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className={labelCls} htmlFor="bizAddress">Business Address</label>
+                <input id="bizAddress" value={createForm.businessAddress} placeholder="e.g. #123 St 456, Phnom Penh"
+                  onChange={(e) => setCreateForm({ ...createForm, businessAddress: e.target.value })}
+                  className={inputCls} />
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setCreateForm(null)}
+                className="rounded-full border border-neutral-300 dark:border-neutral-700 px-5 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={
+                  !createForm.firstName.trim() ||
+                  !createForm.lastName.trim() ||
+                  !createForm.email.trim() ||
+                  !createForm.phone.trim() ||
+                  !createForm.password.trim() ||
+                  createForm.password.length < 8 ||
+                  !createForm.confirmPassword.trim() ||
+                  !createForm.businessName.trim() ||
+                  !createForm.businessCategoryId.trim() ||
+                  !createForm.businessAddress.trim() ||
+                  createResult.isLoading
+                }
+                onClick={handleCreate}
+                className="rounded-full bg-green-700 px-5 py-2 text-sm font-medium text-white hover:bg-green-800 disabled:opacity-50"
+              >
+                {createResult.isLoading ? "Registering..." : "Register Business"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
+

@@ -228,3 +228,22 @@ export interface PlatformFeatureToggleRequest {
   enabled: boolean;
   reason?: string;
 }
+
+export interface SalesChannelResponse {
+  id: string;
+  name: string;
+  code: string;
+  isActive: boolean;
+}
+
+export interface CreateSalesChannelRequest {
+  name: string;
+  code: string;
+  isActive?: boolean;
+}
+
+export interface UpdateSalesChannelRequest {
+  name?: string;
+  code?: string;
+  isActive?: boolean;
+}

@@ -112,6 +112,11 @@ export const NAVIGATION: NavSection[] = [
       {
         label: "Channels",
         href: "/channels",
+        exact: true,
+      },
+      {
+        label: "Manage Channels",
+        href: "/channels/manage",
       },
     ],
   },

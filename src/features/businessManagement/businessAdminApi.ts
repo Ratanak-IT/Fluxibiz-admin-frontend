@@ -13,6 +13,9 @@ import type {
   PlatformFeatureResponse,
   PlatformFeatureToggleRequest,
   StatusActionRequest,
+  SalesChannelResponse,
+  CreateSalesChannelRequest,
+  UpdateSalesChannelRequest,
 } from "@/lib/types/adminTypes";
 
 const ADMIN = "/api/v1/admin";
@@ -171,8 +174,62 @@ export const businessAdminApi = baseApi.injectEndpoints({
       }),
       providesTags: ["AuditLog"],
     }),
+
+    getSalesChannels: builder.query<SalesChannelResponse[], void>({
+      query: () => "/api/v1/sales-channels",
+      providesTags: ["SalesChannel"],
+    }),
+
+    createSalesChannel: builder.mutation<SalesChannelResponse, CreateSalesChannelRequest>({
+      query: (body) => ({
+        url: "/api/v1/sales-channels",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["SalesChannel", "AuditLog"],
+    }),
+
+    updateSalesChannel: builder.mutation<SalesChannelResponse, { id: string } & UpdateSalesChannelRequest>({
+      query: ({ id, ...body }) => ({
+        url: `/api/v1/sales-channels/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["SalesChannel", "AuditLog"],
+    }),
+
+    deleteSalesChannel: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/api/v1/sales-channels/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["SalesChannel", "AuditLog"],
+    }),
+
+    createBusiness: builder.mutation<unknown, RegisterBusinessPayload>({
+      query: (body) => ({
+        url: "/api/v1/auth/register/business",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Business", "Dashboard", "AuditLog"],
+    }),
   }),
 });
+
+export interface RegisterBusinessPayload {
+  username: string;
+  password: string;
+  confirmPassword: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  gender: string;
+  businessName: string;
+  businessAddress: string;
+  businessCategoryId: string;
+}
 
 export const {
   useGetPlatformDashboardQuery,
@@ -195,4 +252,9 @@ export const {
   useCreateBusinessCategoryMutation,
   useUpdateBusinessCategoryMutation,
   useDeleteBusinessCategoryMutation,
+  useGetSalesChannelsQuery,
+  useCreateSalesChannelMutation,
+  useUpdateSalesChannelMutation,
+  useDeleteSalesChannelMutation,
+  useCreateBusinessMutation,
 } = businessAdminApi;

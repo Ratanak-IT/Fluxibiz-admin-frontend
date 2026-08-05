@@ -74,6 +74,7 @@ export const baseApi = createApi({
     "BusinessFeature",
     "PlatformFeature",
     "UserProfile",
+    "SalesChannel",
   ],
   endpoints: () => ({}),
 });
