@@ -44,7 +44,7 @@ export default function Sidebar({
       open ? "translate-x-0" : "invisible -translate-x-full"
     )}
   >
-    <div className="flex items-center justify-between px-6 pt-6 pb-8">
+    <div className="flex items-center justify-between px-6 pt-6 pb-8 dark:bg-background">
       <Link
         href="/apps"
         aria-label="FluxiBiz home"
@@ -76,7 +76,7 @@ export default function Sidebar({
 
     <nav
       aria-label={current?.app?.label ?? current?.label ?? "App"}
-      className="flex-1 overflow-y-auto px-4 pb-6"
+      className="flex-1 overflow-y-auto px-4 pb-6 dark:bg-background"
     >
       <Link
         href="/apps"

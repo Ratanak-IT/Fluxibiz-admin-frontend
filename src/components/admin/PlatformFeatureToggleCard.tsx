@@ -108,37 +108,41 @@ export function PlatformFeatureToggleCard() {
 
   return (
     <>
-      <section className="rounded-2xl border border-neutral-200 p-6 dark:border-neutral-800">
-        <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
-          Platform-wide features
-        </h2>
-        <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
-          Switching something off here takes it away from every business
-          immediately, no matter what that business&apos;s own feature toggle says.
-        </p>
+     <section className="rounded-2xl border border-border bg-card p-6">
+  <h2 className="text-sm font-semibold text-card-foreground">
+    Platform-wide features
+  </h2>
+  <p className="mt-1 text-xs text-muted-foreground">
+    Switching something off here takes it away from every business
+    immediately, no matter what that business&apos;s own feature toggle says.
+  </p>
 
-        {isLoading && (
-          <p className="mt-4 text-sm text-neutral-500 dark:text-neutral-400">Loading features...</p>
-        )}
+  {isLoading && (
+    <p className="mt-4 text-sm text-muted-foreground">
+      Loading features...
+    </p>
+  )}
 
-        {error && (
-          <p className="mt-4 text-sm text-red-600 dark:text-red-400">{errorMessage(error)}</p>
-        )}
+  {error && (
+    <p className="mt-4 text-sm text-destructive">
+      {errorMessage(error)}
+    </p>
+  )}
 
-        {!isLoading && !error && (
-          <ul className="mt-2 divide-y divide-neutral-100 dark:divide-neutral-800">
-            {features.map((feature) => (
-              <FeatureRow
-                key={feature.feature}
-                feature={feature}
-                busy={toggleState.isLoading}
-                onEnable={() => enable(feature)}
-                onDisable={() => setPending(feature)}
-              />
-            ))}
-          </ul>
-        )}
-      </section>
+  {!isLoading && !error && (
+    <ul className="mt-2 divide-y divide-border">
+      {features.map((feature) => (
+        <FeatureRow
+          key={feature.feature}
+          feature={feature}
+          busy={toggleState.isLoading}
+          onEnable={() => enable(feature)}
+          onDisable={() => setPending(feature)}
+        />
+      ))}
+    </ul>
+  )}
+</section>
 
       {pending && (
         <ReasonDialog
