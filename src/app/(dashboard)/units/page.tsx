@@ -11,6 +11,8 @@ import {
 } from "@/features/catalog/unitApi";
 import { UnitFormDialog } from "@/components/admin/UnitFormDialog";
 import type { UnitResponse, UnitUpsertRequest } from "@/lib/types/unitTypes";
+import { ColumnPicker } from "@/components/ui/ColumnPicker";
+import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 
 type DialogState = null | "new" | UnitResponse;
 
@@ -25,7 +27,16 @@ function errorMessage(error: unknown): string | undefined {
   return status ? `Request failed with status ${status}.` : "Request failed.";
 }
 
+const COLUMNS: ColumnDef[] = [
+  { id: "name", label: "Name" },
+  { id: "address", label: "Address" },
+  { id: "note", label: "Note" },
+  { id: "actions", label: "Actions", locked: true },
+];
+
 export default function UnitsPage() {
+  const cols = useColumnVisibility("units", COLUMNS);
+
   const [keyword, setKeyword] = useState("");
   const [dialog, setDialog] = useState<DialogState>(null);
 
@@ -101,23 +112,28 @@ export default function UnitsPage() {
         </button>
       </div>
 
-      <div className="relative mt-7 max-w-md">
-        <Search
-          className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-neutral-400"
-          aria-hidden
-        />
-        <input
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
-          placeholder="Search units"
-          aria-label="Search units"
-          className="w-full rounded-full border border-neutral-200 bg-white py-2.5 pl-11 pr-4 text-sm text-neutral-900 outline-none transition focus:border-green-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-50 dark:focus:border-green-500"
-        />
+      <div className="mt-7 flex flex-wrap items-center gap-3 justify-between">
+        <div className="relative max-w-md flex-1">
+          <Search
+            className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-neutral-400"
+            aria-hidden
+          />
+          <input
+            value={keyword}
+            onChange={(event) => setKeyword(event.target.value)}
+            placeholder="Search units"
+            aria-label="Search units"
+            className="w-full rounded-full border border-neutral-200 bg-white py-2.5 pl-11 pr-4 text-sm text-neutral-900 outline-none transition focus:border-green-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-50 dark:focus:border-green-500"
+          />
+        </div>
+
+        <ColumnPicker state={cols} />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[38rem] text-left">
+          <table className={`w-full text-left ${cols.tableClassName}`}
+            style={{ minWidth: cols.minWidthRem(38) }}>
             <thead className="bg-neutral-50 text-sm font-medium text-neutral-500 dark:bg-neutral-900/60 dark:text-neutral-400">
               <tr>
                 <th className="px-6 py-4">Name</th>

@@ -11,6 +11,9 @@ import {
 import { BusinessRowActions } from "@/components/admin/BusinessRowActions";
 import { Flag, StatusPill } from "@/components/admin/StatusPill";
 import type { BusinessOwnerStatus } from "@/lib/types/adminTypes";
+
+import { ColumnPicker } from "@/components/ui/ColumnPicker";
+import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 import { useInfiniteScroll } from "@/lib/hook/useInfiniteScroll";
 
 const STATUS_FILTERS: Array<{ label: string; value: BusinessOwnerStatus | "ALL" }> = [
@@ -18,6 +21,16 @@ const STATUS_FILTERS: Array<{ label: string; value: BusinessOwnerStatus | "ALL" 
   { label: "Active", value: "ACTIVE" },
   { label: "Suspended", value: "SUSPENDED" },
   { label: "Deleted", value: "DELETED" },
+];
+
+const COLUMNS: ColumnDef[] = [
+  { id: "business", label: "Business" },
+  { id: "category", label: "Category" },
+  { id: "city", label: "City" },
+  { id: "status", label: "Status" },
+  { id: "storefront", label: "Storefront" },
+  { id: "features", label: "Features" },
+  { id: "actions", label: "Actions", locked: true },
 ];
 
 const PAGE_SIZE = 20;
@@ -35,6 +48,7 @@ interface CreateFormState {
 }
 
 export default function BusinessesPage() {
+  const cols = useColumnVisibility("businesses", COLUMNS);
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<BusinessOwnerStatus | "ALL">("ALL");
   const [page, setPage] = useState(0);
@@ -181,10 +195,12 @@ export default function BusinessesPage() {
             </button>
           ))}
         </div>
+
+        <ColumnPicker state={cols} />
       </div>
 
       <div className="mt-6 overflow-visible rounded-2xl border border-neutral-200">
-        <table className="w-full text-left">
+        <table className={`w-full text-left ${cols.tableClassName}`}>
           <thead className="bg-neutral-50 text-sm font-semibold text-neutral-800">
             <tr>
               <th className="px-6 py-4">Business</th>

@@ -8,6 +8,8 @@ import {
   useGetPlatformFeaturesQuery,
 } from "@/features/businessManagement/businessAdminApi";
 import type { BusinessChannelResponse } from "@/lib/types/adminTypes";
+import { ColumnPicker } from "@/components/ui/ColumnPicker";
+import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 
 type Filter = "all" | "storefront" | "telegram" | "bakong" | "none";
 
@@ -50,7 +52,17 @@ function errorMessage(error: unknown): string {
   return status ? `Request failed with status ${status}.` : "Request failed.";
 }
 
+const COLUMNS: ColumnDef[] = [
+  { id: "shop", label: "Shop" },
+  { id: "storefront", label: "Storefront" },
+  { id: "telegram", label: "Telegram" },
+  { id: "khqr", label: "KHQR" },
+  { id: "registered", label: "Registered" },
+];
+
 export default function ChannelsPage() {
+  const cols = useColumnVisibility("channels", COLUMNS);
+
   const [keyword, setKeyword] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -132,11 +144,14 @@ export default function ChannelsPage() {
             </button>
           ))}
         </div>
+
+        <ColumnPicker state={cols} />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[52rem] text-left">
+          <table className={`w-full text-left ${cols.tableClassName}`}
+            style={{ minWidth: cols.minWidthRem(52) }}>
             <thead className="bg-neutral-50 text-sm font-medium text-neutral-500 dark:bg-neutral-900/60 dark:text-neutral-400">
               <tr>
                 <th className="px-6 py-4">Shop</th>

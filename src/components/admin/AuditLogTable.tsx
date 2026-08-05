@@ -4,8 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, X } from "lucide-react";
 import { useGetAuditLogsInfiniteQuery } from "@/features/businessManagement/businessAdminApi";
-
 import type { AdminActionType } from "@/lib/types/adminTypes";
+import { ColumnPicker } from "@/components/ui/ColumnPicker";
+import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 import { useInfiniteScroll } from "@/lib/hook/useInfiniteScroll";
 
 const ACTION_LABELS: Record<AdminActionType, string> = {
@@ -28,7 +29,6 @@ const ACTION_LABELS: Record<AdminActionType, string> = {
 
 type TargetType = "BUSINESS" | "BUSINESS_CATEGORY" | "UNIT" | "BUSINESS_FEATURE";
 
-
 const ACTIONS_BY_TARGET: Record<TargetType, AdminActionType[]> = {
   BUSINESS: [
     "BUSINESS_ACTIVATED",
@@ -49,6 +49,15 @@ const ACTIONS_BY_TARGET: Record<TargetType, AdminActionType[]> = {
 };
 
 const ALL_ACTIONS = Object.values(ACTIONS_BY_TARGET).flat();
+
+const COLUMNS: ColumnDef[] = [
+  { id: "when", label: "When" },
+  { id: "administrator", label: "Administrator" },
+  { id: "action", label: "Action" },
+  { id: "target", label: "Target" },
+  { id: "change", label: "Change" },
+  { id: "reason", label: "Reason" },
+];
 
 const PAGE_SIZE = 25;
 const SEARCH_DEBOUNCE_MS = 350;
@@ -72,6 +81,8 @@ export function AuditLogTable({
   breadcrumb: string;
   targetType?: "BUSINESS" | "BUSINESS_CATEGORY" | "UNIT";
 }) {
+  const cols = useColumnVisibility(`audit-log:${targetType ?? "all"}`, COLUMNS);
+
   const [keywordInput, setKeywordInput] = useState("");
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
 
@@ -183,11 +194,14 @@ export function AuditLogTable({
             Clear
           </button>
         )}
+
+        <ColumnPicker state={cols} />
       </div>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-border">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[72rem] text-left">
+          <table className={`w-full text-left ${cols.tableClassName}`}
+            style={{ minWidth: cols.minWidthRem(72) }}>
             <thead className="bg-muted/60 text-sm font-semibold text-foreground">
               <tr>
                 <th className="px-6 py-4">When</th>
@@ -248,7 +262,6 @@ export function AuditLogTable({
         </div>
       </div>
 
-      {/* scroll sentinel + status footer */}
       <div ref={sentinelRef} className="mt-5 flex flex-col items-center gap-3 py-6 text-sm">
         {isFetching && !isLoading && (
           <span className="text-muted-foreground">Loading more entries...</span>
