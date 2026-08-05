@@ -39,7 +39,7 @@ export default function AppShell({
   }
 
   return (
-    <div className="min-h-dvh bg-[#e8e8e6] lg:p-4">
+    <div className="min-h-dvh bg-background lg:p-4">
       <a
         href="#main-content"
         className="sr-only rounded-lg bg-white px-4 py-2 text-[14px] text-[#16181c] focus:not-sr-only focus:absolute focus:top-6 focus:left-6 focus:z-50"
@@ -56,7 +56,7 @@ export default function AppShell({
             onOpenNav={() => setNavOpen(true)}
           />
 
-          <main id="main-content" className="flex-1 px-5 pb-8 lg:px-8">
+          <main id="main-content" className="flex-1 px-5 pb-8 lg:px-8 dark:bg-background">
             {children}
           </main>
         </div>

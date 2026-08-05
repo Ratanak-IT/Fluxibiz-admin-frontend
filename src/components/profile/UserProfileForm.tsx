@@ -116,7 +116,7 @@ function Field({
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-2">
-      <label htmlFor={name} className="text-sm font-semibold text-[#424841]">
+      <label htmlFor={name} className="text-sm font-semibold text-[#424841] dark:text-muted-foreground">
         {label}
       </label>
       {children}
@@ -139,19 +139,19 @@ function AccountDetail({
   value?: string;
 }) {
   return (
-    <div className="flex gap-3 rounded-xl bg-[#f6f8f5] p-4">
-      <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-[#00932a]/10 text-[#00932a]">
-        {icon}
-      </span>
-      <div className="min-w-0">
-        <p className="text-xs font-medium uppercase tracking-wide text-[#6b7569]">
-          {label}
-        </p>
-        <p className="mt-1 truncate text-sm font-semibold text-[#1a222b]">
-          {value || "Not available"}
-        </p>
-      </div>
-    </div>
+    <div className="flex gap-3 rounded-xl bg-[#f6f8f5] p-4 dark:bg-muted">
+  <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-[#00932a]/10 text-[#00932a]">
+    {icon}
+  </span>
+  <div className="min-w-0">
+    <p className="text-xs font-medium uppercase tracking-wide text-[#6b7569] dark:text-muted-foreground">
+      {label}
+    </p>
+    <p className="mt-1 truncate text-sm font-semibold text-[#1a222b] dark:text-foreground">
+      {value || "Not available"}
+    </p>
+  </div>
+</div>
   );
 }
 
@@ -277,247 +277,247 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-      <aside className="flex flex-col gap-5">
-        <section className="rounded-2xl border border-[#e4eae2] bg-white p-6 text-center shadow-sm">
-          <ImagePicker
-            rules={profilePictureRules}
-            disabled={isSaving}
-            error={picture.error}
-            busy={isSaving && Boolean(picture.file)}
-            previewShape="circle"
-            label="Profile picture"
-            onPick={handlePicturePick}
-            onError={picture.setError}
-            preview={
-              <span className="relative flex size-28 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[linear-gradient(145deg,#dff5e2,#b9e5bf)] text-3xl font-bold text-[#00932a] shadow-md">
-                {picture.preview ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={picture.preview}
-                    alt={`${profileName} profile`}
-                    className="size-full object-cover"
-                  />
-                ) : (
-                  getInitials(firstName, lastName, profile.username)
-                )}
-                <span className="absolute right-0 bottom-0 grid size-9 place-items-center rounded-full border-2 border-white bg-[#00932a] text-white shadow-md">
-                  <Camera className="size-4" aria-hidden="true" />
-                </span>
-              </span>
-            }
-            actions={
-              picture.file ? (
-                <button
-                  type="button"
-                  disabled={isSaving}
-                  onClick={() => {
-                    picture.reset();
-                    setPictureNote(null);
-                  }}
-                  className="px-0 text-xs text-[#6b7569] underline hover:text-[#1a222b]"
-                >
-                  Undo
-                </button>
-              ) : storedPicture ? (
-                <button
-                  type="button"
-                  disabled={isSaving || isRemovingPicture}
-                  onClick={handlePictureRemove}
-                  className="px-0 text-xs text-[#6b7569] underline hover:text-[#d14341]"
-                >
-                  {isRemovingPicture ? "Removing…" : "Remove photo"}
-                </button>
-              ) : null
-            }
-          />
-
-          <h2 className="mt-4 text-xl font-bold text-[#161d16]">
-            {profileName}
-          </h2>
-          <p className="mt-1 text-sm text-[#657064]">
-            {profile.role || "Super Admin"}
-          </p>
-          <div className="min-h-4" aria-live="polite">
-            {pictureNote ? (
-              <p className="mt-2 text-xs text-[#00932a]" role="status">
-                {pictureNote}
-              </p>
-            ) : null}
-          </div>
-        </section>
-
-        <section className="rounded-2xl border border-[#e4eae2] bg-white p-5 shadow-sm">
-          <h2 className="text-base font-bold text-[#16181c]">
-            Account information
-          </h2>
-          <p className="mt-1 text-sm text-[#6b7569]">
-            These details are managed by your Keycloak account provider.
-          </p>
-          <div className="mt-4 flex flex-col gap-3">
-            <AccountDetail
-              icon={<AtSign className="size-4" />}
-              label="Username"
-              value={profile.username}
-            />
-            <AccountDetail
-              icon={<Mail className="size-4" />}
-              label="Email"
-              value={profile.email}
-            />
-            <AccountDetail
-              icon={<BadgeCheck className="size-4" />}
-              label="Role"
-              value={profile.role || "Super Admin"}
-            />
-          </div>
-        </section>
-      </aside>
-
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit}
-        noValidate
-        className="rounded-2xl border border-[#e4eae2] bg-white p-5 shadow-sm sm:p-7"
-      >
-        <div className="flex items-start gap-3 border-b border-[#edf0ec] pb-5">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#00932a]/10 text-[#00932a]">
-            <UserRound className="size-5" />
-          </span>
-          <div>
-            <h2 className="text-lg font-bold text-[#16181c]">
-              Personal details
-            </h2>
-            <p className="mt-1 text-sm text-[#657064]">
-              Keep your contact and profile information current.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-5 md:grid-cols-2">
-          <Field
-            label="First name"
-            name="firstName"
-            error={fieldErrors.firstName}
-          >
-            <input
-              id="firstName"
-              name="firstName"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              maxLength={255}
-              autoComplete="given-name"
-              className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white px-4 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25"
-            />
-          </Field>
-
-          <Field
-            label="Last name"
-            name="lastName"
-            error={fieldErrors.lastName}
-          >
-            <input
-              id="lastName"
-              name="lastName"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              maxLength={255}
-              autoComplete="family-name"
-              className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white px-4 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25"
-            />
-          </Field>
-
-          <Field
-            label="Phone number"
-            name="phoneNumber"
-            error={fieldErrors.phoneNumber}
-          >
-            <div className="relative">
-              <Phone className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-[#7a8478]" />
-              <input
-                id="phoneNumber"
-                name="phoneNumber"
-                type="tel"
-                defaultValue={profile.phoneNumber || ""}
-                maxLength={30}
-                autoComplete="tel"
-                className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white pr-4 pl-11 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25"
+   <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
+  <aside className="flex flex-col gap-5">
+    <section className="rounded-2xl border border-[#e4eae2] bg-white p-6 text-center shadow-sm dark:border-border dark:bg-card">
+      <ImagePicker
+        rules={profilePictureRules}
+        disabled={isSaving}
+        error={picture.error}
+        busy={isSaving && Boolean(picture.file)}
+        previewShape="circle"
+        label="Profile picture"
+        onPick={handlePicturePick}
+        onError={picture.setError}
+        preview={
+          <span className="relative flex size-28 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[linear-gradient(145deg,#dff5e2,#b9e5bf)] text-3xl font-bold text-[#00932a] shadow-md dark:border-card dark:bg-[linear-gradient(145deg,#0f2818,#163d21)]">
+            {picture.preview ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={picture.preview}
+                alt={`${profileName} profile`}
+                className="size-full object-cover"
               />
-            </div>
-          </Field>
-
-          <Field
-            label="Gender"
-            name="gender"
-            error={fieldErrors.gender}
-          >
-            <select
-              id="gender"
-              name="gender"
-              defaultValue={initialGender}
-              className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white px-4 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25"
+            ) : (
+              getInitials(firstName, lastName, profile.username)
+            )}
+            <span className="absolute right-0 bottom-0 grid size-9 place-items-center rounded-full border-2 border-white bg-[#00932a] text-white shadow-md dark:border-card">
+              <Camera className="size-4" aria-hidden="true" />
+            </span>
+          </span>
+        }
+        actions={
+          picture.file ? (
+            <button
+              type="button"
+              disabled={isSaving}
+              onClick={() => {
+                picture.reset();
+                setPictureNote(null);
+              }}
+              className="px-0 text-xs text-[#6b7569] underline hover:text-[#1a222b] dark:text-muted-foreground dark:hover:text-foreground"
             >
-              {userProfileGenders.map((gender) => (
-                <option key={gender} value={gender}>
-                  {genderLabels[gender]}
-                </option>
-              ))}
-            </select>
-          </Field>
-
-          <div className="md:col-span-2">
-            <Field
-              label="Address"
-              name="address"
-              error={fieldErrors.address}
+              Undo
+            </button>
+          ) : storedPicture ? (
+            <button
+              type="button"
+              disabled={isSaving || isRemovingPicture}
+              onClick={handlePictureRemove}
+              className="px-0 text-xs text-[#6b7569] underline hover:text-[#d14341] dark:text-muted-foreground dark:hover:text-red-400"
             >
-              <div className="relative">
-                <MapPin className="pointer-events-none absolute top-4 left-4 size-4 text-[#7a8478]" />
-                <textarea
-                  id="address"
-                  name="address"
-                  defaultValue={profile.address || ""}
-                  rows={3}
-                  autoComplete="street-address"
-                  className="w-full min-h-28 rounded-xl border border-[#e2e2de] bg-white py-3 pr-4 pl-11 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25"
-                />
-              </div>
-            </Field>
-          </div>
-        </div>
+              {isRemovingPicture ? "Removing…" : "Remove photo"}
+            </button>
+          ) : null
+        }
+      />
 
-        <div className="mt-8 flex flex-col gap-4 border-t border-[#edf0ec] pt-6 sm:flex-row sm:items-center">
-          <div className="min-h-5 flex-1 text-sm" aria-live="polite">
-            {status ? (
-              <p
-                className={
-                  status.type === "success"
-                    ? "text-[#00932a]"
-                    : "text-[#d14341]"
-                }
-              >
-                {status.message}
-              </p>
-            ) : null}
-          </div>
-          <button
-            type="button"
-            onClick={handleCancel}
-            disabled={isSaving}
-            className="h-11 rounded-xl border border-[#e2e2de] bg-white px-6 text-sm font-semibold text-[#16181c] transition-colors hover:bg-black/5"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="h-11 rounded-xl bg-[#00932a] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#00932a]/90 disabled:opacity-60"
-          >
-            {isSaving ? "Saving…" : "Save changes"}
-          </button>
-        </div>
-      </form>
+      <h2 className="mt-4 text-xl font-bold text-[#161d16] dark:text-foreground">
+        {profileName}
+      </h2>
+      <p className="mt-1 text-sm text-[#657064] dark:text-muted-foreground">
+        {profile.role || "Super Admin"}
+      </p>
+      <div className="min-h-4" aria-live="polite">
+        {pictureNote ? (
+          <p className="mt-2 text-xs text-[#00932a]" role="status">
+            {pictureNote}
+          </p>
+        ) : null}
+      </div>
+    </section>
+
+    <section className="rounded-2xl border border-[#e4eae2] bg-white p-5 shadow-sm dark:border-border dark:bg-card">
+      <h2 className="text-base font-bold text-[#16181c] dark:text-foreground">
+        Account information
+      </h2>
+      <p className="mt-1 text-sm text-[#6b7569] dark:text-muted-foreground">
+        These details are managed by your Keycloak account provider.
+      </p>
+      <div className="mt-4 flex flex-col gap-3">
+        <AccountDetail
+          icon={<AtSign className="size-4" />}
+          label="Username"
+          value={profile.username}
+        />
+        <AccountDetail
+          icon={<Mail className="size-4" />}
+          label="Email"
+          value={profile.email}
+        />
+        <AccountDetail
+          icon={<BadgeCheck className="size-4" />}
+          label="Role"
+          value={profile.role || "Super Admin"}
+        />
+      </div>
+    </section>
+  </aside>
+
+  <form
+    ref={formRef}
+    onSubmit={handleSubmit}
+    noValidate
+    className="rounded-2xl border border-[#e4eae2] bg-white p-5 shadow-sm sm:p-7 dark:border-border dark:bg-card"
+  >
+    <div className="flex items-start gap-3 border-b border-[#edf0ec] pb-5 dark:border-border">
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#00932a]/10 text-[#00932a]">
+        <UserRound className="size-5" />
+      </span>
+      <div>
+        <h2 className="text-lg font-bold text-[#16181c] dark:text-foreground">
+          Personal details
+        </h2>
+        <p className="mt-1 text-sm text-[#657064] dark:text-muted-foreground">
+          Keep your contact and profile information current.
+        </p>
+      </div>
     </div>
+
+    <div className="mt-6 grid gap-5 md:grid-cols-2">
+      <Field
+        label="First name"
+        name="firstName"
+        error={fieldErrors.firstName}
+      >
+        <input
+          id="firstName"
+          name="firstName"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          maxLength={255}
+          autoComplete="given-name"
+          className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white px-4 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25 dark:border-input dark:bg-card dark:text-foreground"
+        />
+      </Field>
+
+      <Field
+        label="Last name"
+        name="lastName"
+        error={fieldErrors.lastName}
+      >
+        <input
+          id="lastName"
+          name="lastName"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          maxLength={255}
+          autoComplete="family-name"
+          className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white px-4 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25 dark:border-input dark:bg-card dark:text-foreground"
+        />
+      </Field>
+
+      <Field
+        label="Phone number"
+        name="phoneNumber"
+        error={fieldErrors.phoneNumber}
+      >
+        <div className="relative">
+          <Phone className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-[#7a8478] dark:text-muted-foreground" />
+          <input
+            id="phoneNumber"
+            name="phoneNumber"
+            type="tel"
+            defaultValue={profile.phoneNumber || ""}
+            maxLength={30}
+            autoComplete="tel"
+            className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white pr-4 pl-11 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25 dark:border-input dark:bg-card dark:text-foreground"
+          />
+        </div>
+      </Field>
+
+      <Field
+        label="Gender"
+        name="gender"
+        error={fieldErrors.gender}
+      >
+        <select
+          id="gender"
+          name="gender"
+          defaultValue={initialGender}
+          className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white px-4 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25 dark:border-input dark:bg-card dark:text-foreground"
+        >
+          {userProfileGenders.map((gender) => (
+            <option key={gender} value={gender}>
+              {genderLabels[gender]}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      <div className="md:col-span-2">
+        <Field
+          label="Address"
+          name="address"
+          error={fieldErrors.address}
+        >
+          <div className="relative">
+            <MapPin className="pointer-events-none absolute top-4 left-4 size-4 text-[#7a8478] dark:text-muted-foreground" />
+            <textarea
+              id="address"
+              name="address"
+              defaultValue={profile.address || ""}
+              rows={3}
+              autoComplete="street-address"
+              className="w-full min-h-28 rounded-xl border border-[#e2e2de] bg-white py-3 pr-4 pl-11 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25 dark:border-input dark:bg-card dark:text-foreground"
+            />
+          </div>
+        </Field>
+      </div>
+    </div>
+
+    <div className="mt-8 flex flex-col gap-4 border-t border-[#edf0ec] pt-6 sm:flex-row sm:items-center dark:border-border">
+      <div className="min-h-5 flex-1 text-sm" aria-live="polite">
+        {status ? (
+          <p
+            className={
+              status.type === "success"
+                ? "text-[#00932a]"
+                : "text-[#d14341] dark:text-red-400"
+            }
+          >
+            {status.message}
+          </p>
+        ) : null}
+      </div>
+      <button
+        type="button"
+        onClick={handleCancel}
+        disabled={isSaving}
+        className="h-11 rounded-xl border border-[#e2e2de] bg-white px-6 text-sm font-semibold text-[#16181c] transition-colors hover:bg-black/5 dark:border-input dark:bg-card dark:text-foreground dark:hover:bg-accent"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        disabled={isSaving}
+        className="h-11 rounded-xl bg-[#00932a] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#00932a]/90 disabled:opacity-60"
+      >
+        {isSaving ? "Saving…" : "Save changes"}
+      </button>
+    </div>
+  </form>
+</div>
   );
 }
 

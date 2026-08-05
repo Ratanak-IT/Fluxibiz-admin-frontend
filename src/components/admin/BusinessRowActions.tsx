@@ -85,45 +85,45 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
         </button>
 
         {open && (
-          <>
-            <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-            <div className="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-xl border border-border bg-white py-1 shadow-lg">
-              {business.status !== "ACTIVE" &&
-                item("Activate", async () => {
-                  await activate(business.id);
-                  setOpen(false);
-                })}
+        <>
+  <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+  <div className="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-xl border border-border bg-white py-1 shadow-lg dark:bg-popover">
+    {business.status !== "ACTIVE" &&
+      item("Activate", async () => {
+        await activate(business.id);
+        setOpen(false);
+      })}
 
-              {business.status === "ACTIVE" && item("Suspend", () => setDialog("suspend"))}
+    {business.status === "ACTIVE" && item("Suspend", () => setDialog("suspend"))}
 
-              {business.isEnabled
-                ? item("Disable features", () => setDialog("disable"))
-                : item("Enable features", async () => {
-                    await enable(business.id);
-                    setOpen(false);
-                  })}
+    {business.isEnabled
+      ? item("Disable features", () => setDialog("disable"))
+      : item("Enable features", async () => {
+          await enable(business.id);
+          setOpen(false);
+        })}
 
-              {business.isClosed
-                ? item("Reopen shop", async () => {
-                    await reopen(business.id);
-                    setOpen(false);
-                  })
-                : item("Close shop", () => setDialog("close"))}
+    {business.isClosed
+      ? item("Reopen shop", async () => {
+          await reopen(business.id);
+          setOpen(false);
+        })
+      : item("Close shop", () => setDialog("close"))}
 
-              <div className="my-1 h-px bg-muted" />
+    <div className="my-1 h-px bg-muted" />
 
-              {item(
- "Delete",
-                async () => {
-                  if (confirm(`Delete ${business.name}? This marks the account as deleted.`)) {
-                    await remove(business.id);
-                  }
-                  setOpen(false);
-                },
-                true,
-              )}
-            </div>
-          </>
+    {item(
+      "Delete",
+      async () => {
+        if (confirm(`Delete ${business.name}? This marks the account as deleted.`)) {
+          await remove(business.id);
+        }
+        setOpen(false);
+      },
+      true,
+    )}
+  </div>
+</>
         )}
       </div>
 

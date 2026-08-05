@@ -179,61 +179,61 @@ export function ImagePicker({
   });
 
   return (
-    <div className={cn("flex flex-col items-center gap-2", className)}>
-      <label
-        {...dropProps}
-        className={cn(
-          "group relative flex w-full cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-[#e4eae2] bg-white px-5 py-6 text-center outline-none transition-colors focus-within:border-[#00932a] hover:border-[#00932a]/50",
-          isOver && "border-[#00932a] bg-[#f5f8f4]",
-          disabled && "cursor-not-allowed opacity-60"
-        )}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept={rules.accept}
-          disabled={disabled}
-          className="sr-only"
-          onChange={(event) => {
-            const files = Array.from(event.target.files || []);
-            event.target.value = "";
-            handleFiles(files);
-          }}
-        />
+   <div className={cn("flex flex-col items-center gap-2", className)}>
+  <label
+    {...dropProps}
+    className={cn(
+      "group relative flex w-full cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-[#e4eae2] bg-white px-5 py-6 text-center outline-none transition-colors focus-within:border-[#00932a] hover:border-[#00932a]/50 dark:border-input dark:bg-card dark:hover:border-primary/50",
+      isOver && "border-[#00932a] bg-[#f5f8f4] dark:bg-primary/10",
+      disabled && "cursor-not-allowed opacity-60"
+    )}
+  >
+    <input
+      ref={inputRef}
+      type="file"
+      accept={rules.accept}
+      disabled={disabled}
+      className="sr-only"
+      onChange={(event) => {
+        const files = Array.from(event.target.files || []);
+        event.target.value = "";
+        handleFiles(files);
+      }}
+    />
 
-        <span className="relative">
-          {preview}
-          {busy ? (
-            <span
-              className={cn(
-                "absolute inset-0 grid place-items-center bg-white/70 text-xs font-semibold text-[#00932a]",
-                previewShape === "circle" ? "rounded-full" : "rounded-xl"
-              )}
-            >
-              Uploading…
-            </span>
-          ) : null}
+    <span className="relative">
+      {preview}
+      {busy ? (
+        <span
+          className={cn(
+            "absolute inset-0 grid place-items-center bg-white/70 text-xs font-semibold text-[#00932a] dark:bg-card/80",
+            previewShape === "circle" ? "rounded-full" : "rounded-xl"
+          )}
+        >
+          Uploading…
         </span>
-
-        <span className="text-base font-bold leading-6 text-[#1a222b]">
-          {label}
-        </span>
-        <span className="max-w-[220px] text-[11px] leading-[16.5px] text-[#424841]">
-          Drag and drop, or click to browse. {hint || rules.hint}
-        </span>
-      </label>
-
-      {actions ? (
-        <div className="flex items-center justify-center gap-3">{actions}</div>
       ) : null}
+    </span>
 
-      <div className="min-h-4" aria-live="polite">
-        {error ? (
-          <p className="text-xs text-[#d14341]" role="alert">
-            {error}
-          </p>
-        ) : null}
-      </div>
-    </div>
+    <span className="text-base font-bold leading-6 text-[#1a222b] dark:text-foreground">
+      {label}
+    </span>
+    <span className="max-w-[220px] text-[11px] leading-[16.5px] text-[#424841] dark:text-muted-foreground">
+      Drag and drop, or click to browse. {hint || rules.hint}
+    </span>
+  </label>
+
+  {actions ? (
+    <div className="flex items-center justify-center gap-3">{actions}</div>
+  ) : null}
+
+  <div className="min-h-4" aria-live="polite">
+    {error ? (
+      <p className="text-xs text-[#d14341] dark:text-red-400" role="alert">
+        {error}
+      </p>
+    ) : null}
+  </div>
+</div>
   );
 }
