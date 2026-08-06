@@ -49,8 +49,8 @@ export default function CategoriesPage() {
   };
 
   return (
-  <main className="px-4 py-6 sm:px-8 sm:py-7 bg-[var(--background)] text-[var(--foreground)]">
-  <nav className="mb-6 text-[15px] text-neutral-400 dark:text-[var(--muted-foreground)]">
+  <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7 bg-[var(--background)] text-[var(--foreground)]">
+  <nav className="mb-6 text-sm sm:text-[15px] text-neutral-400 dark:text-[var(--muted-foreground)]">
     <Link href="/dashboard" className="hover:text-neutral-600 dark:hover:text-[var(--foreground)]">
       Dashboard
     </Link>
@@ -58,10 +58,10 @@ export default function CategoriesPage() {
     <span className="text-neutral-700 dark:text-[var(--foreground)]">Categories</span>
   </nav>
 
-  <div className="flex items-start justify-between">
+  <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div>
-      <h1 className="text-3xl font-bold text-neutral-900 dark:text-[var(--foreground)]">Categories</h1>
-      <p className="mt-1 text-[15px] text-neutral-500 dark:text-[var(--muted-foreground)]">
+      <h1 className="text-2xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-[var(--foreground)]">Categories</h1>
+      <p className="mt-1 text-sm sm:text-[15px] text-neutral-500 dark:text-[var(--muted-foreground)]">
         The list shop owners pick from when they set up their business.
       </p>
     </div>
@@ -69,7 +69,7 @@ export default function CategoriesPage() {
     <button
       type="button"
       onClick={() => setEditor({ mode: "create", name: "", parentId: null })}
-      className="flex items-center gap-2 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] px-5 py-2.5 text-sm font-medium transition hover:opacity-90"
+      className="flex items-center justify-center gap-2 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] px-5 py-2.5 text-sm font-medium transition hover:opacity-90 w-full sm:w-auto"
     >
       <Plus className="size-4" />
       Add category
@@ -92,13 +92,13 @@ export default function CategoriesPage() {
   <div className="mt-7 space-y-3">
     {categories.map((parent) => (
       <div key={parent.id} className="rounded-2xl border border-neutral-200 dark:border-[var(--border)] dark:bg-[var(--card)]">
-        <div className="flex items-center justify-between px-5 py-4">
-          <div>
-            <span className="font-medium text-neutral-900 dark:text-[var(--card-foreground)]">{parent.name}</span>
+        <div className="flex items-center justify-between gap-2 px-4 py-3 sm:px-5 sm:py-4">
+          <div className="min-w-0">
+            <span className="font-medium text-neutral-900 dark:text-[var(--card-foreground)] break-words">{parent.name}</span>
             <span className="ml-2 text-xs text-neutral-400 dark:text-[var(--muted-foreground)]">/{parent.slug}</span>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center gap-1">
             <button
               type="button"
               title="Add sub category"
@@ -133,14 +133,14 @@ export default function CategoriesPage() {
             {parent.subCategories.map((child) => (
               <li
                 key={child.id}
-                className="flex items-center justify-between px-5 py-3 pl-10 text-sm"
+                className="flex items-center justify-between gap-2 px-4 py-3 pl-6 sm:px-5 sm:pl-8 lg:pl-10 text-sm"
               >
-                <span className="flex items-center gap-2 text-neutral-700 dark:text-[var(--card-foreground)]">
-                  <ChevronRight className="size-3.5 text-neutral-300 dark:text-[var(--muted-foreground)]" aria-hidden />
-                  {child.name}
+                <span className="flex min-w-0 items-center gap-2 text-neutral-700 dark:text-[var(--card-foreground)]">
+                  <ChevronRight className="size-3.5 shrink-0 text-neutral-300 dark:text-[var(--muted-foreground)]" aria-hidden />
+                  <span className="break-words">{child.name}</span>
                 </span>
 
-                <div className="flex items-center gap-1">
+                <div className="flex shrink-0 items-center gap-1">
                   <button
                     type="button"
                     title="Rename"
@@ -175,8 +175,8 @@ export default function CategoriesPage() {
 
   {editor && (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-popover text-popover-foreground p-6 shadow-xl border border-transparent dark:border-border">
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-popover-foreground">
+      <div className="w-full max-w-sm sm:max-w-md rounded-2xl bg-white dark:bg-popover text-popover-foreground p-5 sm:p-6 shadow-xl border border-transparent dark:border-border">
+        <h2 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-popover-foreground">
           {editor.mode === "create"
             ? editor.parentId
               ? "New sub category"
@@ -199,7 +199,7 @@ export default function CategoriesPage() {
           The web address is generated from the name.
         </p>
 
-        <div className="mt-6 flex justify-end gap-2">
+        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={() => setEditor(null)}

@@ -11,6 +11,8 @@ import {
 } from "@/features/catalog/unitApi";
 import { UnitFormDialog } from "@/components/admin/UnitFormDialog";
 import type { UnitResponse, UnitUpsertRequest } from "@/lib/types/unitTypes";
+import { ColumnPicker } from "@/components/ui/ColumnPicker";
+import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 
 type DialogState = null | "new" | UnitResponse;
 
@@ -25,7 +27,16 @@ function errorMessage(error: unknown): string | undefined {
   return status ? `Request failed with status ${status}.` : "Request failed.";
 }
 
+const COLUMNS: ColumnDef[] = [
+  { id: "name", label: "Name" },
+  { id: "address", label: "Address" },
+  { id: "note", label: "Note" },
+  { id: "actions", label: "Actions", locked: true },
+];
+
 export default function UnitsPage() {
+  const cols = useColumnVisibility("units", COLUMNS);
+
   const [keyword, setKeyword] = useState("");
   const [dialog, setDialog] = useState<DialogState>(null);
 
@@ -69,7 +80,7 @@ export default function UnitsPage() {
   };
 
   return (
-    <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8 bg-background text-foreground">
+    <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
   <nav aria-label="Breadcrumb" className="mb-5 text-sm">
     <Link
       href="/dashboard"
@@ -81,9 +92,9 @@ export default function UnitsPage() {
     <span className="text-foreground">Units</span>
   </nav>
 
-  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+  <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div>
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+      <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
         Units
       </h1>
       <p className="mt-1.5 text-sm text-muted-foreground sm:text-[15px]">
@@ -94,50 +105,57 @@ export default function UnitsPage() {
     <button
       type="button"
       onClick={() => setDialog("new")}
-      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+      className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 sm:w-auto"
     >
       <Plus className="size-4" />
       Add unit
     </button>
   </div>
 
-  <div className="relative mt-7 max-w-md">
-    <Search
-      className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-      aria-hidden
-    />
-    <input
-      value={keyword}
-      onChange={(event) => setKeyword(event.target.value)}
-      placeholder="Search units"
-      aria-label="Search units"
-      className="w-full rounded-full border border-input bg-card py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-ring"
-    />
-  </div>
+      <div className="mt-7 flex items-center gap-2 sm:gap-3 lg:flex-wrap lg:justify-between">
+        <div className="relative min-w-0 flex-1 lg:max-w-md">
+          <Search
+            className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            value={keyword}
+            onChange={(event) => setKeyword(event.target.value)}
+            placeholder="Search units"
+            aria-label="Search units"
+            className="w-full rounded-full border border-border bg-background py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary"
+          />
+        </div>
 
-  <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[38rem] text-left">
-        <thead className="bg-muted text-sm font-medium text-muted-foreground">
-          <tr>
-            <th className="px-6 py-4">Name</th>
-            <th className="px-6 py-4">Address</th>
-            <th className="px-6 py-4">Note</th>
-            <th className="w-24 px-4 py-4" />
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border text-sm">
-          {isLoading && (
-            <tr>
-              <td colSpan={4} className="px-6 py-14 text-center text-muted-foreground">
-                Loading units...
-              </td>
-            </tr>
-          )}
+        <div className="shrink-0">
+          <ColumnPicker state={cols} />
+        </div>
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="overflow-x-auto">
+          <table className={`w-full text-left ${cols.tableClassName}`}
+            style={{ minWidth: cols.minWidthRem(38) }}>
+            <thead className="bg-muted text-sm font-medium text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 sm:px-6 sm:py-4">Name</th>
+                <th className="px-4 py-3 sm:px-6 sm:py-4">Address</th>
+                <th className="px-4 py-3 sm:px-6 sm:py-4">Note</th>
+                <th className="w-20 px-3 py-3 sm:w-24 sm:px-4 sm:py-4" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border text-sm">
+              {isLoading && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-12 text-center text-muted-foreground sm:px-6 sm:py-14">
+                    Loading units...
+                  </td>
+                </tr>
+              )}
 
           {error && !isLoading && (
             <tr>
-              <td colSpan={4} className="px-6 py-14 text-center text-destructive">
+              <td colSpan={4} className="px-4 py-12 text-center text-destructive sm:px-6 sm:py-14">
                 {errorMessage(error)}
               </td>
             </tr>
@@ -145,7 +163,7 @@ export default function UnitsPage() {
 
           {!isLoading && !error && visibleUnits.length === 0 && (
             <tr>
-              <td colSpan={4} className="px-6 py-14 text-center text-muted-foreground">
+              <td colSpan={4} className="px-4 py-12 text-center text-muted-foreground sm:px-6 sm:py-14">
                 {keyword ? "No unit matches that search." : "No unit yet. Add the first one."}
               </td>
             </tr>
@@ -156,14 +174,14 @@ export default function UnitsPage() {
               key={unit.id}
               className="transition hover:bg-accent"
             >
-              <td className="px-6 py-4 font-medium text-card-foreground">
+              <td className="px-4 py-3 font-medium text-card-foreground sm:px-6 sm:py-4">
                 {unit.name}
               </td>
-              <td className="px-6 py-4 text-muted-foreground">/{unit.slug}</td>
-              <td className="px-6 py-4 text-muted-foreground">
+              <td className="px-4 py-3 text-muted-foreground sm:px-6 sm:py-4">/{unit.slug}</td>
+              <td className="px-4 py-3 text-muted-foreground sm:px-6 sm:py-4">
                 {unit.note || "—"}
               </td>
-              <td className="px-4 py-4">
+              <td className="px-3 py-3 sm:px-4 sm:py-4">
                 <div className="flex items-center justify-end gap-1">
                   <button
                     type="button"

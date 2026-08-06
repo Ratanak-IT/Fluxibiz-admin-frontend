@@ -39,11 +39,11 @@ export default function AppLauncher({ managerName }: { managerName: string }) {
 
   return (
    <div className="min-h-dvh bg-background text-foreground transition-colors">
-  <header className="flex h-[88px] items-center justify-between border-b border-border bg-background px-5 lg:px-8">
+  <header className="flex h-16 sm:h-20 lg:h-[88px] items-center justify-between border-b border-border bg-background px-4 sm:px-5 lg:px-8">
     <Link
       href="/apps"
       aria-label="FluxiBiz home"
-      className="flex h-11 w-32 items-center rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      className="flex h-9 w-24 sm:h-10 sm:w-28 lg:h-11 lg:w-32 items-center rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     >
       <BrandLogo
         variant="wordmark"
@@ -59,32 +59,35 @@ export default function AppLauncher({ managerName }: { managerName: string }) {
       />
     </Link>
 
-    <div className="flex items-center gap-6">
-      <ModeToggle />
-      <button
-        type="button"
-        aria-label="Notifications"
-        className="relative grid size-8 place-items-center text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      >
-        <Bell className="size-5" aria-hidden="true" />
-        <span className="absolute top-0.5 right-0.5 size-2 rounded-full bg-primary" />
-      </button>
-      <UserMenu name={managerName} />
-    </div>
+   <div className="flex items-center gap-3 sm:gap-4 lg:gap-6">
+  {/* Tablet & desktop only — on phone, ModeToggle lives inside UserMenu's dropdown */}
+  <span className="hidden sm:block">
+    <ModeToggle />
+  </span>
+  <button
+    type="button"
+    aria-label="Notifications"
+    className="relative grid size-8 place-items-center text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+  >
+    <Bell className="size-5" aria-hidden="true" />
+    <span className="absolute top-0.5 right-0.5 size-2 rounded-full bg-primary" />
+  </button>
+  <UserMenu name={managerName} />
+</div>
   </header>
 
-  <main className="mx-auto w-full max-w-[1180px] px-5 py-8 lg:px-8 lg:py-12">
-    <header className="mb-10">
-      <h1 className="text-[32px] leading-tight text-foreground">
+  <main className="mx-auto w-full max-w-[1180px] px-4 py-6 sm:px-5 sm:py-8 lg:px-8 lg:py-12">
+    <header className="mb-6 sm:mb-8 lg:mb-10">
+      <h1 className="text-2xl sm:text-[28px] lg:text-[32px] leading-tight text-foreground">
         <span className="font-semibold">Hello,</span>{" "}
         {managerName.split(" ")[0]}
       </h1>
-      <p className="mt-1.5 text-[16px] text-muted-foreground">
+      <p className="mt-1.5 text-sm sm:text-[16px] text-muted-foreground">
         Choose an app to open.
       </p>
     </header>
 
-    <ul className="grid grid-cols-2 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
       {apps.map((section) => (
         <li key={section.id}>
           <AppTile

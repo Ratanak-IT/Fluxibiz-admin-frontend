@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { KeyRound, Plus, Search } from "lucide-react";
+import { KeyRound, Pencil, Plus, Search } from "lucide-react";
 import {
   useCreatePlatformUserMutation,
   useGetPlatformUsersQuery,
@@ -13,6 +13,8 @@ import {
 import { StaffFormDialog, type StaffFormValues } from "@/components/admin/StaffFormDialog";
 import { isHiddenRole, labelForRole, SUPER_ADMIN_ROLE } from "@/lib/permissionCatalog";
 import type { PlatformUserResponse } from "@/lib/types/adminTypes";
+import { ColumnPicker } from "@/components/ui/ColumnPicker";
+import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 
 type DialogState = null | "new" | PlatformUserResponse;
 
@@ -25,7 +27,16 @@ function errorMessage(error: unknown): string | undefined {
   return status ? `Request failed with status ${status}.` : "Request failed.";
 }
 
+const COLUMNS: ColumnDef[] = [
+  { id: "person", label: "Person" },
+  { id: "canDo", label: "Can do" },
+  { id: "status", label: "Status" },
+  { id: "actions", label: "Actions", locked: true },
+];
+
 export default function PlatformStaffPage() {
+  const cols = useColumnVisibility("platform-users", COLUMNS);
+
   const [keyword, setKeyword] = useState("");
   const [dialog, setDialog] = useState<DialogState>(null);
 
@@ -103,144 +114,67 @@ export default function PlatformStaffPage() {
     </button>
   </div>
 
-  <div className="relative mt-7 max-w-md">
-    <Search
-      className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-      aria-hidden
-    />
-    <input
-      value={keyword}
-      onChange={(e) => setKeyword(e.target.value)}
-      placeholder="Search by name or email"
-      aria-label="Search staff"
-      className="w-full rounded-full border border-input bg-card py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-ring"
-    />
-  </div>
+      <div className="mt-7 flex flex-wrap items-center gap-3">
+        <div className="relative max-w-md flex-1">
+          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-neutral-400" aria-hidden />
+          <input value={keyword} onChange={(e) => setKeyword(e.target.value)}
+            placeholder="Search by name or email" aria-label="Search staff"
+            className="w-full rounded-full border border-neutral-200 bg-white py-2.5 pl-11 pr-4 text-sm text-neutral-900 outline-none transition focus:border-green-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-50 dark:focus:border-green-500" />
+        </div>
 
-  <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[46rem] text-left">
-        <thead className="bg-muted text-sm font-medium text-muted-foreground">
-          <tr>
-            <th className="px-6 py-4">Person</th>
-            <th className="px-6 py-4">Can do</th>
-            <th className="px-6 py-4">Status</th>
-            <th className="w-40 px-4 py-4" />
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border text-sm">
-          {isLoading && (
-            <tr>
-              <td
-                colSpan={4}
-                className="px-6 py-14 text-center text-muted-foreground"
-              >
-                Loading staff...
-              </td>
-            </tr>
-          )}
+        <ColumnPicker state={cols} />
+      </div>
 
-          {error && !isLoading && (
-            <tr>
-              <td
-                colSpan={4}
-                className="px-6 py-14 text-center text-destructive"
-              >
-                {errorMessage(error)}
-              </td>
-            </tr>
-          )}
-
-          {!isLoading && !error && staff.length === 0 && (
-            <tr>
-              <td
-                colSpan={4}
-                className="px-6 py-14 text-center text-muted-foreground"
-              >
-                No staff yet. Add the first colleague.
-              </td>
-            </tr>
-          )}
-
-          {staff.map((user) => {
-            const visibleRoles = user.roles.filter(
-              (role) => !isHiddenRole(role)
-            );
-            const isSuper = visibleRoles.includes(SUPER_ADMIN_ROLE);
-
-            return (
-              <tr
-                key={user.id}
-                className="transition hover:bg-accent"
-              >
-                <td className="px-6 py-4">
-                  <span className="block font-medium text-card-foreground">
-                    {user.username}
-                  </span>
-                  <span className="block text-xs text-muted-foreground">
-                    {user.email ?? "—"}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  {isSuper ? (
-                    <span className="inline-flex rounded-full bg-primary/15 px-2.5 py-1 text-xs font-medium text-primary">
-                      Full access
-                    </span>
-                  ) : (
-                    <span className="flex flex-wrap gap-1.5">
-                      {visibleRoles.map((role) => (
-                        <span
-                          key={role}
-                          className="rounded-full bg-muted px-2.5 py-1 text-xs text-foreground"
-                        >
-                          {labelForRole(role)}
-                        </span>
-                      ))}
-                    </span>
-                  )}
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={
-                      user.enabled
-                        ? "text-foreground"
-                        : "text-muted-foreground"
-                    }
-                  >
-                    {user.enabled ? "Active" : "Disabled"}
-                  </span>
-                </td>
-                <td className="px-4 py-4">
-                  <div className="flex items-center justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setDialog(user)}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-foreground transition hover:bg-accent hover:text-accent-foreground"
-                    >
-                      <KeyRound className="size-3.5" />
-                      Permissions
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setEnabled({
-                          userId: user.id,
-                          enabled: !user.enabled,
-                        })
-                      }
-                      className="rounded-full px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-accent hover:text-foreground"
-                    >
-                      {user.enabled ? "Disable" : "Enable"}
-                    </button>
-                  </div>
-                </td>
+      <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="overflow-x-auto">
+          <table className={`w-full text-left ${cols.tableClassName}`}
+            style={{ minWidth: cols.minWidthRem(46) }}>
+            <thead className="bg-neutral-50 text-sm font-medium text-neutral-500 dark:bg-neutral-900/60 dark:text-neutral-400">
+              <tr>
+                <th className="px-6 py-4">Person</th>
+                <th className="px-6 py-4">Can do</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="w-40 px-4 py-4" />
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  </div>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 text-sm dark:divide-neutral-800">
+              {staff.map((user) => (
+                <tr key={user.id} className="transition hover:bg-accent">
+                  <td className="px-6 py-4 font-medium text-card-foreground">
+                    {user.firstName} {user.lastName}
+                  </td>
+                  <td className="px-6 py-4 text-muted-foreground">
+                    {user.roles.filter((role) => !isHiddenRole(role)).join(", ")}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${
+                        user.enabled
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                      }`}
+                    >
+                      {user.enabled ? "Enabled" : "Disabled"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setDialog(user)}
+                        aria-label={`Edit ${user.username}`}
+                        className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
+                      >
+                        <Pencil className="size-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
   {dialog && (
     <StaffFormDialog

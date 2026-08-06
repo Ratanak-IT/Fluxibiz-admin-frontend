@@ -17,6 +17,8 @@ import { useGetMyBusinessQuery } from "@/features/business/businessApi";
 import { StaffInviteDialog } from "@/components/shop/StaffInviteDialog";
 import { RoleFormDialog } from "@/components/shop/RoleFormDialog";
 import type { ShopRoleRequest, StaffInviteRequest } from "@/lib/types/shopStaffTypes";
+import { ColumnPicker } from "@/components/ui/ColumnPicker";
+import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 
 type Dialog = null | "invite" | "role";
 
@@ -30,10 +32,18 @@ function errorMessage(error: unknown): string | undefined {
   return status ? `Request failed with status ${status}.` : "Request failed.";
 }
 
+const COLUMNS: ColumnDef[] = [
+  { id: "person", label: "Person" },
+  { id: "role", label: "Role" },
+  { id: "status", label: "Status" },
+  { id: "actions", label: "Actions", locked: true },
+];
+
 export default function ShopStaffPage() {
+  const cols = useColumnVisibility("shop-staff", COLUMNS);
+
   const [dialog, setDialog] = useState<Dialog>(null);
 
-  // Every call needs the shop id, and the owner has exactly one.
   const { data: business } = useGetMyBusinessQuery();
   const businessId = business?.id ?? "";
 
@@ -108,9 +118,14 @@ export default function ShopStaffPage() {
         </div>
       )}
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="mt-6 flex justify-end">
+        <ColumnPicker state={cols} />
+      </div>
+
+      <div className="mt-3 overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[42rem] text-left">
+          <table className={`w-full text-left ${cols.tableClassName}`}
+            style={{ minWidth: cols.minWidthRem(42) }}>
             <thead className="bg-neutral-50 text-sm font-medium text-neutral-500 dark:bg-neutral-900/60 dark:text-neutral-400">
               <tr>
                 <th className="px-6 py-4">Person</th>
@@ -139,8 +154,7 @@ export default function ShopStaffPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    {/* Changing the job here is one call; what the job may do
-                        is edited on the role, not per person. */}
+                
                     <select
                       value={person.businessRoleId ?? ""}
                       onChange={(e) => changeRole({
