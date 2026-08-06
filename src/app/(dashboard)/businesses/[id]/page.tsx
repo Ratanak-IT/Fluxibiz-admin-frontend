@@ -20,7 +20,7 @@ function Field({ label, value }: { label: string; value?: string | null }) {
     </div>
   );
 }
-
+                                                                                              
 export default function BusinessDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
 
