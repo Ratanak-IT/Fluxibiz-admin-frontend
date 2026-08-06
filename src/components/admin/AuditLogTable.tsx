@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Search, X } from "lucide-react";
+import { ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
 import { useGetAuditLogsInfiniteQuery } from "@/features/businessManagement/businessAdminApi";
 import type { AdminActionType } from "@/lib/types/adminTypes";
 import { ColumnPicker } from "@/components/ui/ColumnPicker";
@@ -85,6 +85,8 @@ export function AuditLogTable({
 
   const [keywordInput, setKeywordInput] = useState("");
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
+  const [actionFilterOpen, setActionFilterOpen] = useState(false);
+  const actionFilterRef = useRef<HTMLDivElement>(null);
 
   const actionOptions = useMemo(
     () => (targetType ? ACTIONS_BY_TARGET[targetType] : ALL_ACTIONS),
@@ -101,6 +103,16 @@ export function AuditLogTable({
 
     return () => clearTimeout(timer);
   }, [keywordInput, filters.keyword]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (actionFilterRef.current && !actionFilterRef.current.contains(event.target as Node)) {
+        setActionFilterOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const setActionType = (value: AdminActionType | "ALL") =>
     setFilters((prev) => ({ ...prev, actionType: value, page: 0 }));
@@ -139,12 +151,12 @@ export function AuditLogTable({
     setPage,
   });
 
-  const selectCls =
-    "rounded-full border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none transition focus:border-brand";
+  const actionFilterLabel =
+    filters.actionType === "ALL" ? "All actions" : ACTION_LABELS[filters.actionType] ?? filters.actionType;
 
   return (
-  <main className="px-8 py-7 bg-background text-foreground">
-  <nav className="mb-6 text-[15px] text-muted-foreground">
+  <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7 bg-background text-foreground">
+  <nav className="mb-6 text-sm sm:text-[15px] text-muted-foreground">
     <Link href="/dashboard" className="transition hover:text-foreground">
       Dashboard
     </Link>
@@ -156,11 +168,11 @@ export function AuditLogTable({
     <span className="text-foreground">{breadcrumb}</span>
   </nav>
 
-  <h1 className="text-3xl font-bold text-foreground">{title}</h1>
-  <p className="mt-1 text-[15px] text-muted-foreground">{subtitle}</p>
+  <h1 className="text-xl font-bold text-foreground sm:text-2xl lg:text-3xl">{title}</h1>
+  <p className="mt-1 text-sm text-muted-foreground sm:text-[15px]">{subtitle}</p>
 
-      <div className="mt-7 flex flex-wrap items-center gap-3">
-        <div className="relative min-w-[280px] flex-1">
+      <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative w-full sm:max-w-md sm:flex-1">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={keywordInput}
@@ -170,32 +182,84 @@ export function AuditLogTable({
           />
         </div>
 
-        <select
-          value={filters.actionType}
-          onChange={(event) => setActionType(event.target.value as AdminActionType | "ALL")}
-          className={selectCls}
-          aria-label="Filter by action"
-        >
-          <option value="ALL">All actions</option>
-          {actionOptions.map((action) => (
-            <option key={action} value={action}>
-              {ACTION_LABELS[action] ?? action}
-            </option>
-          ))}
-        </select>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="relative w-40 sm:w-56" ref={actionFilterRef}>
+            <button
+              type="button"
+              onClick={() => setActionFilterOpen((open) => !open)}
+              aria-haspopup="listbox"
+              aria-expanded={actionFilterOpen}
+              className="flex w-full items-center gap-2 rounded-full border border-border bg-background py-2.5 pl-4 pr-4 text-sm text-foreground outline-none transition hover:bg-accent hover:text-foreground focus:border-brand"
+            >
+              <SlidersHorizontal className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+              <span className="flex-1 truncate text-left">{actionFilterLabel}</span>
+              <ChevronDown
+                className={`size-4 shrink-0 text-muted-foreground transition-transform ${actionFilterOpen ? "rotate-180" : ""}`}
+                aria-hidden
+              />
+            </button>
 
-        {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="flex items-center gap-1.5 rounded-full border border-border px-4 py-2.5 text-sm text-muted-foreground transition hover:bg-accent hover:text-foreground"
-          >
-            <X className="size-4" />
-            Clear
-          </button>
-        )}
+            {actionFilterOpen && (
+              <div
+                role="listbox"
+                className="absolute left-0 right-0 top-full z-20 mt-2 max-h-72 overflow-y-auto rounded-2xl border border-border bg-popover p-1.5 shadow-lg"
+              >
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={filters.actionType === "ALL"}
+                  onClick={() => {
+                    setActionType("ALL");
+                    setActionFilterOpen(false);
+                  }}
+                  className={[
+                    "block w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium transition",
+                    filters.actionType === "ALL"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-popover-foreground hover:bg-accent hover:text-foreground",
+                  ].join(" ")}
+                >
+                  All actions
+                </button>
+                {actionOptions.map((action) => (
+                  <button
+                    key={action}
+                    type="button"
+                    role="option"
+                    aria-selected={filters.actionType === action}
+                    onClick={() => {
+                      setActionType(action);
+                      setActionFilterOpen(false);
+                    }}
+                    className={[
+                      "block w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium transition",
+                      filters.actionType === action
+                        ? "bg-primary text-primary-foreground"
+                        : "text-popover-foreground hover:bg-accent hover:text-foreground",
+                    ].join(" ")}
+                  >
+                    {ACTION_LABELS[action] ?? action}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
-        <ColumnPicker state={cols} />
+          <div className="shrink-0">
+            <ColumnPicker state={cols} />
+          </div>
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-border px-4 py-2.5 text-sm text-muted-foreground transition hover:bg-accent hover:text-foreground"
+            >
+              <X className="size-4" />
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-border">
@@ -204,18 +268,18 @@ export function AuditLogTable({
             style={{ minWidth: cols.minWidthRem(72) }}>
             <thead className="bg-muted/60 text-sm font-semibold text-foreground">
               <tr>
-                <th className="px-6 py-4">When</th>
-                <th className="px-6 py-4">Administrator</th>
-                <th className="px-6 py-4">Action</th>
-                <th className="px-6 py-4">Target</th>
-                <th className="px-6 py-4">Change</th>
-                <th className="px-6 py-4">Reason</th>
+                <th className="px-4 py-3 sm:px-6 sm:py-4">When</th>
+                <th className="px-4 py-3 sm:px-6 sm:py-4">Administrator</th>
+                <th className="px-4 py-3 sm:px-6 sm:py-4">Action</th>
+                <th className="px-4 py-3 sm:px-6 sm:py-4">Target</th>
+                <th className="px-4 py-3 sm:px-6 sm:py-4">Change</th>
+                <th className="px-4 py-3 sm:px-6 sm:py-4">Reason</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {isLoading && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground sm:px-6 sm:py-12">
                     Loading audit log...
                   </td>
                 </tr>
@@ -223,7 +287,7 @@ export function AuditLogTable({
 
               {error && !isLoading && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-red-600">
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-red-600 sm:px-6 sm:py-12">
                     Request failed{"status" in error ? ` with status ${error.status}` : ""}.
                   </td>
                 </tr>
@@ -231,7 +295,7 @@ export function AuditLogTable({
 
               {!isLoading && !error && rows.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground sm:px-6 sm:py-12">
                     {hasActiveFilters
                       ? "No entry matches these filters. Try clearing them."
                       : "Nothing recorded yet. Take an action and it will appear here."}
@@ -241,20 +305,20 @@ export function AuditLogTable({
 
               {rows.map((log) => (
                 <tr key={log.id} className="align-top hover:bg-muted/40">
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
+                  <td className="whitespace-nowrap px-4 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4">
                     {new Date(log.createdAt).toLocaleString()}
                   </td>
-                  <td className="px-6 py-4 text-sm text-foreground">{log.actorUsername}</td>
-                  <td className="px-6 py-4 text-sm text-foreground">
+                  <td className="px-4 py-3 text-sm text-foreground sm:px-6 sm:py-4">{log.actorUsername}</td>
+                  <td className="px-4 py-3 text-sm text-foreground sm:px-6 sm:py-4">
                     {ACTION_LABELS[log.actionType] ?? log.actionType}
                   </td>
-                  <td className="px-6 py-4 text-sm text-muted-foreground">{log.targetLabel ?? "—"}</td>
-                  <td className="px-6 py-4 text-sm text-muted-foreground">
+                  <td className="px-4 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4">{log.targetLabel ?? "—"}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4">
                     {log.previousState || log.newState
                       ? `${log.previousState ?? "—"} → ${log.newState ?? "—"}`
                       : "—"}
                   </td>
-                  <td className="max-w-xs px-6 py-4 text-sm text-muted-foreground">{log.reason ?? "—"}</td>
+                  <td className="max-w-xs px-4 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4">{log.reason ?? "—"}</td>
                 </tr>
               ))}
             </tbody>
