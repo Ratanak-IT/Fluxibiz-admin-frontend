@@ -1,4 +1,9 @@
 import { baseApi } from "@/lib/baseApi";
+import {
+  infiniteEndpoint,
+  DEFAULT_PAGE_SIZE,
+  type InfinitePage,
+} from "@/lib/api/infinitePage";
 import type {
   AdminAuditLogResponse,
   BusinessFeatureResponse,
@@ -13,7 +18,19 @@ import type {
   PlatformFeatureResponse,
   PlatformFeatureToggleRequest,
   StatusActionRequest,
+  SalesChannelResponse,
+  CreateSalesChannelRequest,
+  UpdateSalesChannelRequest,
 } from "@/lib/types/adminTypes";
+
+export interface AuditLogQuery {
+  targetId?: string;
+  targetType?: string;
+  actionType?: string;
+  keyword?: string;
+  page?: number;
+  size?: number;
+}
 
 const ADMIN = "/api/v1/admin";
 
@@ -37,6 +54,22 @@ export const businessAdminApi = baseApi.injectEndpoints({
         url: `${ADMIN}/businesses`,
         params: toParams({ size: 20, ...(query ?? {}) }),
       }),
+      providesTags: ["Business"],
+    }),
+
+    getBusinessesInfinite: builder.query<InfinitePage<BusinessResponse>, BusinessQuery | void>({
+      query: (query) => ({
+        url: `${ADMIN}/businesses`,
+        params: toParams({ page: 0, size: DEFAULT_PAGE_SIZE, ...(query ?? {}) }),
+      }),
+      ...infiniteEndpoint<BusinessResponse, BusinessQuery>([
+        "keyword",
+        "status",
+        "categoryId",
+        "isEnabled",
+        "isClosed",
+        "size",
+      ]),
       providesTags: ["Business"],
     }),
 
@@ -171,13 +204,83 @@ export const businessAdminApi = baseApi.injectEndpoints({
       }),
       providesTags: ["AuditLog"],
     }),
+
+    getAuditLogsInfinite: builder.query<InfinitePage<AdminAuditLogResponse>, AuditLogQuery | void>({
+      query: (query) => ({
+        url: `${ADMIN}/audit-logs`,
+        params: toParams({ page: 0, size: DEFAULT_PAGE_SIZE, ...(query ?? {}) }),
+      }),
+      ...infiniteEndpoint<AdminAuditLogResponse, AuditLogQuery>([
+        "keyword",
+        "targetType",
+        "targetId",
+        "actionType",
+        "size",
+      ]),
+      providesTags: ["AuditLog"],
+    }),
+
+    getSalesChannels: builder.query<SalesChannelResponse[], void>({
+      query: () => "/api/v1/sales-channels?all=true",
+      providesTags: ["SalesChannel"],
+    }),
+
+    createSalesChannel: builder.mutation<SalesChannelResponse, CreateSalesChannelRequest>({
+      query: (body) => ({
+        url: "/api/v1/sales-channels",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["SalesChannel", "AuditLog"],
+    }),
+
+    updateSalesChannel: builder.mutation<SalesChannelResponse, { id: string } & UpdateSalesChannelRequest>({
+      query: ({ id, ...body }) => ({
+        url: `/api/v1/sales-channels/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["SalesChannel", "AuditLog"],
+    }),
+
+    deleteSalesChannel: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/api/v1/sales-channels/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["SalesChannel", "AuditLog"],
+    }),
+
+    createBusiness: builder.mutation<unknown, RegisterBusinessPayload>({
+      query: (body) => ({
+        url: "/api/v1/auth/register/business",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Business", "Dashboard", "AuditLog"],
+    }),
   }),
 });
+
+export interface RegisterBusinessPayload {
+  username: string;
+  password: string;
+  confirmPassword: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  gender: string;
+  businessName: string;
+  businessAddress: string;
+  businessCategoryId: string;
+}
 
 export const {
   useGetPlatformDashboardQuery,
   useGetBusinessChannelsQuery,
   useGetBusinessesQuery,
+  useGetBusinessesInfiniteQuery,
   useGetBusinessQuery,
   useActivateBusinessMutation,
   useSuspendBusinessMutation,
@@ -187,6 +290,7 @@ export const {
   useReopenBusinessMutation,
   useDeleteBusinessMutation,
   useGetAuditLogsQuery,
+  useGetAuditLogsInfiniteQuery,
   useGetBusinessFeaturesQuery,
   useToggleBusinessFeatureMutation,
   useGetPlatformFeaturesQuery,
@@ -195,4 +299,9 @@ export const {
   useCreateBusinessCategoryMutation,
   useUpdateBusinessCategoryMutation,
   useDeleteBusinessCategoryMutation,
+  useGetSalesChannelsQuery,
+  useCreateSalesChannelMutation,
+  useUpdateSalesChannelMutation,
+  useDeleteSalesChannelMutation,
+  useCreateBusinessMutation,
 } = businessAdminApi;

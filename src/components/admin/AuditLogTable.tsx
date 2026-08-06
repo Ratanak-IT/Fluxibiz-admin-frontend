@@ -1,10 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
-import { useGetAuditLogsQuery } from "@/features/businessManagement/businessAdminApi";
+import { Search, X } from "lucide-react";
+import { useGetAuditLogsInfiniteQuery } from "@/features/businessManagement/businessAdminApi";
 import type { AdminActionType } from "@/lib/types/adminTypes";
+import { ColumnPicker } from "@/components/ui/ColumnPicker";
+import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
+import { useInfiniteScroll } from "@/lib/hook/useInfiniteScroll";
 
 const ACTION_LABELS: Record<AdminActionType, string> = {
   BUSINESS_ACTIVATED: "Activated",
@@ -24,7 +27,48 @@ const ACTION_LABELS: Record<AdminActionType, string> = {
   BUSINESS_FEATURE_DISABLED: "Feature switched off",
 };
 
-const PAGE_SIZE = 15;
+type TargetType = "BUSINESS" | "BUSINESS_CATEGORY" | "UNIT" | "BUSINESS_FEATURE";
+
+const ACTIONS_BY_TARGET: Record<TargetType, AdminActionType[]> = {
+  BUSINESS: [
+    "BUSINESS_ACTIVATED",
+    "BUSINESS_SUSPENDED",
+    "BUSINESS_ENABLED",
+    "BUSINESS_DISABLED",
+    "BUSINESS_CLOSED",
+    "BUSINESS_REOPENED",
+    "BUSINESS_DELETED",
+  ],
+  BUSINESS_CATEGORY: [
+    "BUSINESS_CATEGORY_CREATED",
+    "BUSINESS_CATEGORY_UPDATED",
+    "BUSINESS_CATEGORY_DELETED",
+  ],
+  UNIT: ["UNIT_CREATED", "UNIT_UPDATED", "UNIT_DELETED"],
+  BUSINESS_FEATURE: ["BUSINESS_FEATURE_ENABLED", "BUSINESS_FEATURE_DISABLED"],
+};
+
+const ALL_ACTIONS = Object.values(ACTIONS_BY_TARGET).flat();
+
+const COLUMNS: ColumnDef[] = [
+  { id: "when", label: "When" },
+  { id: "administrator", label: "Administrator" },
+  { id: "action", label: "Action" },
+  { id: "target", label: "Target" },
+  { id: "change", label: "Change" },
+  { id: "reason", label: "Reason" },
+];
+
+const PAGE_SIZE = 25;
+const SEARCH_DEBOUNCE_MS = 350;
+
+interface FilterState {
+  keyword: string;
+  actionType: AdminActionType | "ALL";
+  page: number;
+}
+
+const INITIAL_FILTERS: FilterState = { keyword: "", actionType: "ALL", page: 0 };
 
 export function AuditLogTable({
   title,
@@ -37,16 +81,66 @@ export function AuditLogTable({
   breadcrumb: string;
   targetType?: "BUSINESS" | "BUSINESS_CATEGORY" | "UNIT";
 }) {
-  const [keyword, setKeyword] = useState("");
-  const [page, setPage] = useState(0);
+  const cols = useColumnVisibility(`audit-log:${targetType ?? "all"}`, COLUMNS);
 
-  const query = useMemo(
-    () => ({ keyword: keyword.trim() || undefined, targetType, page, size: PAGE_SIZE }),
-    [keyword, targetType, page],
+  const [keywordInput, setKeywordInput] = useState("");
+  const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
+
+  const actionOptions = useMemo(
+    () => (targetType ? ACTIONS_BY_TARGET[targetType] : ALL_ACTIONS),
+    [targetType],
   );
 
-  const { data, isLoading, error } = useGetAuditLogsQuery(query);
+  useEffect(() => {
+    const next = keywordInput.trim();
+    if (next === filters.keyword) return;
+
+    const timer = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, keyword: next, page: 0 }));
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => clearTimeout(timer);
+  }, [keywordInput, filters.keyword]);
+
+  const setActionType = (value: AdminActionType | "ALL") =>
+    setFilters((prev) => ({ ...prev, actionType: value, page: 0 }));
+
+  const setPage = useCallback(
+    (updater: (prev: number) => number) =>
+      setFilters((prev) => ({ ...prev, page: updater(prev.page) })),
+    [],
+  );
+
+  const clearFilters = () => {
+    setKeywordInput("");
+    setFilters(INITIAL_FILTERS);
+  };
+
+  const hasActiveFilters = filters.keyword !== "" || filters.actionType !== "ALL";
+
+  const query = useMemo(
+    () => ({
+      keyword: filters.keyword || undefined,
+      targetType,
+      actionType: filters.actionType === "ALL" ? undefined : filters.actionType,
+      page: filters.page,
+      size: PAGE_SIZE,
+    }),
+    [filters.keyword, filters.actionType, filters.page, targetType],
+  );
+
+  const { data, isLoading, isFetching, error } = useGetAuditLogsInfiniteQuery(query);
   const rows = data?.content ?? [];
+
+  const { sentinelRef, loadMore, hasMore } = useInfiniteScroll({
+    data,
+    isFetching,
+    page: filters.page,
+    setPage,
+  });
+
+  const selectCls =
+    "rounded-full border border-border bg-background px-4 py-2.5 text-sm text-foreground outline-none transition focus:border-brand";
 
   return (
   <main className="px-8 py-7 bg-background text-foreground">
@@ -65,105 +159,132 @@ export function AuditLogTable({
   <h1 className="text-3xl font-bold text-foreground">{title}</h1>
   <p className="mt-1 text-[15px] text-muted-foreground">{subtitle}</p>
 
-  <div className="relative mt-7 max-w-md">
-    <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-    <input
-      value={keyword}
-      onChange={(event) => {
-        setKeyword(event.target.value);
-        setPage(0);
-      }}
-      placeholder="Search by target, admin or reason"
-      className="w-full rounded-full border border-input bg-card py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-ring"
-    />
-  </div>
+      <div className="mt-7 flex flex-wrap items-center gap-3">
+        <div className="relative min-w-[280px] flex-1">
+          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={keywordInput}
+            onChange={(event) => setKeywordInput(event.target.value)}
+            placeholder="Search by target, admin or reason"
+            className="w-full rounded-full border border-border bg-background py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-brand"
+          />
+        </div>
 
-  <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[72rem] text-left">
-        <thead className="bg-muted text-sm font-semibold text-foreground">
-          <tr>
-            <th className="px-6 py-4">When</th>
-            <th className="px-6 py-4">Administrator</th>
-            <th className="px-6 py-4">Action</th>
-            <th className="px-6 py-4">Target</th>
-            <th className="px-6 py-4">Change</th>
-            <th className="px-6 py-4">Reason</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border text-sm">
-          {isLoading && (
-            <tr>
-              <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
-                Loading audit log...
-              </td>
-            </tr>
-          )}
-
-          {error && !isLoading && (
-            <tr>
-              <td colSpan={6} className="px-6 py-12 text-center text-destructive">
-                Request failed{"status" in error ? ` with status ${error.status}` : ""}.
-              </td>
-            </tr>
-          )}
-
-          {!isLoading && !error && rows.length === 0 && (
-            <tr>
-              <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
-                Nothing recorded yet. Take an action and it will appear here.
-              </td>
-            </tr>
-          )}
-
-          {rows.map((log) => (
-            <tr key={log.id} className="align-top transition hover:bg-accent">
-              <td className="whitespace-nowrap px-6 py-4 text-muted-foreground">
-                {new Date(log.createdAt).toLocaleString()}
-              </td>
-              <td className="px-6 py-4 text-card-foreground">{log.actorUsername}</td>
-              <td className="px-6 py-4 text-card-foreground">
-                {ACTION_LABELS[log.actionType] ?? log.actionType}
-              </td>
-              <td className="px-6 py-4 text-muted-foreground">{log.targetLabel ?? "—"}</td>
-              <td className="px-6 py-4 text-muted-foreground">
-                {log.previousState || log.newState
-                  ? `${log.previousState ?? "—"} → ${log.newState ?? "—"}`
-                  : "—"}
-              </td>
-              <td className="max-w-xs px-6 py-4 text-muted-foreground">{log.reason ?? "—"}</td>
-            </tr>
+        <select
+          value={filters.actionType}
+          onChange={(event) => setActionType(event.target.value as AdminActionType | "ALL")}
+          className={selectCls}
+          aria-label="Filter by action"
+        >
+          <option value="ALL">All actions</option>
+          {actionOptions.map((action) => (
+            <option key={action} value={action}>
+              {ACTION_LABELS[action] ?? action}
+            </option>
           ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
+        </select>
 
-  {data && data.totalPages > 1 && (
-    <div className="mt-5 flex items-center justify-between text-sm text-muted-foreground">
-      <span>
-        Page {data.number + 1} of {data.totalPages} · {data.totalElements} entries
-      </span>
-      <div className="flex gap-2">
-        <button
-          type="button"
-          disabled={data.number === 0}
-          onClick={() => setPage((value) => Math.max(0, value - 1))}
-          className="rounded-full border border-border px-4 py-2 text-foreground transition hover:bg-accent hover:text-accent-foreground disabled:opacity-40"
-        >
-          Previous
-        </button>
-        <button
-          type="button"
-          disabled={data.number + 1 >= data.totalPages}
-          onClick={() => setPage((value) => value + 1)}
-          className="rounded-full border border-border px-4 py-2 text-foreground transition hover:bg-accent hover:text-accent-foreground disabled:opacity-40"
-        >
-          Next
-        </button>
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="flex items-center gap-1.5 rounded-full border border-border px-4 py-2.5 text-sm text-muted-foreground transition hover:bg-accent hover:text-foreground"
+          >
+            <X className="size-4" />
+            Clear
+          </button>
+        )}
+
+        <ColumnPicker state={cols} />
       </div>
-    </div>
-  )}
-</main>
+
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border">
+        <div className="overflow-x-auto">
+          <table className={`w-full text-left ${cols.tableClassName}`}
+            style={{ minWidth: cols.minWidthRem(72) }}>
+            <thead className="bg-muted/60 text-sm font-semibold text-foreground">
+              <tr>
+                <th className="px-6 py-4">When</th>
+                <th className="px-6 py-4">Administrator</th>
+                <th className="px-6 py-4">Action</th>
+                <th className="px-6 py-4">Target</th>
+                <th className="px-6 py-4">Change</th>
+                <th className="px-6 py-4">Reason</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {isLoading && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                    Loading audit log...
+                  </td>
+                </tr>
+              )}
+
+              {error && !isLoading && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-red-600">
+                    Request failed{"status" in error ? ` with status ${error.status}` : ""}.
+                  </td>
+                </tr>
+              )}
+
+              {!isLoading && !error && rows.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                    {hasActiveFilters
+                      ? "No entry matches these filters. Try clearing them."
+                      : "Nothing recorded yet. Take an action and it will appear here."}
+                  </td>
+                </tr>
+              )}
+
+              {rows.map((log) => (
+                <tr key={log.id} className="align-top hover:bg-muted/40">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
+                    {new Date(log.createdAt).toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-foreground">{log.actorUsername}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">
+                    {ACTION_LABELS[log.actionType] ?? log.actionType}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-muted-foreground">{log.targetLabel ?? "—"}</td>
+                  <td className="px-6 py-4 text-sm text-muted-foreground">
+                    {log.previousState || log.newState
+                      ? `${log.previousState ?? "—"} → ${log.newState ?? "—"}`
+                      : "—"}
+                  </td>
+                  <td className="max-w-xs px-6 py-4 text-sm text-muted-foreground">{log.reason ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div ref={sentinelRef} className="mt-5 flex flex-col items-center gap-3 py-6 text-sm">
+        {isFetching && !isLoading && (
+          <span className="text-muted-foreground">Loading more entries...</span>
+        )}
+
+        {!isFetching && hasMore && (
+          <button
+            type="button"
+            onClick={loadMore}
+            className="rounded-full border border-border px-5 py-2 text-foreground transition hover:bg-accent"
+          >
+            Load more
+          </button>
+        )}
+
+        {data && rows.length > 0 && (
+          <span className="text-muted-foreground">
+            Showing {rows.length}
+            {data.totalElements >= 0 ? ` of ${data.totalElements}` : ""} entries
+            {!hasMore && !isFetching ? " · end of log" : ""}
+          </span>
+        )}
+      </div>
+    </main>
   );
 }

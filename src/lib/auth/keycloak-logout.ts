@@ -1,6 +1,7 @@
 const DISCOVERY_PATH = "/.well-known/openid-configuration";
 
 let cachedEndSessionEndpoint: string | undefined;
+//
 
 function issuerUrl() {
   const issuer =
@@ -54,10 +55,12 @@ export async function keycloakLogoutUrl({
     process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID ||
     "fluxipos-client";
 
+  // Always send client_id so Keycloak knows which client is logging out
+  url.searchParams.set("client_id", clientId);
+
+  // id_token_hint allows Keycloak to skip the "do you want to log out?" confirmation
   if (idToken) {
     url.searchParams.set("id_token_hint", idToken);
-  } else {
-    url.searchParams.set("client_id", clientId);
   }
 
   return url.toString();

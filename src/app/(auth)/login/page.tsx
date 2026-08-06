@@ -2,12 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth/auth-client";
+import { tokenStore } from "@/lib/auth/tokenStore";
 import BrandLogo from "@/components/brand/BrandLogo";
 
 export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    // លុប token ចាស់ក្នុង sessionStorage មុនចាប់ផ្ដើម flow ថ្មី
+    tokenStore.clear();
+
     document.cookie = "ipos_welcome=1; path=/; max-age=600; samesite=lax";
 
     void authClient.signIn

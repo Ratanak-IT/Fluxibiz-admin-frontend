@@ -21,7 +21,7 @@ export const auth = betterAuth({
     "http://localhost:3000",
     "http://localhost:3001",
   ],
-  secret: process.env.BETTER_AUTH_SECRET || "2e20f532482fdc58c4cd0007433f0e782aee26da25ed49bfbe1e74dd3b130e55",
+  secret: process.env.BETTER_AUTH_SECRET,
   plugins: [
     genericOAuth({
       config: [
