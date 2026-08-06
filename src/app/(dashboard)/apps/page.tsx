@@ -10,9 +10,13 @@ export default async function AppsPage() {
   ]);
 
   return (
-    <>
+    <div className="min-h-dvh" >
       {cookieStore.get("ipos_welcome")?.value === "1" && <WelcomeIntro />}
       <AppLauncher managerName={session?.user.name || "Administrator"} />
-    </>
+    </div>
+
+    
+      
+    
   );
 }

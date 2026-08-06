@@ -46,7 +46,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <main className="px-8 py-7">
+    <main className="px-8 py-7 dark:bg-background">
       <nav className="mb-6 text-[15px] text-neutral-400">
         <Link href="/dashboard" className="hover:text-neutral-600">
           Dashboard
