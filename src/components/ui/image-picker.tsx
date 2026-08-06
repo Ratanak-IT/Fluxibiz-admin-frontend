@@ -179,11 +179,11 @@ export function ImagePicker({
   });
 
   return (
-    <div className={cn("flex flex-col items-center gap-2", className)}>
+    <div className={cn("flex flex-col items-center gap-3", className)}>
       <label
         {...dropProps}
         className={cn(
-          "group relative flex w-full cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-[#e4eae2] bg-white px-5 py-6 text-center outline-none transition-colors focus-within:border-[#00932a] hover:border-[#00932a]/50 dark:border-input dark:bg-card dark:hover:border-primary/50",
+          "group relative flex w-full cursor-pointer flex-col items-center justify-center rounded-2xl sm:rounded-3xl border-2 border-dashed border-[#e2e8f0] bg-white px-4 py-6 sm:px-6 sm:py-8 text-center outline-none transition-all duration-200 focus-within:border-[#00932a] hover:border-[#00932a]/50 hover:bg-[#fafdfa] dark:border-input dark:bg-card dark:hover:border-primary/50",
           isOver && "border-[#00932a] bg-[#f5f8f4] dark:bg-primary/10",
           disabled && "cursor-not-allowed opacity-60",
         )}>
@@ -214,16 +214,16 @@ export function ImagePicker({
           ) : null}
         </span>
 
-        <span className="text-base font-bold leading-6 text-[#1a222b] dark:text-foreground">
+        <span className="mt-3.5 text-base sm:text-lg font-bold text-[#1e293b] dark:text-foreground">
           {label}
         </span>
-        <span className="max-w-[220px] text-[11px] leading-[16.5px] text-[#424841] dark:text-muted-foreground">
+        <span className="mt-1 max-w-[240px] text-xs leading-relaxed text-[#64748b] dark:text-muted-foreground">
           Drag and drop, or click to browse. {hint || rules.hint}
         </span>
       </label>
 
       {actions ? (
-        <div className="flex items-center justify-center gap-3">{actions}</div>
+        <div className="mt-1 flex items-center justify-center gap-3">{actions}</div>
       ) : null}
 
       <div className="min-h-4" aria-live="polite">

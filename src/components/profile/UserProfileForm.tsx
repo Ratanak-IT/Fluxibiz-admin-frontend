@@ -279,7 +279,7 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
   return (
    <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
   <aside className="flex flex-col gap-5">
-    <section className="rounded-2xl border border-[#e4eae2] bg-white p-6 text-center shadow-sm dark:border-border dark:bg-card">
+    <section className="rounded-3xl border border-[#e2e8f0] bg-white p-6 text-center shadow-sm dark:border-border dark:bg-card">
       <ImagePicker
         rules={profilePictureRules}
         disabled={isSaving}
@@ -290,19 +290,21 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
         onPick={handlePicturePick}
         onError={picture.setError}
         preview={
-          <span className="relative flex size-28 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[linear-gradient(145deg,#dff5e2,#b9e5bf)] text-3xl font-bold text-[#00932a] shadow-md dark:border-card dark:bg-[linear-gradient(145deg,#0f2818,#163d21)]">
-            {picture.preview ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={picture.preview}
-                alt={`${profileName} profile`}
-                className="size-full object-cover"
-              />
-            ) : (
-              getInitials(firstName, lastName, profile.username)
-            )}
-            <span className="absolute right-0 bottom-0 grid size-9 place-items-center rounded-full border-2 border-white bg-[#00932a] text-white shadow-md dark:border-card">
-              <Camera className="size-4" aria-hidden="true" />
+          <span className="relative inline-flex size-28 sm:size-32 items-center justify-center">
+            <span className="flex size-full items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[linear-gradient(145deg,#dff5e2,#b9e5bf)] text-3xl font-bold text-[#00932a] shadow-md dark:border-card dark:bg-[linear-gradient(145deg,#0f2818,#163d21)]">
+              {picture.preview ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={picture.preview}
+                  alt={`${profileName} profile`}
+                  className="size-full object-cover"
+                />
+              ) : (
+                getInitials(firstName, lastName, profile.username)
+              )}
+            </span>
+            <span className="absolute right-0 bottom-0 z-10 grid size-9.5 place-items-center rounded-full border-2 border-white bg-[#00932a] text-white shadow-md transition-transform group-hover:scale-105 dark:border-card">
+              <Camera className="size-4.5" aria-hidden="true" />
             </span>
           </span>
         }
@@ -315,7 +317,7 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
                 picture.reset();
                 setPictureNote(null);
               }}
-              className="px-0 text-xs text-[#6b7569] underline hover:text-[#1a222b] dark:text-muted-foreground dark:hover:text-foreground"
+              className="px-0 text-sm font-medium text-[#2563eb] hover:underline dark:text-blue-400"
             >
               Undo
             </button>
@@ -324,7 +326,7 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
               type="button"
               disabled={isSaving || isRemovingPicture}
               onClick={handlePictureRemove}
-              className="px-0 text-xs text-[#6b7569] underline hover:text-[#d14341] dark:text-muted-foreground dark:hover:text-red-400"
+              className="px-0 text-sm font-medium text-[#2563eb] hover:underline dark:text-blue-400"
             >
               {isRemovingPicture ? "Removing…" : "Remove photo"}
             </button>
@@ -332,12 +334,15 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
         }
       />
 
-      <h2 className="mt-4 text-xl font-bold text-[#161d16] dark:text-foreground">
-        {profileName}
-      </h2>
-      <p className="mt-1 text-sm text-[#657064] dark:text-muted-foreground">
-        {profile.role || "Super Admin"}
-      </p>
+      <div className="mt-5 text-center">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#0f172a] dark:text-foreground tracking-tight">
+          {profileName}
+        </h2>
+        <p className="mt-1 text-xs font-bold tracking-widest text-[#94a3b8] dark:text-muted-foreground uppercase">
+          {profile.role || "BUSINESS"}
+        </p>
+      </div>
+
       <div className="min-h-4" aria-live="polite">
         {pictureNote ? (
           <p className="mt-2 text-xs text-[#00932a]" role="status">
