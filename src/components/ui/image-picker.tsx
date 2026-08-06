@@ -126,7 +126,7 @@ function useDropTarget({
     if (disabled) return;
 
     const files = Array.from(event.dataTransfer.files).filter((file) =>
-      file.type.startsWith("image/")
+      file.type.startsWith("image/"),
     );
 
     if (files.length) {
@@ -179,15 +179,14 @@ export function ImagePicker({
   });
 
   return (
-    <div className={cn("flex flex-col items-center gap-2", className)}>
+    <div className={cn("flex flex-col items-center gap-3", className)}>
       <label
         {...dropProps}
         className={cn(
-          "group relative flex w-full cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-[#e4eae2] bg-white px-5 py-6 text-center outline-none transition-colors focus-within:border-[#00932a] hover:border-[#00932a]/50",
-          isOver && "border-[#00932a] bg-[#f5f8f4]",
-          disabled && "cursor-not-allowed opacity-60"
-        )}
-      >
+          "group relative flex w-full cursor-pointer flex-col items-center justify-center rounded-2xl sm:rounded-3xl border-2 border-dashed border-[#e2e8f0] bg-white px-4 py-6 sm:px-6 sm:py-8 text-center outline-none transition-all duration-200 focus-within:border-[#00932a] hover:border-[#00932a]/50 hover:bg-[#fafdfa] dark:border-input dark:bg-card dark:hover:border-primary/50",
+          isOver && "border-[#00932a] bg-[#f5f8f4] dark:bg-primary/10",
+          disabled && "cursor-not-allowed opacity-60",
+        )}>
         <input
           ref={inputRef}
           type="file"
@@ -206,8 +205,8 @@ export function ImagePicker({
           {busy ? (
             <span
               className={cn(
-                "absolute inset-0 grid place-items-center bg-white/70 text-xs font-semibold text-[#00932a]",
-                previewShape === "circle" ? "rounded-full" : "rounded-xl"
+                "absolute inset-0 grid place-items-center bg-white/70 text-xs font-semibold text-[#00932a] dark:bg-card/80",
+                previewShape === "circle" ? "rounded-full" : "rounded-xl",
               )}
             >
               Uploading…
@@ -215,21 +214,21 @@ export function ImagePicker({
           ) : null}
         </span>
 
-        <span className="text-base font-bold leading-6 text-[#1a222b]">
+        <span className="mt-3.5 text-base sm:text-lg font-bold text-[#1e293b] dark:text-foreground">
           {label}
         </span>
-        <span className="max-w-[220px] text-[11px] leading-[16.5px] text-[#424841]">
+        <span className="mt-1 max-w-[240px] text-xs leading-relaxed text-[#64748b] dark:text-muted-foreground">
           Drag and drop, or click to browse. {hint || rules.hint}
         </span>
       </label>
 
       {actions ? (
-        <div className="flex items-center justify-center gap-3">{actions}</div>
+        <div className="mt-1 flex items-center justify-center gap-3">{actions}</div>
       ) : null}
 
       <div className="min-h-4" aria-live="polite">
         {error ? (
-          <p className="text-xs text-[#d14341]" role="alert">
+          <p className="text-xs text-[#d14341] dark:text-red-400" role="alert">
             {error}
           </p>
         ) : null}
