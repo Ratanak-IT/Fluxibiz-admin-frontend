@@ -1,6 +1,5 @@
 import {
   Building2,
-  FolderTree,
   LayoutGrid,
   Ruler,
   ScrollText,
@@ -45,8 +44,12 @@ export const NAVIGATION: NavSection[] = [
     },
     children: [
       {
-        label: "All businesses",
+        label: "All Business",
         href: "/businesses",
+      },
+      {
+        label: "Categories",
+        href: "/businesses/categories",
       },
     ],
   },
@@ -64,22 +67,6 @@ export const NAVIGATION: NavSection[] = [
         label: "Overview",
         href: "/overview",
         exact: true,
-      },
-    ],
-  },
-  {
-    id: "categories",
-    label: "Business Categories",
-    icon: FolderTree,
-    app: {
-      label: "Business Categories",
-      fill: "linear-gradient(-42.95deg, #0e7e2e 5.06%, #42d00e 80.71%)",
-      ink: "#ffffff",
-    },
-    children: [
-      {
-        label: "Categories",
-        href: "/categories",
       },
     ],
   },
@@ -200,6 +187,10 @@ export function sectionEntryHref(section: NavSection) {
 }
 
 export function isLeafActive(leaf: NavLink, pathname: string): boolean {
+  if (leaf.href === "/businesses" && pathname.startsWith("/businesses/categories")) {
+    return false;
+  }
+
   return leaf.exact
     ? pathname === leaf.href
     : pathname === leaf.href || pathname.startsWith(`${leaf.href}/`);

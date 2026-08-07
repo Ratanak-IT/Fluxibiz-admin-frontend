@@ -53,7 +53,7 @@ function StatCard({
         : "text-neutral-900 dark:text-neutral-50";
 
   const card = (
-   <div className="rounded-2xl border border-neutral-200 p-6 transition hover:border-neutral-300 dark:border-border dark:bg-card dark:hover:border-muted">
+   <div className="rounded-2xl border border-neutral-200 bg-card p-6 transition hover:border-neutral-300 dark:border-border dark:hover:border-muted">
   <p className="text-sm text-neutral-500 dark:text-muted-foreground">{label}</p>
   <p className={`mt-2 text-3xl font-semibold tabular-nums sm:text-4xl ${tone}`}>{value}</p>
   {hint && <p className="mt-1 text-xs text-neutral-400 dark:text-muted-foreground">{hint}</p>}
@@ -285,7 +285,7 @@ export default function OverviewPage() {
       </div>
 
    <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-5">
-        <section className="rounded-2xl border border-neutral-200 p-6 lg:col-span-3 dark:border-border dark:bg-card dark:text-card-foreground">
+        <section className="rounded-2xl border border-neutral-200 bg-card p-6 lg:col-span-3 dark:border-border dark:text-card-foreground">
           <h2 className="text-sm font-semibold text-neutral-900 dark:text-foreground">
             Orders by day
           </h2>
@@ -300,7 +300,7 @@ export default function OverviewPage() {
           />
         </section>
 
-        <section className="rounded-2xl border border-neutral-200 p-6 lg:col-span-2 dark:border-border dark:bg-card dark:text-card-foreground">
+        <section className="rounded-2xl border border-neutral-200 bg-card p-6 lg:col-span-2 dark:border-border dark:text-card-foreground">
           <h2 className="text-sm font-semibold text-neutral-900 dark:text-foreground">
             Busiest shops
           </h2>
@@ -312,7 +312,7 @@ export default function OverviewPage() {
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-5">
-        <section className="rounded-2xl border border-neutral-200 p-6 lg:col-span-3 dark:border-border dark:bg-card dark:text-card-foreground">
+        <section className="rounded-2xl border border-neutral-200 bg-card p-6 lg:col-span-3 dark:border-border dark:text-card-foreground">
           <h2 className="text-sm font-semibold text-neutral-900 dark:text-foreground">
             Sign ups by day
           </h2>
@@ -327,7 +327,7 @@ export default function OverviewPage() {
           />
         </section>
 
-        <section className="rounded-2xl border border-neutral-200 p-6 lg:col-span-2 dark:border-border dark:bg-card dark:text-card-foreground">
+        <section className="rounded-2xl border border-neutral-200 bg-card p-6 lg:col-span-2 dark:border-border dark:text-card-foreground">
           <h2 className="text-sm font-semibold text-neutral-900 dark:text-foreground">
             By category
           </h2>

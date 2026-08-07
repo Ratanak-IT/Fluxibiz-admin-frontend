@@ -17,6 +17,7 @@ export default function AppShell({
 
   const chromeless = pathname === "/apps";
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setNavOpen(false), [pathname]);
 
   useEffect(() => {

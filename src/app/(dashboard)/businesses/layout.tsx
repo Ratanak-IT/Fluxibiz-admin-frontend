@@ -2,6 +2,7 @@ import { ModuleSidebar, type SidebarItem } from "@/components/admin/ModuleSideba
 
 const ITEMS: SidebarItem[] = [
   { label: "All businesses", href: "/businesses", icon: "business" },
+  { label: "Categories", href: "/businesses/categories", icon: "category" },
 ];
 
 export default function BusinessesLayout({ children }: { children: React.ReactNode }) {

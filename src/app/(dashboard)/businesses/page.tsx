@@ -171,7 +171,7 @@ export default function BusinessesPage() {
 
     <div className="mt-7 flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
   <div className="relative w-full lg:min-w-[280px] lg:w-auto lg:flex-1">
-    <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+    <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground dark:text-primary-foreground" />
     <input
       value={keyword}
       onChange={(event) => {
@@ -179,7 +179,7 @@ export default function BusinessesPage() {
         setPage(0);
       }}
       placeholder="Search by name, city or description"
-      className="w-full rounded-full border border-input bg-background py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
+      className="w-full rounded-full border border-input bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring dark:bg-background dark:text-primary-foreground"
     />
   </div>
 
@@ -191,14 +191,14 @@ export default function BusinessesPage() {
         onClick={() => setFilterMenuOpen((prev) => !prev)}
         aria-expanded={filterMenuOpen}
         aria-haspopup="listbox"
-        className="flex w-full items-center justify-between gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm text-foreground transition hover:bg-accent"
+        className="flex w-full items-center justify-between gap-2 rounded-full border border-border bg-primary-foreground px-4 py-2 text-sm text-foreground transition hover:bg-accent dark:bg-background dark:text-primary-foreground"
       >
         <span className="flex items-center gap-2">
-          <SlidersHorizontal className="size-4 text-muted-foreground" aria-hidden />
+          <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
           {activeFilter.label}
         </span>
         <ChevronDown
-          className={`size-4 text-muted-foreground transition-transform ${
+          className={`size-4 text-muted-foreground transition-transform dark:text-primary-foreground ${
             filterMenuOpen ? "rotate-180" : ""
           }`}
         />
@@ -240,13 +240,13 @@ export default function BusinessesPage() {
       )}
     </div>
 
-    <ColumnPicker state={cols} />
+    <ColumnPicker state={cols} buttonClassName="bg-primary-foreground dark:bg-background dark:text-primary-foreground" />
   </div>
 
   {/* Desktop only: original pill row + ColumnPicker inline */}
   <div className="hidden items-center gap-2 lg:flex">
     <SlidersHorizontal
-      className="size-4 text-muted-foreground"
+      className="size-4 fill-primary text-primary"
       aria-hidden
     />
     {STATUS_FILTERS.map((filter) => (
@@ -258,10 +258,10 @@ export default function BusinessesPage() {
           setPage(0);
         }}
         className={[
-          "rounded-full border px-4 py-2 text-sm transition",
+          "rounded-full border px-4 py-2 text-sm transition dark:bg-background dark:text-primary-foreground",
           status === filter.value
-            ? "border-primary bg-primary text-primary-foreground"
-            : "border-border text-foreground hover:bg-accent hover:text-accent-foreground",
+            ? "border-primary bg-primary-foreground text-primary"
+            : "border-border bg-primary-foreground text-foreground hover:bg-accent hover:text-accent-foreground",
         ].join(" ")}
       >
         {filter.label}
@@ -270,7 +270,7 @@ export default function BusinessesPage() {
   </div>
 
   <div className="hidden lg:block">
-    <ColumnPicker state={cols} />
+    <ColumnPicker state={cols} buttonClassName="bg-primary-foreground dark:bg-background dark:text-primary-foreground" />
   </div>
 </div>
 

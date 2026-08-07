@@ -91,11 +91,11 @@ export default function CategoriesPage() {
 
   <div className="mt-7 space-y-3">
     {categories.map((parent) => (
-      <div key={parent.id} className="rounded-2xl border border-neutral-200 dark:border-[var(--border)] dark:bg-[var(--card)]">
+      <div key={parent.id} className="rounded-2xl border border-neutral-200 bg-primary-foreground dark:border-[var(--border)] dark:bg-background dark:text-primary-foreground">
         <div className="flex items-center justify-between gap-2 px-4 py-3 sm:px-5 sm:py-4">
           <div className="min-w-0">
-            <span className="font-medium text-neutral-900 dark:text-[var(--card-foreground)] break-words">{parent.name}</span>
-            <span className="ml-2 text-xs text-neutral-400 dark:text-[var(--muted-foreground)]">/{parent.slug}</span>
+            <span className="font-medium text-neutral-900 dark:text-primary-foreground break-words">{parent.name}</span>
+            <span className="ml-2 text-xs text-neutral-400 dark:text-primary-foreground">/{parent.slug}</span>
           </div>
 
           <div className="flex shrink-0 items-center gap-1">
@@ -103,7 +103,7 @@ export default function CategoriesPage() {
               type="button"
               title="Add sub category"
               onClick={() => setEditor({ mode: "create", name: "", parentId: parent.id })}
-              className="rounded-full p-2 text-neutral-400 dark:text-[var(--muted-foreground)] hover:bg-neutral-100 dark:hover:bg-[var(--accent)] hover:text-neutral-700 dark:hover:text-[var(--accent-foreground)]"
+              className="rounded-full p-2 text-primary hover:bg-neutral-100 dark:hover:bg-[var(--accent)] hover:text-primary"
             >
               <Plus className="size-4" />
             </button>
@@ -113,7 +113,7 @@ export default function CategoriesPage() {
               onClick={() =>
                 setEditor({ mode: "edit", categoryId: parent.id, name: parent.name, parentId: null })
               }
-              className="rounded-full p-2 text-neutral-400 dark:text-[var(--muted-foreground)] hover:bg-neutral-100 dark:hover:bg-[var(--accent)] hover:text-neutral-700 dark:hover:text-[var(--accent-foreground)]"
+              className="rounded-full p-2 text-secondary hover:bg-neutral-100 dark:hover:bg-[var(--accent)] hover:text-secondary"
             >
               <Pencil className="size-4" />
             </button>
@@ -121,7 +121,7 @@ export default function CategoriesPage() {
               type="button"
               title="Delete"
               onClick={() => confirmDelete(parent.id, parent.name)}
-              className="rounded-full p-2 text-neutral-400 dark:text-[var(--muted-foreground)] hover:bg-red-50 dark:hover:bg-[var(--destructive)]/20 hover:text-red-600 dark:hover:text-[var(--destructive)]"
+              className="rounded-full p-2 text-brand-red hover:bg-red-50 dark:hover:bg-[var(--destructive)]/20 hover:text-brand-red"
             >
               <Trash2 className="size-4" />
             </button>
@@ -135,8 +135,8 @@ export default function CategoriesPage() {
                 key={child.id}
                 className="flex items-center justify-between gap-2 px-4 py-3 pl-6 sm:px-5 sm:pl-8 lg:pl-10 text-sm"
               >
-                <span className="flex min-w-0 items-center gap-2 text-neutral-700 dark:text-[var(--card-foreground)]">
-                  <ChevronRight className="size-3.5 shrink-0 text-neutral-300 dark:text-[var(--muted-foreground)]" aria-hidden />
+                <span className="flex min-w-0 items-center gap-2 text-neutral-700 dark:text-primary-foreground">
+                  <ChevronRight className="size-3.5 shrink-0 text-neutral-300 dark:text-primary-foreground" aria-hidden />
                   <span className="break-words">{child.name}</span>
                 </span>
 
@@ -152,7 +152,7 @@ export default function CategoriesPage() {
                         parentId: parent.id,
                       })
                     }
-                    className="rounded-full p-2 text-neutral-400 dark:text-muted-foreground hover:bg-neutral-100 dark:hover:bg-accent hover:text-neutral-700 dark:hover:text-accent-foreground"
+                    className="rounded-full p-2 text-secondary hover:bg-neutral-100 dark:hover:bg-accent hover:text-secondary"
                   >
                     <Pencil className="size-4" />
                   </button>
@@ -160,7 +160,7 @@ export default function CategoriesPage() {
                     type="button"
                     title="Delete"
                     onClick={() => confirmDelete(child.id, child.name)}
-                    className="rounded-full p-2 text-neutral-400 dark:text-muted-foreground)] hover:bg-red-50 dark:hover:bg-destructive/20 hover:text-red-600 dark:hover:text-destructive"
+                    className="rounded-full p-2 text-brand-red hover:bg-red-50 dark:hover:bg-destructive/20 hover:text-brand-red"
                   >
                     <Trash2 className="size-4" />
                   </button>

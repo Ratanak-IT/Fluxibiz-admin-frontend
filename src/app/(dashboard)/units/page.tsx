@@ -123,12 +123,12 @@ export default function UnitsPage() {
             onChange={(event) => setKeyword(event.target.value)}
             placeholder="Search units"
             aria-label="Search units"
-            className="w-full rounded-full border border-border bg-background py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary"
+            className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
           />
         </div>
 
         <div className="shrink-0">
-          <ColumnPicker state={cols} />
+          <ColumnPicker state={cols} buttonClassName="bg-primary-foreground dark:bg-background" />
         </div>
       </div>
 
@@ -187,7 +187,7 @@ export default function UnitsPage() {
                     type="button"
                     onClick={() => setDialog(unit)}
                     aria-label={`Edit ${unit.name}`}
-                    className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
+                    className="rounded-full p-2 text-secondary transition hover:bg-accent hover:text-secondary"
                   >
                     <Pencil className="size-4" />
                   </button>
@@ -195,7 +195,7 @@ export default function UnitsPage() {
                     type="button"
                     onClick={() => remove(unit)}
                     aria-label={`Delete ${unit.name}`}
-                    className="rounded-full p-2 text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive"
+                    className="rounded-full p-2 text-brand-red transition hover:bg-destructive/15 hover:text-brand-red"
                   >
                     <Trash2 className="size-4" />
                   </button>

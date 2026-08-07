@@ -26,7 +26,7 @@ function Badge({ on, label }: { on: boolean; label: string }) {
     <span
       className={
         on
-          ? "inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
+          ? "inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary "
           : "inline-flex rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground"
       }
     >
@@ -136,30 +136,30 @@ export default function ChannelsPage() {
               onChange={(event) => setKeyword(event.target.value)}
               placeholder="Search by shop, address or bot"
               aria-label="Search channels"
-              className="w-full rounded-full border border-border bg-background py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary"
+              className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
             />
           </div>
 
           <div className="hidden shrink-0 lg:block">
-            <ColumnPicker state={cols} />
+            <ColumnPicker state={cols} buttonClassName="bg-primary-foreground dark:bg-background " />
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3 lg:hidden">
+        <div className="flex items-center gap-2 sm:gap-3 lg:hidden ">
           <div className="relative flex-1" ref={filterRef}>
             <button
               type="button"
               onClick={() => setFilterOpen((open) => !open)}
               aria-haspopup="listbox"
               aria-expanded={filterOpen}
-              className="flex w-full items-center gap-2 rounded-full border border-border bg-background py-2.5 pl-4 pr-4 text-sm text-foreground outline-none transition hover:bg-accent hover:text-accent-foreground focus:border-primary"
+              className="flex w-full items-center gap-2 rounded-full border border-border bg-primary-foreground py-2.5 pl-4 pr-4 text-sm text-foreground outline-none transition hover:bg-accent hover:text-accent-foreground focus:border-primary "
             >
               <SlidersHorizontal className="size-4 shrink-0 text-muted-foreground" aria-hidden />
               <span className="flex-1 text-left">
                 {FILTERS.find((option) => option.value === filter)?.label}
               </span>
               <ChevronDown
-                className={`size-4 shrink-0 text-muted-foreground transition-transform ${filterOpen ? "rotate-180" : ""}`}
+                className={`size-4 shrink-0 text-muted-foreground transition-transform ${filterOpen ? "rotate-180" : ""} `}
                 aria-hidden
               />
             </button>
@@ -180,7 +180,7 @@ export default function ChannelsPage() {
                       setFilterOpen(false);
                     }}
                     className={[
-                      "block w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium transition",
+                      "block w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium transition ",
                       filter === option.value
                         ? "bg-primary text-primary-foreground"
                         : "text-popover-foreground hover:bg-accent hover:text-accent-foreground",
@@ -194,27 +194,27 @@ export default function ChannelsPage() {
           </div>
 
           <div className="shrink-0">
-            <ColumnPicker state={cols} />
+            <ColumnPicker state={cols} buttonClassName="bg-primary-foreground" />
           </div>
         </div>
 
-        <div className="hidden flex-wrap gap-2 lg:flex">
-          {FILTERS.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => setFilter(option.value)}
-              className={[
-                "rounded-full border px-4 py-2 text-sm transition",
-                filter === option.value
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-              ].join(" ")}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+       <div className="hidden flex-wrap gap-2 lg:flex">
+  {FILTERS.map((option) => (
+    <button
+      key={option.value}
+      type="button"
+      onClick={() => setFilter(option.value)}
+      className={[
+        "rounded-full border bg-primary-foreground px-4 py-2 text-sm transition dark:bg-background",
+        filter === option.value
+          ? "border-primary text-primary"
+          : "border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+      ].join(" ")}
+    >
+      {option.label}
+    </button>
+  ))}
+</div>
       </div>
 
       <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">

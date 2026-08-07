@@ -95,7 +95,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       <div className="mt-9 grid gap-6 lg:grid-cols-3">
-        <section className="rounded-2xl border border-neutral-200 p-6 lg:col-span-2">
+        <section className="rounded-2xl border border-neutral-200 bg-primary-foreground p-6 lg:col-span-2">
           <h2 className="text-sm font-semibold text-neutral-900">Profile</h2>
           <p className="mt-2 text-sm leading-relaxed text-neutral-600">
             {business.about?.trim() || "The owner has not written a description yet."}

@@ -17,7 +17,7 @@ export default function Header({
   const { app, page } = getPageTitle(pathname);
 
   return (
-    <header className="flex flex-nowrap items-center gap-2 px-4 pt-4 pb-5 sm:gap-4 sm:px-8 sm:pt-6 sm:pb-8 dark:bg-background">
+    <header className="flex flex-nowrap items-center gap-2 px-4 pt-4 pb-5 sm:gap-4 sm:px-8 sm:pt-6 sm:pb-8 dark:bg-background ">
       <button
         type="button"
         onClick={onOpenNav}
