@@ -3,6 +3,7 @@ import { Google_Sans } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "sonner";
 
 const googleSans = Google_Sans({
   variable: "--font-google-sans",
@@ -32,7 +33,9 @@ export default function RootLayout({
         >{children}
         </ThemeProvider>
           </StoreProvider>
+        <Toaster richColors position="top-right" closeButton />
       </body>
     </html>
   );
 }
+

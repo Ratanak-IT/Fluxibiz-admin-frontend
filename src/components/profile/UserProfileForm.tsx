@@ -6,6 +6,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
+import { toast } from "sonner";
 import {
   AtSign,
   BadgeCheck,
@@ -249,13 +250,11 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
       picture.reset();
       publishProfile({ ...profile, profilePicture: "" });
       setPictureNote("Profile picture removed.");
+      toast.success("Profile picture removed.");
     } catch (error) {
-      picture.setError(
-        getApiErrorMessage(
-          error,
-          "Unable to remove your profile picture."
-        )
-      );
+      const msg = getApiErrorMessage(error, "Unable to remove your profile picture.");
+      picture.setError(msg);
+      toast.error(msg);
     }
   }
 
@@ -311,14 +310,11 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
         type: "success",
         message: "Your profile was saved successfully.",
       });
+      toast.success("Your profile was saved successfully.");
     } catch (error) {
-      setStatus({
-        type: "error",
-        message: getApiErrorMessage(
-          error,
-          "Unable to save your profile."
-        ),
-      });
+      const msg = getApiErrorMessage(error, "Unable to save your profile.");
+      setStatus({ type: "error", message: msg });
+      toast.error(msg);
     }
   }
 

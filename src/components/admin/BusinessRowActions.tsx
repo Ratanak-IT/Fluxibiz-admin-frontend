@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MoreVertical } from "lucide-react";
+import { toast } from "sonner";
 import {
   useActivateBusinessMutation,
   useCloseBusinessMutation,
@@ -51,9 +52,13 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
   const runWithReason = async (reason: string) => {
     const payload = { businessId: business.id, reason };
 
-    if (dialog === "suspend") await suspend(payload);
-    if (dialog === "disable") await disable(payload);
-    if (dialog === "close") await close(payload);
+    try {
+      if (dialog === "suspend") { await suspend(payload).unwrap(); toast.success(`"${business.name}" has been suspended.`); }
+      if (dialog === "disable") { await disable(payload).unwrap(); toast.success(`Features disabled for "${business.name}".`); }
+      if (dialog === "close") { await close(payload).unwrap(); toast.success(`"${business.name}" has been closed.`); }
+    } catch {
+      toast.error(`Failed to ${dialog} "${business.name}".`);
+    }
 
     setDialog(null);
     setOpen(false);
@@ -90,7 +95,8 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
   <div className="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-xl border border-border bg-white py-1 shadow-lg dark:bg-popover">
     {business.status !== "ACTIVE" &&
       item("Activate", async () => {
-        await activate(business.id);
+        try { await activate(business.id).unwrap(); toast.success(`"${business.name}" activated.`); }
+        catch { toast.error(`Failed to activate "${business.name}".`); }
         setOpen(false);
       })}
 
@@ -99,13 +105,15 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
     {business.isEnabled
       ? item("Disable features", () => setDialog("disable"))
       : item("Enable features", async () => {
-          await enable(business.id);
+          try { await enable(business.id).unwrap(); toast.success(`Features enabled for "${business.name}".`); }
+          catch { toast.error(`Failed to enable features for "${business.name}".`); }
           setOpen(false);
         })}
 
     {business.isClosed
       ? item("Reopen shop", async () => {
-          await reopen(business.id);
+          try { await reopen(business.id).unwrap(); toast.success(`"${business.name}" has been reopened.`); }
+          catch { toast.error(`Failed to reopen "${business.name}".`); }
           setOpen(false);
         })
       : item("Close shop", () => setDialog("close"))}
@@ -116,7 +124,8 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
       "Delete",
       async () => {
         if (confirm(`Delete ${business.name}? This marks the account as deleted.`)) {
-          await remove(business.id);
+          try { await remove(business.id).unwrap(); toast.success(`"${business.name}" deleted.`); }
+          catch { toast.error(`Failed to delete "${business.name}".`); }
         }
         setOpen(false);
       },
