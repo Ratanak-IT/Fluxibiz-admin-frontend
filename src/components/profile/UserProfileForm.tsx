@@ -10,6 +10,7 @@ import {
   AtSign,
   BadgeCheck,
   Camera,
+  ChevronDown,
   Mail,
   MapPin,
   Phone,
@@ -31,6 +32,12 @@ import {
   userProfileApi,
 } from "@/services/userProfileApi";
 import { useAppDispatch } from "@/store/hooks";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type FieldName = keyof UserProfileInput;
 type FieldErrors = Partial<Record<FieldName, string>>;
@@ -129,6 +136,43 @@ function Field({
   );
 }
 
+function GenderSelect({
+  value,
+  onChange,
+  options,
+  labels,
+}: {
+  value: (typeof userProfileGenders)[number];
+  onChange: (value: (typeof userProfileGenders)[number]) => void;
+  options: readonly (typeof userProfileGenders)[number][];
+  labels: Record<(typeof userProfileGenders)[number], string>;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="inline-flex h-11 w-full items-center justify-between rounded-xl border border-[#e2e2de] bg-white px-4 text-left text-[14px] font-semibold text-[#16181c] outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-input dark:bg-card dark:text-foreground dark:focus-visible:ring-offset-card">
+        <span>{labels[value]}</span>
+        <ChevronDown className="size-4 text-[#7a8478] dark:text-muted-foreground" />
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent className="mt-2 min-w-60 overflow-hidden rounded-xl border border-[#e2e8f0] bg-white p-2 shadow-lg dark:border-border dark:bg-card">
+        {options.map((option) => (
+          <DropdownMenuItem
+            key={option}
+            className={`rounded-2xl px-4 py-3 text-sm font-semibold ${
+              option === value
+                ? "bg-primary text-white"
+                : "text-[#16181c] hover:bg-[#eff9ee] hover:text-[#16181c] dark:text-foreground dark:hover:bg-[#163d21]"
+            }`}
+            onSelect={() => onChange(option)}
+          >
+            {labels[option]}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 function AccountDetail({
   icon,
   label,
@@ -167,6 +211,7 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
 
   const [firstName, setFirstName] = useState(profile.firstName || "");
   const [lastName, setLastName] = useState(profile.lastName || "");
+  const [gender, setGender] = useState(initialGender);
   const picture = useStagedImage(profilePictureRules, storedPicture);
   const [pictureNote, setPictureNote] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -218,6 +263,7 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
     formRef.current?.reset();
     setFirstName(profile.firstName || "");
     setLastName(profile.lastName || "");
+    setGender(initialGender);
     picture.reset();
     setFieldErrors({});
     setPictureNote(null);
@@ -455,19 +501,16 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
         label="Gender"
         name="gender"
         error={fieldErrors.gender}
+       
       >
-        <select
-          id="gender"
-          name="gender"
-          defaultValue={initialGender}
-          className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white px-4 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25 dark:border-input dark:bg-card dark:text-foreground"
-        >
-          {userProfileGenders.map((gender) => (
-            <option key={gender} value={gender}>
-              {genderLabels[gender]}
-            </option>
-          ))}
-        </select>
+        <GenderSelect
+          value={gender}
+          onChange={setGender}
+          options={userProfileGenders}
+          labels={genderLabels}
+        />
+        <input type="hidden" name="gender" value={gender}
+         />
       </Field>
 
       <div className="md:col-span-2">
@@ -532,7 +575,7 @@ export default function UserProfileForm() {
   if (profileQuery.isLoading) {
     return (
       <div
-        className="min-h-[500px] animate-pulse rounded-2xl bg-[#e8ede7]"
+        className="min-h-125 animate-pulse rounded-2xl bg-[#e8ede7]"
         aria-label="Loading user profile"
       />
     );
