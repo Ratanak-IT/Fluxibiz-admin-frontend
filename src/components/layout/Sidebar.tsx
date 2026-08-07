@@ -130,8 +130,7 @@ function SectionItem({
           active
             ? "bg-white text-[#16181c] shadow-[0_1px_2px_rgba(22,24,28,.08)] font-medium"
             : "text-[#5c6660] hover:bg-black/[.04] hover:text-[#16181c]"
-        )}
-      >
+        )}>
         <Icon
           className={cn(
             "size-[18px] shrink-0",
@@ -168,7 +167,7 @@ function SectionItem({
                 className={cn(
                   "flex items-center gap-2 rounded-lg px-3 py-2 text-[14px] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
                   leafActive
-                    ? "bg-background text-foreground shadow-[0_1px_2px_rgba(0,0,0,.24)] font-medium"
+                    ? "bg-card text-foreground  font-medium"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >

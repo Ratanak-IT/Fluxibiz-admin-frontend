@@ -27,17 +27,22 @@ export default function Header({
         <Menu className="size-5" aria-hidden="true" />
       </button>
 
-   <h1 className="min-w-0 flex-1 truncate text-xl leading-tight text-[#16181c] sm:text-[24px] dark:text-foreground">
-  <span className="font-semibold">{app}</span>
-  {page && (
-    <span className="hidden lg:inline">
-      <span aria-hidden="true" className="mx-2 text-[#c4c9c3] dark:text-muted-foreground">
-        /
-      </span>
-      <span className="text-[#5c6660] dark:text-muted-foreground">{page}</span>
-    </span>
-  )}
-</h1>
+      <h1 className="min-w-0 flex-1 truncate text-xl leading-tight text-[#16181c] sm:text-[24px] dark:text-foreground">
+        <span className="font-semibold">{app}</span>
+        {page && (
+          <span className="hidden lg:inline">
+            <span
+              aria-hidden="true"
+              className="mx-2 text-[#c4c9c3] dark:text-muted-foreground"
+            >
+              /
+            </span>
+            <span className="text-[#5c6660] dark:text-muted-foreground">
+              {page}
+            </span>
+          </span>
+        )}
+      </h1>
 
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <label className="relative hidden md:block">

@@ -83,7 +83,7 @@ function BarChart({ data }: { data: Array<{ label: string; value: number }> }) {
    <div className="mt-6 overflow-x-auto ">
   <ChartContainer
     config={chartConfig}
-    className="min-h-[200px] min-w-[28rem] w-full"
+    className="min-h-50 min-w-[28rem] w-full"
   >
     <RechartsBarChart accessibilityLayer data={data}>
       <CartesianGrid 
@@ -230,7 +230,7 @@ export default function OverviewPage() {
       <h2 className="mt-8 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-[var(--muted-foreground)]">
         Activity, last 30 days
       </h2>
-      <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Orders completed"
           value={data.ordersPaidLast30Days}
@@ -260,7 +260,7 @@ export default function OverviewPage() {
       <h2 className="mt-10 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-muted-foreground">
         Businesses
       </h2>
-      <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           label="Total businesses"
           value={data.totalBusinesses}
@@ -284,7 +284,7 @@ export default function OverviewPage() {
         <StatCard label="Deleted" value={data.deletedBusinesses} hint="Marked deleted, data retained" />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-5">
+   <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-5">
         <section className="rounded-2xl border border-neutral-200 p-6 lg:col-span-3 dark:border-border dark:bg-card dark:text-card-foreground">
           <h2 className="text-sm font-semibold text-neutral-900 dark:text-foreground">
             Orders by day
@@ -311,7 +311,7 @@ export default function OverviewPage() {
         </section>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-5">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-5">
         <section className="rounded-2xl border border-neutral-200 p-6 lg:col-span-3 dark:border-border dark:bg-card dark:text-card-foreground">
           <h2 className="text-sm font-semibold text-neutral-900 dark:text-foreground">
             Sign ups by day
