@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⚡ FluxiBiz Admin Panel — Platform Operations & Management Portal
 
-## Getting Started
+![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)
+![React](https://img.shields.io/badge/React-19-blue.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC.svg)
+![Security](https://img.shields.io/badge/Security-RBAC%20%2B%20Keycloak-green.svg)
 
-First, run the development server:
+The **FluxiBiz Admin Panel** is the command and control portal for system super-administrators and platform operations teams. It provides platform-wide oversight across all tenant organizations, connected POS terminals, web storefronts, social marketplaces, and system infrastructure. 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Designed to govern multi-tenant commerce operations, the Admin Panel handles global tenant provisioning, real-time platform metrics, service health monitoring, identity/access management (IAM), global catalog enforcement, and financial audit logs.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ System Capabilities & Core Modules
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* **Multi-Tenant Platform Provisioning:** Create, manage, suspend, and configure tenant organizations, business accounts, and subscription tiers.
+* **Global Ecosystem Observability:** Real-time metrics for total Gross Merchandise Value (GMV), active POS terminals, API request rates, and webhook processing health across all tenants.
+* **Identity & Access Management (IAM):** Keycloak-backed Role-Based Access Control (RBAC) to manage administrative privileges, staff roles, and security policies.
+* **Platform-Wide Inventory & Catalog Governance:** Manage global taxonomies, category standards, system-wide brand registries, and cross-channel sync rules.
+* **Webhook & Event Orchestration:** Inspect, monitor, and retry multi-channel webhook deliveries, event streaming queues, and API integration logs.
+* **Audit & Compliance Logging:** System-wide immutable logging of admin actions, security events, payment gateway transactions, and tenant status changes.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🏗️ Platform Management Architecture
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+                               ┌──────────────────────────────┐
+                               │     Super Admin Console      │
+                               │  (FluxiBiz Admin Platform)   │
+                               └──────────────┬───────────────┘
+                                              │
+                                              ▼
+                               ┌──────────────────────────────┐
+                               │  Core System Gateway & IAM   │
+                               │ (Keycloak / OAuth2 / RBAC)   │
+                               └──────────────┬───────────────┘
+                                              │
+         ┌────────────────────────────────────┼────────────────────────────────────┐
+         │                                    │                                    │
+┌────────┴─────────┐                 ┌────────┴─────────┐                 ┌────────┴─────────┐
+│ Tenant Management│                 │ Service Health   │                 │ Global Audit     │
+│ - Provisioning   │                 │ - Webhook Queues │                 │ - Security Logs  │
+│ - Subscriptions  │                 │ - System Metrics │                 │ - Financial Sync │
+└────────┴─────────┘                 └────────┴─────────┘                 └────────┴─────────┘
+         │                                    │                                    │
+         └────────────────────────────────────┼────────────────────────────────────┘
+                                              │
+                                              ▼
+                               ┌──────────────────────────────┐
+                               │ Central Core Engine / DB     │
+                               │  (PostgreSQL / MinIO / Redis) │
+                               └──────────────────────────────┘
