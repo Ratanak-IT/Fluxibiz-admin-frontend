@@ -1,7 +1,6 @@
 import { ModuleSidebar, type SidebarItem } from "@/components/admin/ModuleSidebar";
 
 const ITEMS: SidebarItem[] = [
-  { label: "Roles", href: "/settings/roles", icon: "settings" },
   { label: "Platform features", href: "/settings/platform-features", icon: "settings" },
 ];
 

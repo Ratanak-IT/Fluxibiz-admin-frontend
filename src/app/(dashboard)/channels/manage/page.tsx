@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Pencil, Plus, Trash2, ShieldAlert } from "lucide-react";
+import { toast } from "sonner";
 import {
   useGetSalesChannelsQuery,
   useCreateSalesChannelMutation,
@@ -40,6 +41,7 @@ export default function ConfigureChannelsPage() {
           code: editor.code.trim().toUpperCase(),
           isActive: editor.isActive,
         }).unwrap();
+        toast.success(`Sales channel "${editor.name}" created.`);
       } else if (editor.id) {
         await update({
           id: editor.id,
@@ -47,25 +49,33 @@ export default function ConfigureChannelsPage() {
           code: editor.code.trim().toUpperCase(),
           isActive: editor.isActive,
         }).unwrap();
+        toast.success(`Sales channel "${editor.name}" updated.`);
       }
       setEditor(null);
     } catch (err) {
-      alert("Failed to save channel. Please ensure the code is unique.");
+      toast.error("Failed to save channel. Please ensure the code is unique.");
     }
   };
 
-  const confirmDelete = async (id: string, name: string) => {
-    if (
-      confirm(
-        `Are you sure you want to delete the "${name}" sales channel? Businesses using this channel won't be able to sell items on it anymore.`
-      )
-    ) {
-      try {
-        await remove(id).unwrap();
-      } catch (err) {
-        alert("Failed to delete channel.");
-      }
-    }
+  const confirmDelete = (id: string, name: string) => {
+    toast(`Delete "${name}" sales channel?`, {
+      description: "Businesses using this channel won't be able to sell items on it anymore.",
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            await remove(id).unwrap();
+            toast.success(`"${name}" channel deleted.`);
+          } catch (err) {
+            toast.error("Failed to delete channel.");
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {},
+      },
+    });
   };
 
   const crumbs = [

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, SlidersHorizontal, Plus, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 import {
   useGetBusinessesInfiniteQuery,
   useGetBusinessCategoriesQuery,
@@ -93,7 +94,7 @@ export default function BusinessesPage() {
   const handleCreate = async () => {
     if (!createForm) return;
     if (createForm.password !== createForm.confirmPassword) {
-      alert("Passwords do not match.");
+      toast.error("Passwords do not match.");
       return;
     }
     try {
@@ -110,6 +111,7 @@ export default function BusinessesPage() {
         businessAddress: createForm.businessAddress,
         businessCategoryId: createForm.businessCategoryId,
       }).unwrap();
+      toast.success("Business registered successfully!");
       setCreateForm(null);
     } catch (err: any) {
       const msg =
@@ -117,7 +119,7 @@ export default function BusinessesPage() {
         err?.data?.error ||
         err?.data?.detail ||
         "Registration failed. Please check your information and try again.";
-      alert(msg);
+      toast.error(msg);
     }
   };
 
@@ -169,110 +171,82 @@ export default function BusinessesPage() {
         </button>
       </div>
 
-    <div className="mt-7 flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
-  <div className="relative w-full lg:min-w-[280px] lg:w-auto lg:flex-1">
-    <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground dark:text-primary-foreground" />
-    <input
-      value={keyword}
-      onChange={(event) => {
-        setKeyword(event.target.value);
-        setPage(0);
-      }}
-      placeholder="Search by name, city or description"
-      className="w-full rounded-full border border-input bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring dark:bg-background dark:text-primary-foreground"
-    />
-  </div>
-
-  {/* Phone & tablet: filter dropdown + ColumnPicker share a row */}
-  <div className="flex w-full items-center gap-2 lg:hidden">
-    <div className="relative flex-1">
-      <button
-        type="button"
-        onClick={() => setFilterMenuOpen((prev) => !prev)}
-        aria-expanded={filterMenuOpen}
-        aria-haspopup="listbox"
-        className="flex w-full items-center justify-between gap-2 rounded-full border border-border bg-primary-foreground px-4 py-2 text-sm text-foreground transition hover:bg-accent dark:bg-background dark:text-primary-foreground"
-      >
-        <span className="flex items-center gap-2">
-          <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
-          {activeFilter.label}
-        </span>
-        <ChevronDown
-          className={`size-4 text-muted-foreground transition-transform dark:text-primary-foreground ${
-            filterMenuOpen ? "rotate-180" : ""
-          }`}
+    <div className="mt-7 flex items-center gap-2 sm:gap-3 lg:flex-wrap lg:justify-between">
+      <div className="relative min-w-0 flex-1 lg:max-w-md">
+        <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+        <input
+          value={keyword}
+          onChange={(event) => {
+            setKeyword(event.target.value);
+            setPage(0);
+          }}
+          placeholder="Search by name, city or description"
+          aria-label="Search businesses"
+          className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
         />
-      </button>
+      </div>
 
-      {filterMenuOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setFilterMenuOpen(false)}
-          />
-          <div
-            role="listbox"
-            className="absolute left-0 right-0 z-50 mt-2 overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg"
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Mobile/tablet dropdown filter */}
+        <div className="relative lg:hidden">
+          <button
+            type="button"
+            onClick={() => setFilterMenuOpen((prev) => !prev)}
+            aria-expanded={filterMenuOpen}
+            aria-haspopup="listbox"
+            className="flex items-center gap-2 rounded-full border border-border bg-primary-foreground px-4 py-2.5 text-sm text-foreground transition hover:bg-accent dark:bg-background"
           >
-            {STATUS_FILTERS.map((filter) => (
-              <button
-                key={filter.value}
-                type="button"
-                role="option"
-                aria-selected={status === filter.value}
-                onClick={() => {
-                  setStatus(filter.value);
-                  setPage(0);
-                  setFilterMenuOpen(false);
-                }}
-                className={[
-                  "flex w-full items-center rounded-lg px-3 py-2 text-left text-sm transition",
-                  status === filter.value
-                    ? "bg-primary text-primary-foreground"
-                    : "text-foreground hover:bg-accent hover:text-accent-foreground",
-                ].join(" ")}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+            <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
+            <span>{activeFilter.label}</span>
+            <ChevronDown className={`size-4 text-muted-foreground transition-transform ${filterMenuOpen ? "rotate-180" : ""}`} />
+          </button>
+
+          {filterMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setFilterMenuOpen(false)} />
+              <div role="listbox" className="absolute right-0 z-50 mt-2 min-w-[160px] overflow-hidden rounded-xl border border-border bg-popover p-1 shadow-lg">
+                {STATUS_FILTERS.map((filter) => (
+                  <button
+                    key={filter.value}
+                    type="button"
+                    role="option"
+                    aria-selected={status === filter.value}
+                    onClick={() => {
+                      setStatus(filter.value);
+                      setPage(0);
+                      setFilterMenuOpen(false);
+                    }}
+                    className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition ${status === filter.value ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-accent"}`}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Desktop pill filters */}
+        <div className="hidden items-center gap-2 lg:flex">
+          <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
+          {STATUS_FILTERS.map((filter) => (
+            <button
+              key={filter.value}
+              type="button"
+              onClick={() => {
+                setStatus(filter.value);
+                setPage(0);
+              }}
+              className={`rounded-full border px-4 py-2 text-sm transition ${status === filter.value ? "border-primary bg-primary-foreground text-primary dark:bg-background" : "border-border bg-primary-foreground text-foreground hover:bg-accent dark:bg-background"}`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+
+        <ColumnPicker state={cols} buttonClassName="bg-primary-foreground dark:bg-background" />
+      </div>
     </div>
-
-    <ColumnPicker state={cols} buttonClassName="bg-primary-foreground dark:bg-background dark:text-primary-foreground" />
-  </div>
-
-  {/* Desktop only: original pill row + ColumnPicker inline */}
-  <div className="hidden items-center gap-2 lg:flex">
-    <SlidersHorizontal
-      className="size-4 fill-primary text-primary"
-      aria-hidden
-    />
-    {STATUS_FILTERS.map((filter) => (
-      <button
-        key={filter.value}
-        type="button"
-        onClick={() => {
-          setStatus(filter.value);
-          setPage(0);
-        }}
-        className={[
-          "rounded-full border px-4 py-2 text-sm transition dark:bg-background dark:text-primary-foreground",
-          status === filter.value
-            ? "border-primary bg-primary-foreground text-primary"
-            : "border-border bg-primary-foreground text-foreground hover:bg-accent hover:text-accent-foreground",
-        ].join(" ")}
-      >
-        {filter.label}
-      </button>
-    ))}
-  </div>
-
-  <div className="hidden lg:block">
-    <ColumnPicker state={cols} buttonClassName="bg-primary-foreground dark:bg-background dark:text-primary-foreground" />
-  </div>
-</div>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-card">
         <table

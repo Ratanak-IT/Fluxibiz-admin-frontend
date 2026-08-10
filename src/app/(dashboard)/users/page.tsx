@@ -115,31 +115,31 @@ export default function PlatformStaffPage() {
   </div>
 
    
-        <div className="mt-7 flex items-center gap-2 sm:gap-3">
-  {/* Search */}
-  <div className="relative min-w-0 flex-1 lg:max-w-md">
-    <Search
-      className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-      aria-hidden
-    />
+      <div className="mt-7 flex items-center gap-2 sm:gap-3 lg:flex-wrap lg:justify-between">
+        {/* Search */}
+        <div className="relative min-w-0 flex-1 lg:max-w-md">
+          <Search
+            className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
 
-    <input
-      value={keyword}
-      onChange={(e) => setKeyword(e.target.value)}
-      placeholder="Search by name or email"
-      aria-label="Search staff"
-      className="w-full rounded-full border border-border bg-white py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
-    />
-  </div>
+          <input
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="Search by name or email"
+            aria-label="Search staff"
+            className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
+          />
+        </div>
 
-  {/* Filter / Column Picker */}
-  <div className="shrink-0">
-    <ColumnPicker
-      state={cols}
-      buttonClassName="bg-white dark:bg-background"
-    />
-  </div>
-</div>
+        {/* Filter / Column Picker */}
+        <div className="shrink-0">
+          <ColumnPicker
+            state={cols}
+            buttonClassName="bg-primary-foreground dark:bg-background"
+          />
+        </div>
+      </div>
 
 {/* Card */}
 <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-white dark:bg-background">

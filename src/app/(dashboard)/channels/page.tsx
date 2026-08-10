@@ -124,42 +124,37 @@ export default function ChannelsPage() {
         trading figures.
       </p>
 
-      <div className="mt-7 flex flex-col gap-3">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="relative min-w-0 flex-1 lg:max-w-md">
-            <Search
-              className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden
-            />
-            <input
-              value={keyword}
-              onChange={(event) => setKeyword(event.target.value)}
-              placeholder="Search by shop, address or bot"
-              aria-label="Search channels"
-              className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
-            />
-          </div>
-
-          <div className="hidden shrink-0 lg:block">
-            <ColumnPicker state={cols} buttonClassName="bg-primary-foreground dark:bg-background " />
-          </div>
+      <div className="mt-7 flex items-center gap-2 sm:gap-3 lg:flex-wrap lg:justify-between">
+        <div className="relative min-w-0 flex-1 lg:max-w-md">
+          <Search
+            className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            value={keyword}
+            onChange={(event) => setKeyword(event.target.value)}
+            placeholder="Search by shop, address or bot"
+            aria-label="Search channels"
+            className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
+          />
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3 lg:hidden ">
-          <div className="relative flex-1" ref={filterRef}>
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Mobile dropdown filter */}
+          <div className="relative lg:hidden" ref={filterRef}>
             <button
               type="button"
               onClick={() => setFilterOpen((open) => !open)}
               aria-haspopup="listbox"
               aria-expanded={filterOpen}
-              className="flex w-full items-center gap-2 rounded-full border border-border bg-primary-foreground py-2.5 pl-4 pr-4 text-sm text-foreground outline-none transition hover:bg-accent hover:text-accent-foreground focus:border-primary "
+              className="flex items-center gap-2 rounded-full border border-border bg-primary-foreground py-2.5 px-4 text-sm text-foreground outline-none transition hover:bg-accent focus:border-primary dark:bg-background"
             >
               <SlidersHorizontal className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-              <span className="flex-1 text-left">
+              <span className="truncate">
                 {FILTERS.find((option) => option.value === filter)?.label}
               </span>
               <ChevronDown
-                className={`size-4 shrink-0 text-muted-foreground transition-transform ${filterOpen ? "rotate-180" : ""} `}
+                className={`size-4 shrink-0 text-muted-foreground transition-transform ${filterOpen ? "rotate-180" : ""}`}
                 aria-hidden
               />
             </button>
@@ -167,7 +162,7 @@ export default function ChannelsPage() {
             {filterOpen && (
               <div
                 role="listbox"
-                className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-2xl border border-border bg-popover p-1.5 shadow-lg"
+                className="absolute right-0 top-full z-20 mt-2 min-w-[160px] overflow-hidden rounded-2xl border border-border bg-popover p-1.5 shadow-lg"
               >
                 {FILTERS.map((option) => (
                   <button
@@ -179,12 +174,11 @@ export default function ChannelsPage() {
                       setFilter(option.value);
                       setFilterOpen(false);
                     }}
-                    className={[
-                      "block w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium transition ",
+                    className={`block w-full rounded-xl px-4 py-2 text-left text-sm font-medium transition ${
                       filter === option.value
                         ? "bg-primary text-primary-foreground"
-                        : "text-popover-foreground hover:bg-accent hover:text-accent-foreground",
-                    ].join(" ")}
+                        : "text-popover-foreground hover:bg-accent"
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -193,28 +187,26 @@ export default function ChannelsPage() {
             )}
           </div>
 
-          <div className="shrink-0">
-            <ColumnPicker state={cols} buttonClassName="bg-primary-foreground" />
+          {/* Desktop pill filters */}
+          <div className="hidden flex-wrap gap-2 lg:flex">
+            {FILTERS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setFilter(option.value)}
+                className={`rounded-full border bg-primary-foreground px-4 py-2 text-sm transition dark:bg-background ${
+                  filter === option.value
+                    ? "border-primary text-primary"
+                    : "border-border text-muted-foreground hover:bg-accent"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
-        </div>
 
-       <div className="hidden flex-wrap gap-2 lg:flex">
-  {FILTERS.map((option) => (
-    <button
-      key={option.value}
-      type="button"
-      onClick={() => setFilter(option.value)}
-      className={[
-        "rounded-full border bg-primary-foreground px-4 py-2 text-sm transition dark:bg-background",
-        filter === option.value
-          ? "border-primary text-primary"
-          : "border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-      ].join(" ")}
-    >
-      {option.label}
-    </button>
-  ))}
-</div>
+          <ColumnPicker state={cols} buttonClassName="bg-primary-foreground dark:bg-background" />
+        </div>
       </div>
 
       <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">

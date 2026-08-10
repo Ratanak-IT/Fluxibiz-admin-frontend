@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import {
   useCreateBusinessCategoryMutation,
   useDeleteBusinessCategoryMutation,
@@ -29,23 +30,43 @@ export default function CategoriesPage() {
   const save = async () => {
     if (!editor?.name.trim()) return;
 
-    if (editor.mode === "create") {
-      await create({ name: editor.name.trim(), parentId: editor.parentId ?? null });
-    } else if (editor.categoryId) {
-      await update({
-        categoryId: editor.categoryId,
-        name: editor.name.trim(),
-        parentId: editor.parentId ?? null,
-      });
+    try {
+      if (editor.mode === "create") {
+        await create({ name: editor.name.trim(), parentId: editor.parentId ?? null }).unwrap();
+        toast.success(`Category "${editor.name}" created.`);
+      } else if (editor.categoryId) {
+        await update({
+          categoryId: editor.categoryId,
+          name: editor.name.trim(),
+          parentId: editor.parentId ?? null,
+        }).unwrap();
+        toast.success(`Category "${editor.name}" updated.`);
+      }
+      setEditor(null);
+    } catch {
+      toast.error("Failed to save category.");
     }
-
-    setEditor(null);
   };
 
-  const confirmDelete = async (id: string, name: string) => {
-    if (confirm(`Delete "${name}"? Shops already using it keep their link.`)) {
-      await remove(id);
-    }
+  const confirmDelete = (id: string, name: string) => {
+    toast(`Delete category "${name}"?`, {
+      description: "Shops already using it will keep their link.",
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            await remove(id).unwrap();
+            toast.success(`Category "${name}" deleted.`);
+          } catch {
+            toast.error("Failed to delete category.");
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {},
+      },
+    });
   };
 
   return (

@@ -270,9 +270,9 @@ export function AuditLogTable({
       </p>
 
       {/* Search + Filters */}
-      <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="mt-7 flex items-center gap-2 sm:gap-3 lg:flex-wrap lg:justify-between">
         {/* Search */}
-        <div className="relative w-full sm:max-w-md sm:flex-1">
+        <div className="relative min-w-0 flex-1 lg:max-w-md">
           <Search
             className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
             aria-hidden
@@ -284,12 +284,12 @@ export function AuditLogTable({
               setKeywordInput(event.target.value)
             }
             placeholder="Search by target, admin or reason"
-            className="w-full rounded-full border border-border bg-white py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-brand dark:bg-background"
+            className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary dark:bg-background"
           />
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <div
             className="relative w-40 sm:w-56"
             ref={actionFilterRef}

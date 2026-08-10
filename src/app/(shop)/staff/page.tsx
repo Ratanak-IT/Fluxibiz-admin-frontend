@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import {
   useChangeStaffRoleMutation,
   useGetShopPermissionsQuery,
@@ -68,10 +69,25 @@ export default function ShopStaffPage() {
     if (!("error" in result)) setDialog(null);
   };
 
-  const confirmRemove = async (userId: string, name: string) => {
-    if (confirm(`Remove ${name} from the shop? Past orders keep their name.`)) {
-      await remove({ businessId, userId });
-    }
+  const confirmRemove = (userId: string, name: string) => {
+    toast(`Remove ${name} from the shop?`, {
+      description: "Past orders will retain their name.",
+      action: {
+        label: "Remove",
+        onClick: async () => {
+          try {
+            await remove({ businessId, userId }).unwrap();
+            toast.success(`Removed ${name} from shop.`);
+          } catch {
+            toast.error(`Failed to remove ${name}.`);
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {},
+      },
+    });
   };
 
   return (

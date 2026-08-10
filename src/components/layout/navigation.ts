@@ -101,10 +101,6 @@ export const NAVIGATION: NavSection[] = [
         href: "/channels",
         exact: true,
       },
-      {
-        label: "Manage Channels",
-        href: "/channels/manage",
-      },
     ],
   },
   {
@@ -152,10 +148,6 @@ export const NAVIGATION: NavSection[] = [
       {
         label: "Platform Features",
         href: "/settings/platform-features",
-      },
-      {
-        label: "Staff Roles",
-        href: "/settings/roles",
       },
     ],
   },

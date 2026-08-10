@@ -1,15 +1,8 @@
 import type { Metadata } from "next";
-import { Google_Sans } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
-
-const googleSans = Google_Sans({
-  variable: "--font-google-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "FluxiBiz - Admin Platform",
@@ -22,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${googleSans.variable} h-full antialiased`}>
+    <html lang="en" className="h-full font-sans antialiased">
       <body className="min-h-full flex flex-col">
         <StoreProvider>
           <ThemeProvider

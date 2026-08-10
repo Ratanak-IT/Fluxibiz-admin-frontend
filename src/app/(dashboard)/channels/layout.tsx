@@ -2,7 +2,6 @@ import { ModuleSidebar, type SidebarItem } from "@/components/admin/ModuleSideba
 
 const ITEMS: SidebarItem[] = [
   { label: "Shop Integrations", href: "/channels", icon: "business" },
-  { label: "Configure Channels", href: "/channels/manage", icon: "settings" },
 ];
 
 export default function ChannelsLayout({ children }: { children: React.ReactNode }) {

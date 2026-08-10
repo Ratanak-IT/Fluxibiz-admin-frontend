@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import {
   useCreateUnitMutation,
   useDeleteUnitMutation,
@@ -61,22 +62,39 @@ export default function UnitsPage() {
   const saveError = errorMessage(createState.error ?? updateState.error);
 
   const save = async (values: UnitUpsertRequest) => {
+    const isNew = dialog === "new";
     const result =
-      dialog === "new"
+      isNew
         ? await createUnit(values)
         : dialog
           ? await updateUnit({ unitId: dialog.id, ...values })
           : undefined;
 
-    if (result && !("error" in result)) setDialog(null);
+    if (result && !("error" in result)) {
+      toast.success(isNew ? `Unit "${values.name}" created.` : `Unit "${values.name}" updated.`);
+      setDialog(null);
+    }
   };
 
-  const remove = async (unit: UnitResponse) => {
-    const confirmed = confirm(
-      `Delete "${unit.name}"? Products already using it will block the delete.`,
-    );
-
-    if (confirmed) await deleteUnit(unit.id);
+  const remove = (unit: UnitResponse) => {
+    toast(`Delete "${unit.name}" unit?`, {
+      description: "Products already using it will block the delete.",
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            await deleteUnit(unit.id).unwrap();
+            toast.success(`Unit "${unit.name}" deleted.`);
+          } catch {
+            toast.error("Failed to delete unit.");
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {},
+      },
+    });
   };
 
   return (
