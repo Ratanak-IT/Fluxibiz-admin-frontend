@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, SlidersHorizontal, Plus, ChevronDown } from "lucide-react";
+import { Search, SlidersHorizontal, Plus, ChevronDown, Download } from "lucide-react";
 import { toast } from "sonner";
 import {
   useGetBusinessesInfiniteQuery,
@@ -16,6 +16,7 @@ import type { BusinessOwnerStatus } from "@/lib/types/adminTypes";
 import { ColumnPicker } from "@/components/ui/ColumnPicker";
 import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 import { useInfiniteScroll } from "@/lib/hook/useInfiniteScroll";
+import { ExportReportDialog } from "@/components/admin/ExportReportDialog";
 
 const STATUS_FILTERS: Array<{
   label: string;
@@ -30,7 +31,6 @@ const STATUS_FILTERS: Array<{
 const COLUMNS: ColumnDef[] = [
   { id: "business", label: "Business" },
   { id: "category", label: "Category" },
-  { id: "city", label: "City" },
   { id: "status", label: "Status" },
   { id: "storefront", label: "Storefront" },
   { id: "features", label: "Features" },
@@ -57,6 +57,7 @@ export default function BusinessesPage() {
   const [status, setStatus] = useState<BusinessOwnerStatus | "ALL">("ALL");
   const [page, setPage] = useState(0);
   const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   const [createForm, setCreateForm] = useState<CreateFormState | null>(null);
 
@@ -135,12 +136,12 @@ export default function BusinessesPage() {
           Dashboard
         </Link>
         <span className="px-2 opacity-60">/</span>
-        <span className="text-foreground">Businesses</span>
+        <span className="font-medium text-foreground">Businesses</span>
       </nav>
 
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-0">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             Businesses
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground sm:text-[15px]">
@@ -171,22 +172,25 @@ export default function BusinessesPage() {
         </button>
       </div>
 
-    <div className="mt-7 flex items-center gap-2 sm:gap-3 lg:flex-wrap lg:justify-between">
-      <div className="relative min-w-0 flex-1 lg:max-w-md">
-        <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-        <input
-          value={keyword}
-          onChange={(event) => {
-            setKeyword(event.target.value);
-            setPage(0);
-          }}
-          placeholder="Search by name, city or description"
-          aria-label="Search businesses"
-          className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
-        />
-      </div>
+      <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-xs lg:max-w-md">
+          <Search
+            className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            value={keyword}
+            onChange={(event) => {
+              setKeyword(event.target.value);
+              setPage(0);
+            }}
+            placeholder="Search by name, description or address"
+            aria-label="Search businesses"
+            className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
+          />
+        </div>
 
-      <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2">
         {/* Mobile/tablet dropdown filter */}
         <div className="relative lg:hidden">
           <button
@@ -244,8 +248,24 @@ export default function BusinessesPage() {
           ))}
         </div>
 
+        <button
+          type="button"
+          onClick={() => setExportDialogOpen(true)}
+          className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+        >
+          <Download className="size-3.5" />
+          Export
+        </button>
+
         <ColumnPicker state={cols} buttonClassName="bg-primary-foreground dark:bg-background" />
       </div>
+
+      <ExportReportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        defaultType="businesses"
+        businessData={rows}
+      />
     </div>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-card">
@@ -256,7 +276,6 @@ export default function BusinessesPage() {
             <tr>
               <th className="px-6 py-4 rounded-tl-2xl">Business</th>
               <th className="px-6 py-4">Category</th>
-              <th className="px-6 py-4">City</th>
               <th className="px-6 py-4">Status</th>
               <th className="px-6 py-4">Storefront</th>
               <th className="px-6 py-4">Features</th>
@@ -267,7 +286,7 @@ export default function BusinessesPage() {
             {isLoading && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={6}
                   className="px-6 py-12 text-center text-sm text-muted-foreground"
                 >
                   Loading businesses...
@@ -278,7 +297,7 @@ export default function BusinessesPage() {
             {error && !isLoading && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={6}
                   className="px-6 py-12 text-center text-sm text-destructive"
                 >
                   Could not load businesses. Check that your session still has
@@ -290,7 +309,7 @@ export default function BusinessesPage() {
             {!isLoading && !error && rows.length === 0 && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={6}
                   className="px-6 py-12 text-center text-sm text-muted-foreground"
                 >
                   No business matches this filter. Try clearing the search.
@@ -316,9 +335,6 @@ export default function BusinessesPage() {
                 </td>
                 <td className="px-6 py-4 text-sm text-muted-foreground">
                   {business.category?.name ?? "—"}
-                </td>
-                <td className="px-6 py-4 text-sm text-muted-foreground">
-                  {business.cityOrProvince ?? "—"}
                 </td>
                 <td className="px-6 py-4">
                   <StatusPill status={business.status} />

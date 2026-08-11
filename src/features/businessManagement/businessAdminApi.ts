@@ -3,6 +3,7 @@ import {
   infiniteEndpoint,
   DEFAULT_PAGE_SIZE,
   type InfinitePage,
+  type PageableQuery,
 } from "@/lib/api/infinitePage";
 import type {
   AdminAuditLogResponse,
@@ -32,6 +33,13 @@ export interface AuditLogQuery {
   size?: number;
 }
 
+export interface BusinessChannelsQuery extends PageableQuery {
+  keyword?: string;
+  filter?: string;
+  page?: number;
+  size?: number;
+}
+
 const ADMIN = "/api/v1/admin";
 
 const toParams = (query: Record<string, unknown>) =>
@@ -46,6 +54,19 @@ export const businessAdminApi = baseApi.injectEndpoints({
 
     getBusinessChannels: builder.query<BusinessChannelResponse[], void>({
       query: () => `${ADMIN}/channels`,
+      providesTags: ["Business"],
+    }),
+
+    getBusinessChannelsInfinite: builder.query<InfinitePage<BusinessChannelResponse>, BusinessChannelsQuery | void>({
+      query: (query) => ({
+        url: `${ADMIN}/channels`,
+        params: toParams({ page: 0, size: DEFAULT_PAGE_SIZE, ...(query ?? {}) }),
+      }),
+      ...infiniteEndpoint<BusinessChannelResponse, BusinessChannelsQuery>([
+        "keyword",
+        "filter",
+        "size",
+      ]),
       providesTags: ["Business"],
     }),
 
@@ -279,6 +300,7 @@ export interface RegisterBusinessPayload {
 export const {
   useGetPlatformDashboardQuery,
   useGetBusinessChannelsQuery,
+  useGetBusinessChannelsInfiniteQuery,
   useGetBusinessesQuery,
   useGetBusinessesInfiniteQuery,
   useGetBusinessQuery,

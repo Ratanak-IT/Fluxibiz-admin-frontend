@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
+import { SystemAnnouncementBanner } from "@/components/admin/SystemAnnouncementBanner";
+import { CommandPalette } from "@/components/admin/CommandPalette";
+import { AdminPlatformTourModal } from "@/components/admin/AdminPlatformTourModal";
 
 export default function AppShell({
   managerName,
@@ -48,20 +51,25 @@ export default function AppShell({
         Skip to content
       </a>
 
-      <div className="flex min-h-dvh gap-0 bg-[#f7f7f6] lg:min-h-[calc(100dvh-2rem)] lg:rounded-[28px]">
-        <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
+      <div className="overflow-hidden bg-[#f7f7f6] lg:min-h-[calc(100dvh-2rem)] lg:rounded-[28px]">
+        <SystemAnnouncementBanner />
+        <div className="flex min-h-dvh gap-0 lg:min-h-[calc(100dvh-2rem)]">
+          <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
 
-        <div className="flex min-w-0 flex-1 flex-col">
-          <Header
-            managerName={managerName}
-            onOpenNav={() => setNavOpen(true)}
-          />
+          <div className="flex min-w-0 flex-1 flex-col">
+            <Header
+              managerName={managerName}
+              onOpenNav={() => setNavOpen(true)}
+            />
 
-          <main id="main-content" className="flex-1 px-5 pb-8 lg:px-8 dark:bg-background">
-            {children}
-          </main>
+            <main id="main-content" className="flex-1 px-5 pb-8 lg:px-8 dark:bg-background">
+              {children}
+            </main>
+          </div>
         </div>
       </div>
+      <CommandPalette />
+      <AdminPlatformTourModal />
     </div>
   );
 }

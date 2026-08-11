@@ -60,12 +60,15 @@ const COLUMNS: ColumnDef[] = [
   { id: "registered", label: "Registered" },
 ];
 
+const PAGE_SIZE = 10;
+
 export default function ChannelsPage() {
   const cols = useColumnVisibility("channels", COLUMNS);
 
   const [keyword, setKeyword] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [page, setPage] = useState(0);
   const filterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -88,7 +91,7 @@ export default function ChannelsPage() {
     (row) => row.feature === "KHQR_PAYMENT" && !row.enabled,
   );
 
-  const rows = useMemo(() => {
+  const filteredRows = useMemo(() => {
     const needle = keyword.trim().toLowerCase();
 
     return channels.filter((row) => {
@@ -103,6 +106,37 @@ export default function ChannelsPage() {
     });
   }, [channels, keyword, filter]);
 
+  // Reset to showing strictly 10 items when keyword or filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [keyword, filter]);
+
+  const visibleCount = page * PAGE_SIZE;
+  const rows = useMemo(() => {
+    return filteredRows.slice(0, visibleCount);
+  }, [filteredRows, visibleCount]);
+
+  const hasMore = visibleCount < filteredRows.length;
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const target = sentinelRef.current;
+    if (!target || !hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { threshold: 0.1, rootMargin: "0px" },
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [hasMore]);
+
   return (
     <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
       <nav aria-label="Breadcrumb" className="mb-5 text-sm">
@@ -113,10 +147,10 @@ export default function ChannelsPage() {
           Dashboard
         </Link>
         <span className="px-2 text-muted-foreground">/</span>
-        <span className="text-foreground">Channels</span>
+        <span className="font-medium text-foreground">Channels</span>
       </nav>
 
-      <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
+      <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
         Shop channels
       </h1>
       <p className="mt-1.5 text-sm text-muted-foreground sm:text-[15px]">
@@ -124,22 +158,25 @@ export default function ChannelsPage() {
         trading figures.
       </p>
 
-      <div className="mt-7 flex items-center gap-2 sm:gap-3 lg:flex-wrap lg:justify-between">
-        <div className="relative min-w-0 flex-1 lg:max-w-md">
+      <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-xs lg:max-w-md">
           <Search
             className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
             aria-hidden
           />
           <input
             value={keyword}
-            onChange={(event) => setKeyword(event.target.value)}
+            onChange={(event) => {
+              setKeyword(event.target.value);
+              setPage(0);
+            }}
             placeholder="Search by shop, address or bot"
             aria-label="Search channels"
             className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
           />
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Mobile dropdown filter */}
           <div className="relative lg:hidden" ref={filterRef}>
             <button
@@ -172,6 +209,7 @@ export default function ChannelsPage() {
                     aria-selected={filter === option.value}
                     onClick={() => {
                       setFilter(option.value);
+                      setPage(0);
                       setFilterOpen(false);
                     }}
                     className={`block w-full rounded-xl px-4 py-2 text-left text-sm font-medium transition ${
@@ -193,10 +231,13 @@ export default function ChannelsPage() {
               <button
                 key={option.value}
                 type="button"
-                onClick={() => setFilter(option.value)}
+                onClick={() => {
+                  setFilter(option.value);
+                  setPage(0);
+                }}
                 className={`rounded-full border bg-primary-foreground px-4 py-2 text-sm transition dark:bg-background ${
                   filter === option.value
-                    ? "border-primary text-primary"
+                    ? "border-primary text-primary font-medium"
                     : "border-border text-muted-foreground hover:bg-accent"
                 }`}
               >
@@ -209,11 +250,11 @@ export default function ChannelsPage() {
         </div>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <div className="overflow-x-auto">
           <table className={`w-full text-left ${cols.tableClassName}`}
             style={{ minWidth: cols.minWidthRem(52) }}>
-            <thead className="bg-muted text-sm font-medium text-muted-foreground">
+            <thead className="bg-muted text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 sm:px-6 sm:py-4">Shop</th>
                 <th className="px-4 py-3 sm:px-6 sm:py-4">Storefront</th>
@@ -233,7 +274,7 @@ export default function ChannelsPage() {
 
               {error && !isLoading && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-destructive sm:px-6 sm:py-14">
+                  <td colSpan={5} className="px-4 py-12 text-center text-destructive sm:px-6 sm:py-14 font-medium">
                     {errorMessage(error)}
                   </td>
                 </tr>
@@ -250,7 +291,7 @@ export default function ChannelsPage() {
               {rows.map((row) => (
                 <tr
                   key={row.businessId}
-                  className="transition hover:bg-muted/60"
+                  className="transition hover:bg-accent/40"
                 >
                   <td className="px-4 py-3 sm:px-6 sm:py-4">
                     <Link
@@ -259,7 +300,7 @@ export default function ChannelsPage() {
                     >
                       {row.businessName}
                     </Link>
-                    <span className="block text-xs text-muted-foreground">
+                    <span className="block text-xs text-muted-foreground font-mono">
                       /{row.slug}
                     </span>
                   </td>
@@ -327,6 +368,28 @@ export default function ChannelsPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* scroll sentinel + status footer */}
+      <div
+        ref={sentinelRef}
+        className="mt-5 flex flex-col items-center gap-3 py-6 text-sm"
+      >
+        {hasMore && (
+          <button
+            type="button"
+            onClick={() => setPage((prev) => prev + 1)}
+            className="rounded-full border border-border px-5 py-2 text-foreground transition hover:bg-accent hover:text-accent-foreground font-medium"
+          >
+            Load more ({rows.length} of {filteredRows.length})
+          </button>
+        )}
+
+        {!hasMore && rows.length > 0 && (
+          <span className="text-xs text-muted-foreground">
+            Showing all {rows.length} shop channels
+          </span>
+        )}
       </div>
     </main>
   );

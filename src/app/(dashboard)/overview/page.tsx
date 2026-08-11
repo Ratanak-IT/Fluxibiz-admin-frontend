@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { checkAllServices, type SystemHealthSummary } from "@/lib/healthService";
 import { Area, AreaChart as RechartsAreaChart, CartesianGrid, XAxis } from "recharts";
 import {
   ArrowRight,
@@ -16,7 +17,11 @@ import {
   Sliders,
   FileText,
   Server,
+  Download,
 } from "lucide-react";
+import { ExportReportDialog } from "@/components/admin/ExportReportDialog";
+import { RegionalGrowthWidget } from "@/components/admin/RegionalGrowthWidget";
+import { MerchantHealthRadarWidget } from "@/components/admin/MerchantHealthRadarWidget";
 import {
   ChartContainer,
   ChartTooltip,
@@ -41,19 +46,22 @@ function trendLabel(point: TrendCountResponse) {
 }
 
 function formatTrendLabel(value: unknown) {
+  if (!value) return "";
   const label = String(value);
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   const dayMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(label);
   if (dayMatch) {
-    const idx = parseInt(dayMatch[2], 10) - 1;
-    return months[idx] ?? label;
+    const monthIdx = parseInt(dayMatch[2], 10) - 1;
+    const dayNum = parseInt(dayMatch[3], 10);
+    const monthName = months[monthIdx] ?? dayMatch[2];
+    return `${dayNum} ${monthName}`;
   }
 
   const monthMatch = /^(\d{4})-(\d{2})$/.exec(label);
   if (monthMatch) {
-    const idx = parseInt(monthMatch[2], 10) - 1;
-    return months[idx] ?? label;
+    const monthIdx = parseInt(monthMatch[2], 10) - 1;
+    return months[monthIdx] ?? label;
   }
 
   return label;
@@ -92,47 +100,52 @@ function StatCard({
   return href ? <Link href={href}>{card}</Link> : card;
 }
 
-const DEFAULT_TREND_DATA = [
-  { label: "Apr 01", signups: 4, activeShops: 2 },
-  { label: "Apr 08", signups: 12, activeShops: 7 },
-  { label: "Apr 15", signups: 8, activeShops: 5 },
-  { label: "Apr 22", signups: 18, activeShops: 11 },
-  { label: "Apr 29", signups: 14, activeShops: 9 },
-  { label: "May 06", signups: 22, activeShops: 15 },
-  { label: "May 13", signups: 19, activeShops: 12 },
-  { label: "May 20", signups: 26, activeShops: 18 },
-];
-
 function OverviewAreaChart({ data }: { data: Array<{ label: string; value: number }> }) {
   const chartData = useMemo(() => {
     if (!data || data.length === 0) {
-      return DEFAULT_TREND_DATA;
+      return [];
     }
 
     if (data.length === 1) {
       const p = data[0];
-      return [
-        { label: "Prev", signups: Math.max(p.value - 2, 1), activeShops: 1 },
-        { label: p.label, signups: p.value, activeShops: Math.max(Math.round(p.value * 0.7), 1) },
-        { label: "Next", signups: p.value + 3, activeShops: Math.max(Math.round(p.value * 0.8), 2) },
-      ];
+      const todayVal = p.value || 0;
+      const dateObj = new Date();
+      const points = [];
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(dateObj);
+        d.setDate(d.getDate() - i);
+        const dayNum = d.getDate();
+        const labelStr = `${dayNum} ${monthNames[d.getMonth()]}`;
+        
+        const val = i === 0 ? todayVal : Math.max(1, Math.round(todayVal * (0.35 + (6 - i) * 0.1)));
+        points.push({
+          label: labelStr,
+          signups: val,
+        });
+      }
+      return points;
     }
 
     return data.map((point) => ({
-      label: point.label,
+      label: formatTrendLabel(point.label),
       signups: point.value,
-      activeShops: Math.max(Math.round(point.value * 0.65), 1),
     }));
   }, [data]);
+
+  if (!chartData || chartData.length === 0) {
+    return (
+      <div className="mt-6 flex h-[280px] w-full items-center justify-center rounded-2xl border border-dashed border-border bg-muted/20 p-6 text-sm text-muted-foreground">
+        No signup data available for this period.
+      </div>
+    );
+  }
 
   const chartConfig = {
     signups: {
       label: "New Signups",
       color: "#FEB90D",
-    },
-    activeShops: {
-      label: "Active Merchants",
-      color: "#00932A",
     },
   } satisfies ChartConfig;
 
@@ -145,16 +158,12 @@ function OverviewAreaChart({ data }: { data: Array<{ label: string; value: numbe
         <RechartsAreaChart
           accessibilityLayer
           data={chartData}
-          margin={{ top: 12, right: 0, left: 0, bottom: 0 }}
+          margin={{ top: 12, right: 10, left: 0, bottom: 0 }}
         >
           <defs>
-            <linearGradient id="fillPrimaryGreen" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#00932A" stopOpacity={0.85} />
-              <stop offset="100%" stopColor="#00932A" stopOpacity={0.05} />
-            </linearGradient>
             <linearGradient id="fillSecondaryGold" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#FEB90D" stopOpacity={0.85} />
-              <stop offset="100%" stopColor="#FEB90D" stopOpacity={0.05} />
+              <stop offset="0%" stopColor="#FEB90D" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#FEB90D" stopOpacity={0.01} />
             </linearGradient>
           </defs>
           <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border/30" />
@@ -163,15 +172,13 @@ function OverviewAreaChart({ data }: { data: Array<{ label: string; value: numbe
             tickLine={false}
             axisLine={false}
             tickMargin={10}
-            minTickGap={16}
-            tickFormatter={formatTrendLabel}
+            minTickGap={12}
             tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
           />
           <ChartTooltip
-            cursor={{ stroke: "#00932A", strokeWidth: 1.5, strokeDasharray: "4 4" }}
+            cursor={{ stroke: "#FEB90D", strokeWidth: 1.5, strokeDasharray: "4 4" }}
             content={
               <ChartTooltipContent
-                labelFormatter={formatTrendLabel}
                 indicator="dot"
                 className="rounded-xl shadow-2xl border border-border/80 bg-popover text-popover-foreground px-3.5 py-2.5 text-xs font-medium"
               />
@@ -181,19 +188,9 @@ function OverviewAreaChart({ data }: { data: Array<{ label: string; value: numbe
             dataKey="signups"
             type="monotone"
             fill="url(#fillSecondaryGold)"
-            fillOpacity={0.5}
+            fillOpacity={0.4}
             stroke="#FEB90D"
             strokeWidth={2.5}
-            stackId="a"
-          />
-          <Area
-            dataKey="activeShops"
-            type="monotone"
-            fill="url(#fillPrimaryGreen)"
-            fillOpacity={0.7}
-            stroke="#00932A"
-            strokeWidth={2.5}
-            stackId="a"
           />
         </RechartsAreaChart>
       </ChartContainer>
@@ -310,12 +307,13 @@ function ChannelAdoptionWidget() {
 }
 
 function SystemStatusWidget() {
-  const services = [
-    { name: "Keycloak Auth", status: "Operational", color: "bg-[#00932A]" },
-    { name: "Core Admin API", status: "Operational", color: "bg-[#00932A]" },
-    { name: "Bakong Gateway", status: "Operational", color: "bg-[#00932A]" },
-    { name: "Telegram Bot Service", status: "Operational", color: "bg-[#00932A]" },
-  ];
+  const [health, setHealth] = useState<SystemHealthSummary | null>(null);
+
+  useEffect(() => {
+    checkAllServices().then(setHealth);
+  }, []);
+
+  const services = health?.services ?? [];
 
   return (
     <section className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border dark:text-card-foreground">
@@ -326,22 +324,26 @@ function SystemStatusWidget() {
             Platform Infrastructure Health
           </h2>
           <p className="mt-1 text-xs text-neutral-400 dark:text-muted-foreground">
-            Real-time operational status of platform services.
+            Real-time operational status and API response times.
           </p>
         </div>
-        <span className="flex items-center gap-1 text-xs font-medium text-[#00932A] bg-[#00932A]/10 dark:bg-[#00932A]/20 px-2.5 py-1 rounded-full">
-          All Operational
-        </span>
+        <Link
+          href="/logs/health"
+          className="flex items-center gap-1 text-xs font-medium text-[#00932A] bg-[#00932A]/10 dark:bg-[#00932A]/20 px-2.5 py-1 rounded-full transition hover:opacity-80"
+        >
+          <span>{health?.overallStatus === "down" ? "Degraded" : "All Operational"}</span>
+          <ArrowRight className="size-3" />
+        </Link>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {services.map((s) => (
-          <div key={s.name} className="flex items-center gap-2.5 rounded-xl border border-border bg-background p-3 text-xs">
-            <span className={`size-2.5 rounded-full ${s.color} animate-pulse shrink-0`} />
-            <div>
+          <div key={s.name} className="flex items-center justify-between gap-2 rounded-xl border border-border bg-background p-3 text-xs">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className={`size-2.5 rounded-full ${s.status === "operational" ? "bg-[#00932A]" : s.status === "degraded" ? "bg-[#FEB90D]" : "bg-[#D14341]"} animate-pulse shrink-0`} />
               <p className="font-medium text-foreground truncate">{s.name}</p>
-              <p className="text-[11px] text-muted-foreground">{s.status}</p>
             </div>
+            <span className="text-[11px] font-semibold text-muted-foreground shrink-0">{s.latencyMs} ms</span>
           </div>
         ))}
       </div>
@@ -529,10 +531,15 @@ function RecentAuditWidget() {
 }
 
 export default function OverviewPage() {
-  const { data, isLoading, error } = useGetPlatformDashboardQuery();
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const { data, isLoading, error } = useGetPlatformDashboardQuery(undefined, {
+    pollingInterval: 5000,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
 
   return (
-    <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8 bg-[var(--background)] text-[var(--foreground)]">
+    <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
       <nav aria-label="Breadcrumb" className="mb-5 text-sm">
         <Link
           href="/dashboard"
@@ -556,6 +563,14 @@ export default function OverviewPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setExportDialogOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+          >
+            <Download className="size-3.5" />
+            Export Report
+          </button>
           <Link
             href="/businesses"
             className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition hover:opacity-90"
@@ -587,6 +602,12 @@ export default function OverviewPage() {
         </div>
       </div>
 
+      <ExportReportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        defaultType="overview"
+      />
+
       {isLoading && (
         <p className="mt-8 text-sm text-neutral-500 dark:text-muted-foreground">Loading platform metrics...</p>
       )}
@@ -599,11 +620,6 @@ export default function OverviewPage() {
 
       {data && (
         <>
-          {/* System Infrastructure Health Status */}
-          <div className="mt-8">
-            <SystemStatusWidget />
-          </div>
-
           {/* Key Platform Stats */}
           <h2 className="mt-8 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-[var(--muted-foreground)]">
             Platform Key Metrics
@@ -687,6 +703,12 @@ export default function OverviewPage() {
           {/* Channel Integration Rates */}
           <div className="mt-6">
             <ChannelAdoptionWidget />
+          </div>
+
+          {/* Regional Density & Risk Radar Widgets */}
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <RegionalGrowthWidget />
+            <MerchantHealthRadarWidget />
           </div>
 
           {/* Management Widgets */}

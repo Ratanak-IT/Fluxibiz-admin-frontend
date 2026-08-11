@@ -5,6 +5,9 @@ import { auth } from "@/lib/auth/auth";
 import { getServerIdentity } from "@/lib/auth/getServerIdentity";
 import ForbiddenScreen from "@/components/auth/ForbiddenScreen";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function DashboardLayout({
   children,
 }: {

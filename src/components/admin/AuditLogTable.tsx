@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
+import { ChevronDown, Download, Search, SlidersHorizontal, X } from "lucide-react";
 import { useGetAuditLogsInfiniteQuery } from "@/features/businessManagement/businessAdminApi";
 import type { AdminActionType } from "@/lib/types/adminTypes";
 import { ColumnPicker } from "@/components/ui/ColumnPicker";
 import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 import { useInfiniteScroll } from "@/lib/hook/useInfiniteScroll";
+import { ExportReportDialog } from "@/components/admin/ExportReportDialog";
 
 const ACTION_LABELS: Record<AdminActionType, string> = {
   BUSINESS_ACTIVATED: "Activated",
@@ -107,6 +108,7 @@ export function AuditLogTable({
 
   const [actionFilterOpen, setActionFilterOpen] =
     useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   const actionFilterRef =
     useRef<HTMLDivElement>(null);
@@ -374,6 +376,16 @@ export function AuditLogTable({
             )}
           </div>
 
+          {/* Export Button */}
+          <button
+            type="button"
+            onClick={() => setExportDialogOpen(true)}
+            className="flex shrink-0 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-4 py-2.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+          >
+            <Download className="size-4" />
+            Export Logs
+          </button>
+
           {/* Column Picker */}
           <div className="shrink-0">
             <ColumnPicker
@@ -395,6 +407,13 @@ export function AuditLogTable({
           )}
         </div>
       </div>
+
+      <ExportReportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        defaultType="audit"
+        auditData={rows}
+      />
 
       {/* Table Card */}
       <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-white dark:bg-background">
