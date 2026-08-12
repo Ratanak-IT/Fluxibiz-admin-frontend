@@ -166,7 +166,7 @@ export default function ConfigureChannelsPage() {
                           isActive: channel.isActive,
                         })
                       }
-                      className="rounded-full p-2 text-secondary hover:bg-muted hover:text-secondary"
+                      className="rounded-full p-2 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
                     >
                       <Pencil className="size-4" />
                     </button>
@@ -174,7 +174,7 @@ export default function ConfigureChannelsPage() {
                       type="button"
                       title="Delete"
                       onClick={() => confirmDelete(channel.id, channel.name)}
-                      className="rounded-full p-2 text-brand-red hover:bg-destructive/10 hover:text-brand-red"
+                      className="rounded-full p-2 text-destructive hover:bg-destructive/10 transition-colors"
                     >
                       <Trash2 className="size-4" />
                     </button>

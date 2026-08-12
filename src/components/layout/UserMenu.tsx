@@ -43,7 +43,7 @@ export default function UserMenu({ name }: { name: string }) {
   >
     <span
       aria-hidden="true"
-      className="grid size-8 place-items-center overflow-hidden rounded-full border border-primary bg-primary text-[13px] font-medium text-primary-foreground"
+      className="grid size-8 place-items-center overflow-hidden rounded-full bg-primary text-[13px] font-medium text-primary-foreground"
     >
       {picture ? (
         /* eslint-disable-next-line @next/next/no-img-element */
