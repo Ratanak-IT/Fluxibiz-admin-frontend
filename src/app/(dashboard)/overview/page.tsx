@@ -118,7 +118,7 @@ function OverviewAreaChart({ data }: { data: Array<{ label: string; value: numbe
         d.setDate(d.getDate() - i);
         const dayNum = d.getDate();
         const labelStr = `${dayNum} ${monthNames[d.getMonth()]}`;
-        
+
         const val = i === 0 ? todayVal : Math.max(1, Math.round(todayVal * (0.35 + (6 - i) * 0.1)));
         points.push({
           label: labelStr,
@@ -462,11 +462,10 @@ function PlatformFeaturesWidget() {
                 </div>
               </div>
               <span
-                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  feat.enabled
+                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${feat.enabled
                     ? "bg-[#00932A]/10 text-[#00932A] dark:bg-[#00932A]/20 dark:text-[#00932A]"
                     : "bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
-                }`}
+                  }`}
               >
                 {feat.enabled ? "Active" : "Disabled"}
               </span>

@@ -218,6 +218,71 @@ export function AuditLogTable({
 
   const rows = data?.content ?? [];
 
+function formatDateDMY(isoString: string) {
+  const d = new Date(isoString);
+  if (isNaN(d.getTime())) return isoString;
+  const day = d.getDate().toString().padStart(2, "0");
+  const month = (d.getMonth() + 1).toString().padStart(2, "0");
+  const year = d.getFullYear();
+  const time = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+  return `${day}/${month}/${year}, ${time}`;
+}
+
+  const filteredRows = useMemo(() => {
+    if (!filters.keyword) return rows;
+    const needle = filters.keyword.trim().toLowerCase();
+
+    return rows.filter((log) => {
+      const targetMatch = (log.targetLabel ?? "").toLowerCase().includes(needle);
+      const adminMatch = (log.actorUsername ?? "").toLowerCase().includes(needle);
+      const reasonMatch = (log.reason ?? "").toLowerCase().includes(needle);
+      const actionMatch = (log.actionType ?? "").toLowerCase().replace(/_/g, " ").includes(needle);
+      const labelMatch = (ACTION_LABELS[log.actionType] ?? "").toLowerCase().includes(needle);
+
+      let dateMatch = false;
+      if (log.createdAt) {
+        const d = new Date(log.createdAt);
+        if (!isNaN(d.getTime())) {
+          const dayNum = d.getDate().toString().padStart(2, "0");
+          const monthNum = (d.getMonth() + 1).toString().padStart(2, "0");
+          const yearStr = d.getFullYear().toString();
+
+          // Day-Month-Year Formats
+          const dmySlash = `${dayNum}/${monthNum}/${yearStr}`;
+          const dmyHyphen = `${dayNum}-${monthNum}-${yearStr}`;
+          const dmyShortSlash = `${dayNum}/${monthNum}`;
+          const dmyShortHyphen = `${dayNum}-${monthNum}`;
+
+          const monthNameShort = d.toLocaleDateString("en-GB", { month: "short" }).toLowerCase();
+          const monthNameFull = d.toLocaleDateString("en-GB", { month: "long" }).toLowerCase();
+
+          const dmyNamedSlash = `${dayNum} ${monthNameShort} ${yearStr}`.toLowerCase();
+          const dmyNamedHyphen = `${dayNum}-${monthNameShort}-${yearStr}`.toLowerCase();
+          const dmyNamedFull = `${dayNum} ${monthNameFull} ${yearStr}`.toLowerCase();
+
+          const isoDate = `${yearStr}-${monthNum}-${dayNum}`;
+          const monthYearStr = `${monthNum}/${yearStr}`;
+
+          dateMatch =
+            dmySlash.includes(needle) ||
+            dmyHyphen.includes(needle) ||
+            dmyShortSlash.includes(needle) ||
+            dmyShortHyphen.includes(needle) ||
+            dmyNamedSlash.includes(needle) ||
+            dmyNamedHyphen.includes(needle) ||
+            dmyNamedFull.includes(needle) ||
+            isoDate.includes(needle) ||
+            monthYearStr.includes(needle) ||
+            yearStr.includes(needle) ||
+            monthNameShort.includes(needle) ||
+            monthNameFull.includes(needle);
+        }
+      }
+
+      return targetMatch || adminMatch || reasonMatch || actionMatch || labelMatch || dateMatch;
+    });
+  }, [rows, filters.keyword]);
+
   const {
     sentinelRef,
     loadMore,
@@ -287,7 +352,7 @@ export function AuditLogTable({
             onChange={(event) =>
               setKeywordInput(event.target.value)
             }
-            placeholder="Search by target, admin or reason"
+            placeholder="Search by target, admin, reason or date (DD/MM/YYYY e.g. 12/08/2026)..."
             className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary dark:bg-background"
           />
         </div>
@@ -414,7 +479,7 @@ export function AuditLogTable({
         open={exportDialogOpen}
         onOpenChange={setExportDialogOpen}
         defaultType="audit"
-        auditData={rows}
+        auditData={filteredRows}
       />
 
       {/* Table Card */}
@@ -455,17 +520,17 @@ export function AuditLogTable({
             </thead>
 
             <tbody className="divide-y divide-border">
-              {isLoading && (
+              {isLoading && rows.length === 0 && (
                 <AdminLoadingState label="Loading audit logs..." compact colSpan={6} />
               )}
 
-              {error && !isLoading && (
+              {error && !isLoading && rows.length === 0 && (
                 <AdminApiErrorFallback error={error} compact colSpan={6} />
               )}
 
               {!isLoading &&
-                !error &&
-                rows.length === 0 && (
+                (!error || rows.length > 0) &&
+                filteredRows.length === 0 && (
                   <tr>
                     <td
                       colSpan={6}
@@ -478,15 +543,13 @@ export function AuditLogTable({
                   </tr>
                 )}
 
-              {rows.map((log) => (
+              {filteredRows.map((log) => (
                 <tr
                   key={log.id}
                   className="align-top hover:bg-muted/40"
                 >
                   <td className="whitespace-nowrap px-4 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4">
-                    {new Date(
-                      log.createdAt,
-                    ).toLocaleString()}
+                    {formatDateDMY(log.createdAt)}
                   </td>
 
                   <td className="px-4 py-3 text-sm text-foreground sm:px-6 sm:py-4">

@@ -32,7 +32,7 @@ function errorMessage(error: unknown): string | undefined {
 
 const COLUMNS: ColumnDef[] = [
   { id: "name", label: "Name" },
-  { id: "address", label: "Address" },
+  { id: "slug", label: "Slug / Code" },
   { id: "note", label: "Note" },
   { id: "actions", label: "Actions", locked: true },
 ];
@@ -43,7 +43,10 @@ export default function UnitsPage() {
   const [keyword, setKeyword] = useState("");
   const [dialog, setDialog] = useState<DialogState>(null);
 
-  const { data: units = [], isLoading, error } = useGetUnitsQuery();
+  const { data: units = [], isLoading, error } = useGetUnitsQuery(undefined, {
+    pollingInterval: 5000,
+    refetchOnFocus: true,
+  });
   const [createUnit, createState] = useCreateUnitMutation();
   const [updateUnit, updateState] = useUpdateUnitMutation();
   const [deleteUnit] = useDeleteUnitMutation();
@@ -159,7 +162,7 @@ export default function UnitsPage() {
             <thead className="bg-muted text-sm font-medium text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 sm:px-6 sm:py-4">Name</th>
-                <th className="px-4 py-3 sm:px-6 sm:py-4">Address</th>
+                <th className="px-4 py-3 sm:px-6 sm:py-4">Slug / Code</th>
                 <th className="px-4 py-3 sm:px-6 sm:py-4">Note</th>
                 <th className="w-20 px-3 py-3 sm:w-24 sm:px-4 sm:py-4" />
               </tr>

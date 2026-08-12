@@ -75,16 +75,7 @@ export function CommandPalette() {
       },
     },
 
-    {
-      id: "nav-security",
-      label: "Go to Security & Session Inspector",
-      category: "Navigation",
-      icon: ShieldCheck,
-      action: () => {
-        router.push("/logs/security");
-        setOpen(false);
-      },
-    },
+
     {
       id: "nav-calendar",
       label: "Go to Renewal Calendar",

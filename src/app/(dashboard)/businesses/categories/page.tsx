@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
+  Building2,
+  ChevronDown,
   ChevronRight,
   FolderTree,
   Pencil,
@@ -17,6 +19,7 @@ import {
   useCreateBusinessCategoryMutation,
   useDeleteBusinessCategoryMutation,
   useGetBusinessCategoriesQuery,
+  useGetBusinessesQuery,
   useUpdateBusinessCategoryMutation,
 } from "@/features/businessManagement/businessAdminApi";
 
@@ -38,6 +41,28 @@ export default function CategoriesPage() {
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<FilterType>("ALL");
+
+  const { data: businessData } = useGetBusinessesQuery({ size: 200 });
+  const businessList = businessData?.content ?? [];
+
+  const categoryBusinessCountMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    businessList.forEach((b) => {
+      if (b.category?.id) {
+        map[b.category.id] = (map[b.category.id] ?? 0) + 1;
+      }
+    });
+    return map;
+  }, [businessList]);
+
+  const [expandedParents, setExpandedParents] = useState<Record<string, boolean>>({});
+
+  const toggleExpand = (id: string) => {
+    setExpandedParents((prev) => ({
+      ...prev,
+      [id]: prev[id] === undefined ? false : !prev[id],
+    }));
+  };
 
   const busy = createState.isLoading || updateState.isLoading;
 
@@ -264,95 +289,126 @@ export default function CategoriesPage() {
       )}
 
       <div className="mt-6 space-y-3">
-        {filteredCategories.map((parent) => (
-          <div
-            key={parent.id}
-            className="overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-sm transition hover:border-border/80"
-          >
-            <div className="flex items-center justify-between gap-2 px-5 py-4">
-              <div className="min-w-0">
-                <span className="font-semibold text-card-foreground text-base break-words">
-                  {parent.name}
-                </span>
-                <span className="ml-2.5 text-xs text-muted-foreground font-mono">
-                  /{parent.slug}
-                </span>
-              </div>
+        {filteredCategories.map((parent) => {
+          const parentDirectCount = categoryBusinessCountMap[parent.id] ?? 0;
+          const subTotalCount = (parent.subCategories ?? []).reduce(
+            (acc, child) => acc + (categoryBusinessCountMap[child.id] ?? 0),
+            0,
+          );
+          const totalCategoryBusinesses = parentDirectCount + subTotalCount;
+          const subCount = parent.subCategories?.length ?? 0;
 
-              <div className="flex shrink-0 items-center gap-1">
-                <button
-                  type="button"
-                  title="Add sub category"
-                  onClick={() => setEditor({ mode: "create", name: "", parentId: parent.id })}
-                  className="rounded-full p-2 text-primary transition hover:bg-primary/10 hover:text-primary"
-                >
-                  <Plus className="size-4.5" />
-                </button>
-                <button
-                  type="button"
-                  title="Rename"
-                  onClick={() =>
-                    setEditor({ mode: "edit", categoryId: parent.id, name: parent.name, parentId: null })
-                  }
-                  className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-                >
-                  <Pencil className="size-4" />
-                </button>
-                <button
-                  type="button"
-                  title="Delete"
-                  onClick={() => confirmDelete(parent.id, parent.name)}
-                  className="rounded-full p-2 text-destructive transition hover:bg-destructive/10 hover:text-destructive"
-                >
-                  <Trash2 className="size-4" />
-                </button>
-              </div>
-            </div>
+          return (
+            <div
+              key={parent.id}
+              className="overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-sm transition hover:border-border/80"
+            >
+              <div className="flex items-center justify-between gap-2 px-5 py-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="font-semibold text-card-foreground text-base break-words">
+                    {parent.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground font-mono hidden sm:inline">
+                    /{parent.slug}
+                  </span>
 
-            {parent.subCategories && parent.subCategories.length > 0 && (
-              <ul className="divide-y divide-border border-t border-border bg-muted/20">
-                {parent.subCategories.map((child) => (
-                  <li
-                    key={child.id}
-                    className="flex items-center justify-between gap-2 px-5 py-3 pl-8 sm:pl-10 text-sm hover:bg-accent/40 transition-colors"
-                  >
-                    <span className="flex min-w-0 items-center gap-2.5 text-foreground">
-                      <ChevronRight className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
-                      <span className="break-words font-medium">{child.name}</span>
-                      <span className="text-xs text-muted-foreground font-mono">/{child.slug}</span>
+                  {/* Subcategories count badge */}
+                  {subCount > 0 && (
+                    <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground font-medium shrink-0">
+                      {subCount} {subCount === 1 ? "subcategory" : "subcategories"}
                     </span>
+                  )}
 
-                    <div className="flex shrink-0 items-center gap-1">
-                      <button
-                        type="button"
-                        title="Rename"
-                        onClick={() =>
-                          setEditor({
-                            mode: "edit",
-                            categoryId: child.id,
-                            name: child.name,
-                            parentId: parent.id,
-                          })
-                        }
-                        className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                  {/* Live Business Count Badge */}
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary shrink-0">
+                    <Building2 className="size-3" />
+                    {totalCategoryBusinesses} {totalCategoryBusinesses === 1 ? "Business" : "Businesses"}
+                  </span>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-1">
+                  <button
+                    type="button"
+                    title="Add subcategory"
+                    onClick={() => setEditor({ mode: "create", name: "", parentId: parent.id })}
+                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+                  >
+                    <Plus className="size-3.5" />
+                    <span className="hidden sm:inline">Subcategory</span>
+                  </button>
+                  <button
+                    type="button"
+                    title="Rename"
+                    onClick={() =>
+                      setEditor({ mode: "edit", categoryId: parent.id, name: parent.name, parentId: null })
+                    }
+                    className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                  >
+                    <Pencil className="size-4" />
+                  </button>
+                  <button
+                    type="button"
+                    title="Delete"
+                    onClick={() => confirmDelete(parent.id, parent.name)}
+                    className="rounded-full p-2 text-destructive transition hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+              </div>
+
+              {parent.subCategories && parent.subCategories.length > 0 && (
+                <ul className="divide-y divide-border border-t border-border bg-muted/20">
+                  {parent.subCategories.map((child) => {
+                    const childBusinessCount = categoryBusinessCountMap[child.id] ?? 0;
+                    return (
+                      <li
+                        key={child.id}
+                        className="flex items-center justify-between gap-2 px-5 py-3 pl-8 sm:pl-10 text-sm hover:bg-accent/40 transition-colors"
                       >
-                        <Pencil className="size-4" />
-                      </button>
-                      <button
-                        type="button"
-                        title="Delete"
-                        onClick={() => confirmDelete(child.id, child.name)}
-                        className="rounded-full p-2 text-destructive transition hover:bg-destructive/10 hover:text-destructive"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        ))}
+                        <span className="flex min-w-0 items-center gap-2.5 text-foreground">
+                          <ChevronRight className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+                          <span className="break-words font-medium">{child.name}</span>
+                          <span className="text-xs text-muted-foreground font-mono hidden sm:inline">/{child.slug}</span>
+                          <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2 py-0.5 text-xs font-medium text-muted-foreground shrink-0">
+                            <Building2 className="size-3" />
+                            {childBusinessCount}
+                          </span>
+                        </span>
+
+                        <div className="flex shrink-0 items-center gap-1">
+                          <button
+                            type="button"
+                            title="Rename"
+                            onClick={() =>
+                              setEditor({
+                                mode: "edit",
+                                categoryId: child.id,
+                                name: child.name,
+                                parentId: parent.id,
+                              })
+                            }
+                            className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                          >
+                            <Pencil className="size-4" />
+                          </button>
+                          <button
+                            type="button"
+                            title="Delete"
+                            onClick={() => confirmDelete(child.id, child.name)}
+                            className="rounded-full p-2 text-destructive transition hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            <Trash2 className="size-4" />
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Category Editor Modal */}

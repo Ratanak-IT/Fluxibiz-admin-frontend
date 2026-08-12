@@ -2,16 +2,17 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, SlidersHorizontal, Plus, ChevronDown, Download } from "lucide-react";
+import { Eye, Search, SlidersHorizontal, Plus, ChevronDown, Download } from "lucide-react";
 import { toast } from "sonner";
 import {
   useGetBusinessesInfiniteQuery,
   useGetBusinessCategoriesQuery,
   useCreateBusinessMutation,
 } from "@/features/businessManagement/businessAdminApi";
+import { BusinessInspectorDrawer } from "@/components/admin/BusinessInspectorDrawer";
 import { BusinessRowActions } from "@/components/admin/BusinessRowActions";
 import { Flag, StatusPill } from "@/components/admin/StatusPill";
-import type { BusinessOwnerStatus } from "@/lib/types/adminTypes";
+import type { BusinessOwnerStatus, BusinessResponse } from "@/lib/types/adminTypes";
 
 import { ColumnPicker } from "@/components/ui/ColumnPicker";
 import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
@@ -60,6 +61,7 @@ export default function BusinessesPage() {
   const [page, setPage] = useState(0);
   const [filterMenuOpen, setFilterMenuOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [inspectedBusiness, setInspectedBusiness] = useState<BusinessResponse | null>(null);
 
   const [createForm, setCreateForm] = useState<CreateFormState | null>(null);
 
@@ -361,7 +363,17 @@ export default function BusinessesPage() {
                   />
                 </td>
                 <td className="px-4 py-4">
-                  <BusinessRowActions business={business} />
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      title="Quick Inspect"
+                      onClick={() => setInspectedBusiness(business)}
+                      className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-primary"
+                    >
+                      <Eye className="size-4" />
+                    </button>
+                    <BusinessRowActions business={business} />
+                  </div>
                 </td>
               </tr>
             ))}
@@ -616,6 +628,11 @@ export default function BusinessesPage() {
           </div>
         </div>
       )}
+
+      <BusinessInspectorDrawer
+        business={inspectedBusiness}
+        onClose={() => setInspectedBusiness(null)}
+      />
     </main>
   );
 }

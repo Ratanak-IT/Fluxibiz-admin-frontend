@@ -120,10 +120,6 @@ export const NAVIGATION: NavSection[] = [
         label: "Audit Logs",
         href: "/audit-logs",
       },
-      {
-        label: "Security & Sessions",
-        href: "/logs/security",
-      },
     ],
   },
 
@@ -156,10 +152,6 @@ export const NAVIGATION: NavSection[] = [
       {
         label: "Platform Features",
         href: "/settings/platform-features",
-      },
-      {
-        label: "Webhook Monitors",
-        href: "/settings/webhooks",
       },
     ],
   },
