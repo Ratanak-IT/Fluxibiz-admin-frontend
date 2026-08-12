@@ -70,10 +70,10 @@ export function BusinessInspectorDrawer({
               <img
                 src={business.logo || business.thumbnail || ""}
                 alt={business.name}
-                className="h-20 w-20 min-w-[80px] shrink-0 rounded-2xl border-2 border-neutral-200 shadow-md object-cover bg-white p-1 dark:border-neutral-700 dark:bg-card"
+                className="h-20 w-20 min-w-[80px] shrink-0 rounded-2xl shadow-sm object-cover bg-muted"
               />
             ) : (
-              <div className="flex h-20 w-20 min-w-[80px] shrink-0 items-center justify-center rounded-2xl bg-neutral-100 font-black text-neutral-600 text-2xl shadow-md border-2 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700">
+              <div className="flex h-20 w-20 min-w-[80px] shrink-0 items-center justify-center rounded-2xl bg-muted font-bold text-foreground text-2xl shadow-sm">
                 {business.name ? business.name.charAt(0).toUpperCase() : "B"}
               </div>
             )}

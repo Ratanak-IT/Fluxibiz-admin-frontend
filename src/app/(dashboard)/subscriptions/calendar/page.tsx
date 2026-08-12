@@ -100,15 +100,7 @@ export default function RenewalCalendarPage() {
   };
 
   return (
-    <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
-      {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="mb-5 text-sm">
-        <Link href="/dashboard" className="text-muted-foreground transition hover:text-foreground">
-          Dashboard
-        </Link>
-        <span className="px-2 text-muted-foreground">/</span>
-        <span className="text-foreground">Renewal Calendar</span>
-      </nav>
+    <div className="w-full pt-2">
 
       {/* Header */}
       <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -359,6 +351,6 @@ export default function RenewalCalendarPage() {
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }

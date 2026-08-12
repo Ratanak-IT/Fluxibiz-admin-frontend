@@ -86,19 +86,7 @@ export default function AiInsightsPage() {
   };
 
   return (
-    <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
-      {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="mb-5 text-sm">
-        <Link href="/dashboard" className="text-muted-foreground transition hover:text-foreground">
-          Dashboard
-        </Link>
-        <span className="px-2 text-muted-foreground">/</span>
-        <Link href="/audit-logs" className="text-muted-foreground transition hover:text-foreground">
-          Audit Logs
-        </Link>
-        <span className="px-2 text-muted-foreground">/</span>
-        <span className="text-foreground">AI Intelligence & Anomaly Insights</span>
-      </nav>
+    <div className="w-full pt-2">
 
       {/* Header */}
       <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -164,22 +152,22 @@ export default function AiInsightsPage() {
         </div>
       </div>
 
-      {/* Search & Filter Bar (Units Style Flex) */}
+      {/* Search & Filter Bar */}
       <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative w-full sm:w-80 lg:w-96">
-          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative w-full sm:max-w-xs lg:max-w-md">
+          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
           <input
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             placeholder="Search AI insights & recommendations..."
-            className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
+            className="w-full rounded-full border border-border bg-card py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary"
           />
         </div>
 
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="rounded-full border border-border bg-primary-foreground px-4 py-2.5 text-xs font-semibold text-foreground outline-none transition focus:border-primary dark:bg-background cursor-pointer"
+          className="rounded-full border border-border bg-card px-4 py-2.5 text-xs font-semibold text-foreground outline-none transition focus:border-primary cursor-pointer"
         >
           <option value="ALL">All AI Categories</option>
           <option value="GROWTH">Growth Insights</option>
@@ -189,36 +177,36 @@ export default function AiInsightsPage() {
       </div>
 
       {/* Table Layout */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase text-muted-foreground">
+            <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
               <tr>
-                <th scope="col" className="px-6 py-4">Insight Title</th>
-                <th scope="col" className="px-6 py-4">Category</th>
-                <th scope="col" className="px-6 py-4">AI Score</th>
-                <th scope="col" className="px-6 py-4">Executive Recommendation</th>
-                <th scope="col" className="px-6 py-4 text-right">Actions</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Insight Title</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Category</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">AI Score</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Executive Recommendation</th>
+                <th scope="col" className="px-4 py-3.5 text-right sm:px-6">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-border text-sm">
               {filtered.map((item) => (
-                <tr key={item.id} className="transition hover:bg-muted/50">
-                  <td className="px-6 py-4 font-bold text-foreground">{item.title}</td>
-                  <td className="px-6 py-4">
-                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+                <tr key={item.id} className="transition hover:bg-accent/40">
+                  <td className="px-4 py-3.5 font-bold text-foreground sm:px-6">{item.title}</td>
+                  <td className="px-4 py-3.5 sm:px-6">
+                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                       {item.category}
                     </span>
                   </td>
-                  <td className="px-6 py-4 font-bold text-emerald-600 dark:text-emerald-400">{item.impactScore}%</td>
-                  <td className="px-6 py-4 text-xs text-muted-foreground max-w-md">{item.recommendation}</td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-4 py-3.5 font-bold text-emerald-600 dark:text-emerald-400 sm:px-6">{item.impactScore}%</td>
+                  <td className="px-4 py-3.5 text-xs text-muted-foreground max-w-md sm:px-6">{item.recommendation}</td>
+                  <td className="px-4 py-3.5 text-right sm:px-6">
                     <button
                       type="button"
                       onClick={() => handleApplyOptimization(item.title)}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-semibold text-foreground transition hover:bg-accent"
                     >
-                      <Sparkles className="size-3.5" />
+                      <Sparkles className="size-3.5 text-primary" />
                       Apply
                     </button>
                   </td>
@@ -228,6 +216,6 @@ export default function AiInsightsPage() {
           </table>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

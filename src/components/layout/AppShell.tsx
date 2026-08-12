@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
-import { SystemAnnouncementBanner } from "@/components/admin/SystemAnnouncementBanner";
 import { CommandPalette } from "@/components/admin/CommandPalette";
 import { AdminPlatformTourModal } from "@/components/admin/AdminPlatformTourModal";
 
@@ -52,7 +51,6 @@ export default function AppShell({
       </a>
 
       <div className="overflow-hidden bg-[#f7f7f6] lg:min-h-[calc(100dvh-2rem)] lg:rounded-[28px]">
-        <SystemAnnouncementBanner />
         <div className="flex min-h-dvh gap-0 lg:min-h-[calc(100dvh-2rem)]">
           <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
 

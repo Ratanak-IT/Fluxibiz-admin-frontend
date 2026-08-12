@@ -64,7 +64,7 @@ const ACTIONS_BY_TARGET: Record<TargetType, AdminActionType[]> = {
 const ALL_ACTIONS = Object.values(ACTIONS_BY_TARGET).flat();
 
 const COLUMNS: ColumnDef[] = [
-  { id: "when", label: "When" },
+  { id: "when", label: "Date" },
   { id: "administrator", label: "Administrator" },
   { id: "action", label: "Action" },
   { id: "target", label: "Target" },
@@ -301,34 +301,7 @@ function formatDateDMY(isoString: string) {
         filters.actionType;
 
   return (
-    <main className="bg-background px-4 py-5 text-foreground sm:px-6 sm:py-6 lg:px-8 lg:py-7">
-      <nav className="mb-6 text-sm text-muted-foreground sm:text-[15px]">
-        <Link
-          href="/dashboard"
-          className="transition hover:text-foreground"
-        >
-          Dashboard
-        </Link>
-
-        <span className="px-2 text-muted-foreground">
-          /
-        </span>
-
-        <Link
-          href="/audit-logs"
-          className="transition hover:text-foreground"
-        >
-          Audit
-        </Link>
-
-        <span className="px-2 text-muted-foreground">
-          /
-        </span>
-
-        <span className="text-foreground">
-          {breadcrumb}
-        </span>
-      </nav>
+    <div className="w-full pt-2">
 
       <h1 className="text-xl font-bold text-foreground sm:text-2xl lg:text-3xl">
         {title}
@@ -352,8 +325,8 @@ function formatDateDMY(isoString: string) {
             onChange={(event) =>
               setKeywordInput(event.target.value)
             }
-            placeholder="Search by target, admin, reason or date (DD/MM/YYYY e.g. 12/08/2026)..."
-            className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary dark:bg-background"
+            placeholder="Search by target, admin, reason or date (DD/MM/YYYY)..."
+            className="w-full rounded-full border border-border bg-card py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary"
           />
         </div>
 
@@ -370,14 +343,14 @@ function formatDateDMY(isoString: string) {
               }
               aria-haspopup="listbox"
               aria-expanded={actionFilterOpen}
-              className="flex w-full items-center gap-2 rounded-full border border-border bg-white py-2.5 pl-4 pr-4 text-sm text-foreground outline-none transition hover:bg-accent hover:text-foreground focus:border-brand dark:bg-background"
+              className="flex w-full items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm text-foreground outline-none transition hover:bg-accent focus:border-primary"
             >
               <SlidersHorizontal
                 className="size-4 shrink-0 text-muted-foreground"
                 aria-hidden
               />
 
-              <span className="flex-1 truncate text-left">
+              <span className="flex-1 truncate text-left font-medium">
                 {actionFilterLabel}
               </span>
 
@@ -406,12 +379,11 @@ function formatDateDMY(isoString: string) {
                     setActionType("ALL");
                     setActionFilterOpen(false);
                   }}
-                  className={[
-                    "block w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium transition",
+                  className={`block w-full rounded-xl px-4 py-2 text-left text-sm font-medium transition ${
                     filters.actionType === "ALL"
-                      ? "bg-primary text-primary-foreground"
-                      : "text-popover-foreground hover:bg-accent hover:text-foreground",
-                  ].join(" ")}
+                      ? "bg-primary text-primary-foreground font-semibold"
+                      : "text-foreground hover:bg-accent"
+                  }`}
                 >
                   All actions
                 </button>
@@ -428,15 +400,13 @@ function formatDateDMY(isoString: string) {
                       setActionType(action);
                       setActionFilterOpen(false);
                     }}
-                    className={[
-                      "block w-full rounded-xl px-4 py-2.5 text-left text-sm font-medium transition",
+                    className={`block w-full rounded-xl px-4 py-2 text-left text-sm font-medium transition ${
                       filters.actionType === action
-                        ? "bg-primary text-primary-foreground"
-                        : "text-popover-foreground hover:bg-accent hover:text-foreground",
-                    ].join(" ")}
+                        ? "bg-primary text-primary-foreground font-semibold"
+                        : "text-foreground hover:bg-accent"
+                    }`}
                   >
-                    {ACTION_LABELS[action] ??
-                      action}
+                    {ACTION_LABELS[action] ?? action}
                   </button>
                 ))}
               </div>
@@ -447,7 +417,7 @@ function formatDateDMY(isoString: string) {
           <button
             type="button"
             onClick={() => setExportDialogOpen(true)}
-            className="flex shrink-0 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-4 py-2.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+            className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2.5 text-xs font-semibold text-foreground transition hover:bg-accent"
           >
             <Download className="size-4" />
             Export Logs
@@ -457,7 +427,7 @@ function formatDateDMY(isoString: string) {
           <div className="shrink-0">
             <ColumnPicker
               state={cols}
-              buttonClassName="bg-white dark:bg-background"
+              buttonClassName="bg-card border-border"
             />
           </div>
 
@@ -466,7 +436,7 @@ function formatDateDMY(isoString: string) {
             <button
               type="button"
               onClick={clearFilters}
-              className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-white px-4 py-2.5 text-sm text-muted-foreground transition hover:bg-accent hover:text-foreground dark:bg-background"
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2.5 text-sm text-muted-foreground transition hover:bg-accent hover:text-foreground"
             >
               <X className="size-4" />
               Clear
@@ -483,39 +453,22 @@ function formatDateDMY(isoString: string) {
       />
 
       {/* Table Card */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-white dark:bg-background">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
         <div className="overflow-x-auto">
           <table
-            className={`w-full text-left ${cols.tableClassName}`}
+            className={`w-full text-left text-sm ${cols.tableClassName}`}
             style={{
               minWidth: cols.minWidthRem(72),
             }}
           >
-            <thead className="bg-muted/60 text-sm font-semibold text-foreground">
+            <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
               <tr>
-                <th className="px-4 py-3 sm:px-6 sm:py-4">
-                  When
-                </th>
-
-                <th className="px-4 py-3 sm:px-6 sm:py-4">
-                  Administrator
-                </th>
-
-                <th className="px-4 py-3 sm:px-6 sm:py-4">
-                  Action
-                </th>
-
-                <th className="px-4 py-3 sm:px-6 sm:py-4">
-                  Target
-                </th>
-
-                <th className="px-4 py-3 sm:px-6 sm:py-4">
-                  Change
-                </th>
-
-                <th className="px-4 py-3 sm:px-6 sm:py-4">
-                  Reason
-                </th>
+                {!cols.isHidden("when") && <th className="px-4 py-3.5 sm:px-6">Date</th>}
+                {!cols.isHidden("administrator") && <th className="px-4 py-3.5 sm:px-6">Administrator</th>}
+                {!cols.isHidden("action") && <th className="px-4 py-3.5 sm:px-6">Action</th>}
+                {!cols.isHidden("target") && <th className="px-4 py-3.5 sm:px-6">Target</th>}
+                {!cols.isHidden("change") && <th className="px-4 py-3.5 sm:px-6">Change</th>}
+                {!cols.isHidden("reason") && <th className="px-4 py-3.5 sm:px-6">Reason</th>}
               </tr>
             </thead>
 
@@ -546,41 +499,45 @@ function formatDateDMY(isoString: string) {
               {filteredRows.map((log) => (
                 <tr
                   key={log.id}
-                  className="align-top hover:bg-muted/40"
+                  className="transition hover:bg-accent/40"
                 >
-                  <td className="whitespace-nowrap px-4 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4">
-                    {formatDateDMY(log.createdAt)}
-                  </td>
+                  {!cols.isHidden("when") && (
+                    <td className="whitespace-nowrap px-4 py-3.5 text-xs text-muted-foreground sm:px-6">
+                      {formatDateDMY(log.createdAt)}
+                    </td>
+                  )}
 
-                  <td className="px-4 py-3 text-sm text-foreground sm:px-6 sm:py-4">
-                    {log.actorUsername}
-                  </td>
+                  {!cols.isHidden("administrator") && (
+                    <td className="px-4 py-3.5 font-medium text-foreground sm:px-6">
+                      {log.actorUsername}
+                    </td>
+                  )}
 
-                  <td className="px-4 py-3 text-sm text-foreground sm:px-6 sm:py-4">
-                    {ACTION_LABELS[
-                      log.actionType
-                    ] ?? log.actionType}
-                  </td>
+                  {!cols.isHidden("action") && (
+                    <td className="px-4 py-3.5 font-semibold text-foreground sm:px-6">
+                      {ACTION_LABELS[log.actionType] ?? log.actionType}
+                    </td>
+                  )}
 
-                  <td className="px-4 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4">
-                    {log.targetLabel ?? "—"}
-                  </td>
+                  {!cols.isHidden("target") && (
+                    <td className="px-4 py-3.5 text-muted-foreground sm:px-6">
+                      {log.targetLabel ?? "—"}
+                    </td>
+                  )}
 
-                  <td className="px-4 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4">
-                    {log.previousState ||
-                    log.newState
-                      ? `${
-                          log.previousState ??
-                          "—"
-                        } → ${
-                          log.newState ?? "—"
-                        }`
-                      : "—"}
-                  </td>
+                  {!cols.isHidden("change") && (
+                    <td className="px-4 py-3.5 text-muted-foreground font-mono text-xs sm:px-6">
+                      {log.previousState || log.newState
+                        ? `${log.previousState ?? "—"} → ${log.newState ?? "—"}`
+                        : "—"}
+                    </td>
+                  )}
 
-                  <td className="max-w-xs px-4 py-3 text-sm text-muted-foreground sm:px-6 sm:py-4">
-                    {log.reason ?? "—"}
-                  </td>
+                  {!cols.isHidden("reason") && (
+                    <td className="max-w-xs px-4 py-3.5 text-muted-foreground sm:px-6">
+                      {log.reason ?? "—"}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -622,6 +579,6 @@ function formatDateDMY(isoString: string) {
           </span>
         )}
       </div>
-    </main>
+    </div>
   );
 }

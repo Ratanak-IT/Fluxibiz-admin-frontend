@@ -9,6 +9,7 @@ import {
   sectionEntryHref,
   type NavSection,
 } from "@/components/layout/navigation";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import UserMenu from "@/components/layout/UserMenu";
 import BrandLogo from "@/components/brand/BrandLogo";
 import { ModeToggle } from "../mode-toggle";
@@ -64,14 +65,7 @@ export default function AppLauncher({ managerName }: { managerName: string }) {
           <span className="hidden sm:block">
             <ModeToggle />
           </span>
-          <button
-            type="button"
-            aria-label="Notifications"
-            className="relative grid size-8 place-items-center text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          >
-            <Bell className="size-5" aria-hidden="true" />
-            <span className="absolute top-0.5 right-0.5 size-2 rounded-full bg-primary" />
-          </button>
+          <NotificationBell />
           <UserMenu name={managerName} />
         </div>
       </header>

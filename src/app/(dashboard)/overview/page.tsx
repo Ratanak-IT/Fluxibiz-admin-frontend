@@ -529,6 +529,122 @@ function RecentAuditWidget() {
   );
 }
 
+function OverviewSkeleton() {
+  return (
+    <div className="mt-8 space-y-8 animate-pulse">
+      {/* Key Platform Stats Skeleton */}
+      <div>
+        <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-muted-foreground mb-3">
+          Platform Key Metrics
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border shadow-xs">
+              <div className="h-4 w-32 rounded bg-neutral-200 dark:bg-neutral-800" />
+              <div className="mt-2 h-9 w-16 rounded bg-neutral-200 dark:bg-neutral-800" />
+              <div className="mt-1 h-3.5 w-36 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Shop Status Breakdown Skeleton */}
+      <div>
+        <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-muted-foreground mb-3">
+          Shop Status Breakdown
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border shadow-xs">
+              <div className="h-4 w-32 rounded bg-neutral-200 dark:bg-neutral-800" />
+              <div className="mt-2 h-9 w-16 rounded bg-neutral-200 dark:bg-neutral-800" />
+              <div className="mt-1 h-3.5 w-36 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Analytics Charts & Category Breakdown Skeleton */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+        <section className="rounded-2xl border border-neutral-200 bg-card p-6 lg:col-span-3 dark:border-border">
+          <div className="h-5 w-36 rounded bg-neutral-200 dark:bg-neutral-800" />
+          <div className="mt-1 h-3.5 w-72 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
+          <div className="mt-6 h-[280px] w-full rounded-xl bg-neutral-100 dark:bg-neutral-900/50" />
+        </section>
+
+        <section className="rounded-2xl border border-neutral-200 bg-card p-6 lg:col-span-2 dark:border-border">
+          <div className="h-5 w-36 rounded bg-neutral-200 dark:bg-neutral-800" />
+          <div className="mt-1 h-3.5 w-56 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
+          <div className="mt-5 space-y-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="space-y-1.5">
+                <div className="flex justify-between">
+                  <div className="h-4 w-28 rounded bg-neutral-200 dark:bg-neutral-800" />
+                  <div className="h-4 w-8 rounded bg-neutral-200 dark:bg-neutral-800" />
+                </div>
+                <div className="h-2 w-full rounded-full bg-neutral-200/60 dark:bg-neutral-800/60" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* Channel Integration Rates Skeleton */}
+      <section className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-5 w-48 rounded bg-neutral-200 dark:bg-neutral-800" />
+            <div className="mt-1 h-3.5 w-72 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
+          </div>
+          <div className="h-4 w-24 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
+        </div>
+        <div className="mt-5 space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="space-y-1.5">
+              <div className="flex justify-between">
+                <div className="h-4 w-36 rounded bg-neutral-200 dark:bg-neutral-800" />
+                <div className="h-4 w-24 rounded bg-neutral-200 dark:bg-neutral-800" />
+              </div>
+              <div className="h-2 w-full rounded-full bg-neutral-200/60 dark:bg-neutral-800/60" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Regional Density & Risk Radar Skeletons */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {[...Array(2)].map((_, i) => (
+          <section key={i} className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border">
+            <div className="h-5 w-48 rounded bg-neutral-200 dark:bg-neutral-800" />
+            <div className="mt-1 h-3.5 w-72 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
+            <div className="mt-5 h-48 rounded-xl bg-neutral-100 dark:bg-neutral-900/50" />
+          </section>
+        ))}
+      </div>
+
+      {/* Management Widgets Skeletons */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {[...Array(3)].map((_, i) => (
+          <section key={i} className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="h-5 w-40 rounded bg-neutral-200 dark:bg-neutral-800" />
+                <div className="mt-1 h-3.5 w-48 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
+              </div>
+              <div className="h-4 w-16 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
+            </div>
+            <div className="mt-5 space-y-3">
+              {[...Array(4)].map((_, j) => (
+                <div key={j} className="h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900/50" />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function OverviewPage() {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const { data, isLoading, error } = useGetPlatformDashboardQuery(undefined, {
@@ -538,18 +654,7 @@ export default function OverviewPage() {
   });
 
   return (
-    <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
-      <nav aria-label="Breadcrumb" className="mb-5 text-sm">
-        <Link
-          href="/dashboard"
-          className="text-neutral-500 transition hover:text-neutral-900 dark:text-[var(--muted-foreground)] dark:hover:text-[var(--foreground)]"
-        >
-          Dashboard
-        </Link>
-        <span className="px-2 text-neutral-400 dark:text-[var(--muted-foreground)]">/</span>
-        <span className="text-neutral-900 dark:text-[var(--foreground)]">Overview</span>
-      </nav>
-
+    <div className="w-full pt-2">
       {/* Top Header & Quick Actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
@@ -565,39 +670,11 @@ export default function OverviewPage() {
           <button
             type="button"
             onClick={() => setExportDialogOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90 shadow-sm"
           >
-            <Download className="size-3.5" />
+            <Download className="size-4" />
             Export Report
           </button>
-          <Link
-            href="/businesses"
-            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition hover:opacity-90"
-          >
-            <Plus className="size-3.5" />
-            New Business
-          </Link>
-          <Link
-            href="/businesses/categories"
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-foreground transition hover:bg-accent"
-          >
-            <Layers className="size-3.5" />
-            Categories
-          </Link>
-          <Link
-            href="/channels"
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-foreground transition hover:bg-accent"
-          >
-            <Sliders className="size-3.5" />
-            Channels
-          </Link>
-          <Link
-            href="/audit-logs"
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-foreground transition hover:bg-accent"
-          >
-            <FileText className="size-3.5" />
-            Audit Logs
-          </Link>
         </div>
       </div>
 
@@ -607,9 +684,7 @@ export default function OverviewPage() {
         defaultType="overview"
       />
 
-      {isLoading && (
-        <p className="mt-8 text-sm text-neutral-500 dark:text-muted-foreground">Loading platform metrics...</p>
-      )}
+      {isLoading && <OverviewSkeleton />}
 
       {error && (
         <p className="mt-8 text-sm text-red-600 dark:text-destructive">
@@ -639,7 +714,7 @@ export default function OverviewPage() {
               href="/businesses"
             />
             <StatCard
-              label="Storefronts Live"
+              label="Store Menus Live"
               value={data.storefrontsPublished}
               hint="Published to public directory"
               accent="amber"
@@ -718,6 +793,6 @@ export default function OverviewPage() {
           </div>
         </>
       )}
-    </main>
+    </div>
   );
 }

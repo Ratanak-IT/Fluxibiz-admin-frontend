@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Bell, Megaphone, Menu, Search } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import { getPageTitle } from "@/components/layout/navigation";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import UserMenu from "@/components/layout/UserMenu";
 import { ModeToggle } from "../mode-toggle";
-import { AnnouncementDialog } from "@/components/admin/AnnouncementDialog";
-import { getAnnouncement, subscribeToAnnouncement, type AnnouncementConfig } from "@/lib/announcementStore";
 
 export default function Header({
   managerName,
@@ -18,17 +16,10 @@ export default function Header({
 }) {
   const pathname = usePathname();
   const { app, page } = getPageTitle(pathname);
-  const [announcementDialogOpen, setAnnouncementDialogOpen] = useState(false);
-  const [announcement, setAnnouncement] = useState<AnnouncementConfig>(getAnnouncement);
-
-  useEffect(() => {
-    setAnnouncement(getAnnouncement());
-    return subscribeToAnnouncement(setAnnouncement);
-  }, []);
 
   return (
     <>
-      <header className="flex flex-nowrap items-center gap-2 px-4 pt-4 pb-5 sm:gap-4 sm:px-8 sm:pt-6 sm:pb-8 dark:bg-background ">
+      <header className="flex flex-nowrap items-center gap-2 px-5 py-5 sm:gap-4 lg:px-8 border-b border-border/40 bg-background dark:bg-background">
         <button
           type="button"
           onClick={onOpenNav}
@@ -69,41 +60,17 @@ export default function Header({
             />
           </label>
 
-          {/* Quick System Announcement Broadcast Button */}
-          <button
-            type="button"
-            onClick={() => setAnnouncementDialogOpen(true)}
-            aria-label="Manage System Announcement"
-            title="System Announcement & Maintenance Broadcast"
-            className="relative grid size-10 sm:size-11 place-items-center rounded-xl border border-[#e2e2de] bg-white text-[#16181c] outline-none transition-colors hover:bg-[#f7f7f6] focus-visible:ring-2 focus-visible:ring-[#00932a] dark:border-input dark:bg-card dark:text-foreground dark:hover:bg-accent"
-          >
-            <Megaphone className="size-[18px]" aria-hidden="true" />
-            {announcement.active && (
-              <span className="absolute top-2 right-2 size-2 rounded-full bg-[#00932A] ring-2 ring-white dark:ring-background" />
-            )}
-          </button>
-
           {/* Hidden on mobile — moved into UserMenu's dropdown for that breakpoint */}
           <div className="hidden sm:block">
             <ModeToggle />
           </div>
 
-          <button
-            type="button"
-            aria-label="Notifications"
-            className="relative grid size-10 sm:size-11 place-items-center rounded-xl border border-[#e2e2de] bg-white text-[#16181c] outline-none transition-colors hover:bg-[#f7f7f6] focus-visible:ring-2 focus-visible:ring-[#00932a] dark:border-input dark:bg-card dark:text-foreground dark:hover:bg-accent"
-          >
-            <Bell className="size-[18px]" aria-hidden="true" />
-          </button>
+          {/* Real-time STOMP & API Notification Bell */}
+          <NotificationBell />
 
           <UserMenu name={managerName} />
         </div>
       </header>
-
-      <AnnouncementDialog
-        open={announcementDialogOpen}
-        onOpenChange={setAnnouncementDialogOpen}
-      />
     </>
   );
 }

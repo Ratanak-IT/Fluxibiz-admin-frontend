@@ -101,15 +101,7 @@ export default function OnboardingTrackerPage() {
   };
 
   return (
-    <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
-      {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="mb-5 text-sm">
-        <Link href="/dashboard" className="text-muted-foreground transition hover:text-foreground">
-          Dashboard
-        </Link>
-        <span className="px-2 text-muted-foreground">/</span>
-        <span className="text-foreground">Merchant Onboarding SLA Tracker</span>
-      </nav>
+    <div className="w-full pt-2">
 
       {/* Header */}
       <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -167,29 +159,29 @@ export default function OnboardingTrackerPage() {
         </div>
       </div>
 
-      {/* Search & Subcategory Filter Bar */}
+      {/* Filters Toolbar */}
       <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative w-full sm:w-80 lg:w-96">
-          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative w-full sm:max-w-xs lg:max-w-md">
+          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
           <input
+            type="text"
+            placeholder="Search merchant name, email, or city..."
             value={keyword}
             onChange={(e) => {
               setKeyword(e.target.value);
               setPage(0);
             }}
-            placeholder="Search merchant by name, email or city"
-            className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
+            className="w-full rounded-full border border-border bg-card py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary"
           />
         </div>
 
-        {/* Subcategory Select Dropdown */}
         <select
           value={selectedCategory}
           onChange={(e) => {
             setSelectedCategory(e.target.value);
             setPage(0);
           }}
-          className="rounded-full border border-border bg-primary-foreground px-4 py-2.5 text-xs font-semibold text-foreground outline-none transition focus:border-primary dark:bg-background cursor-pointer"
+          className="rounded-full border border-border bg-card px-4 py-2.5 text-xs font-semibold text-foreground outline-none transition focus:border-primary cursor-pointer"
         >
           <option value="ALL">All Subcategories</option>
           {subCategories.map((sub) => (
@@ -201,42 +193,42 @@ export default function OnboardingTrackerPage() {
       </div>
 
       {/* Onboarding SLA Table */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase text-muted-foreground">
+            <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
               <tr>
-                <th scope="col" className="px-6 py-4">
+                <th scope="col" className="px-4 py-3.5 sm:px-6">
                   Merchant / Business
                 </th>
-                <th scope="col" className="px-6 py-4">
+                <th scope="col" className="px-4 py-3.5 sm:px-6">
                   Subcategory
                 </th>
-                <th scope="col" className="px-6 py-4">
+                <th scope="col" className="px-4 py-3.5 sm:px-6">
                   City & Phone
                 </th>
-                <th scope="col" className="px-6 py-4">
+                <th scope="col" className="px-4 py-3.5 sm:px-6">
                   SLA Progress
                 </th>
-                <th scope="col" className="px-6 py-4">
+                <th scope="col" className="px-4 py-3.5 sm:px-6">
                   Setup Steps Status
                 </th>
-                <th scope="col" className="px-6 py-4 text-right">
+                <th scope="col" className="px-4 py-3.5 text-right sm:px-6">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-border text-sm">
               {isLoading && page === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-xs text-muted-foreground">
+                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-muted-foreground">
                     Loading onboarding SLA tracker...
                   </td>
                 </tr>
               )}
 
               {filtered.map((b) => (
-                <tr key={b.id} className="transition hover:bg-muted/50">
+                <tr key={b.id} className="transition hover:bg-accent/40">
                   <td className="px-6 py-4 font-semibold text-foreground">
                     <div>
                       <p className="font-bold text-foreground">{b.name}</p>
@@ -323,6 +315,6 @@ export default function OnboardingTrackerPage() {
           {isFetching && <p className="text-xs text-muted-foreground">Loading next 15 merchants...</p>}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

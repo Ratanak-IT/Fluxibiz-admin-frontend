@@ -24,7 +24,7 @@ export function StatusPill({ status }: { status: BusinessOwnerStatus }) {
 
 export function Flag({ on, onLabel, offLabel }: { on: boolean; onLabel: string; offLabel: string }) {
   return (
-    <span className={on ? "text-foreground" : "text-muted-foreground/70"}>
+    <span className={on ? "font-medium text-foreground" : "text-muted-foreground/70"}>
       {on ? onLabel : offLabel}
     </span>
   );

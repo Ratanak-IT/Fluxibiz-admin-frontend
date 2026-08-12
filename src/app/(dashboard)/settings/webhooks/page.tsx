@@ -92,19 +92,7 @@ export default function WebhooksPage() {
   };
 
   return (
-    <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
-      {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="mb-5 text-sm">
-        <Link href="/dashboard" className="text-muted-foreground transition hover:text-foreground">
-          Dashboard
-        </Link>
-        <span className="px-2 text-muted-foreground">/</span>
-        <Link href="/settings/platform-features" className="text-muted-foreground transition hover:text-foreground">
-          Settings
-        </Link>
-        <span className="px-2 text-muted-foreground">/</span>
-        <span className="text-foreground">Third-Party Webhook Delivery Monitor</span>
-      </nav>
+    <div className="w-full pt-2">
 
       {/* Header */}
       <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -159,21 +147,22 @@ export default function WebhooksPage() {
       </div>
 
       {/* Search & Filter Bar (Units Style Flex) */}
+      {/* Search & Filter Bar */}
       <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative w-full sm:w-80 lg:w-96">
-          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative w-full sm:max-w-xs lg:max-w-md">
+          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
           <input
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             placeholder="Search webhook by name or endpoint URL..."
-            className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
+            className="w-full rounded-full border border-border bg-card py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary"
           />
         </div>
 
         <select
           value={providerFilter}
           onChange={(e) => setProviderFilter(e.target.value)}
-          className="rounded-full border border-border bg-primary-foreground px-4 py-2.5 text-xs font-semibold text-foreground outline-none transition focus:border-primary dark:bg-background cursor-pointer"
+          className="rounded-full border border-border bg-card px-4 py-2.5 text-xs font-semibold text-foreground outline-none transition focus:border-primary cursor-pointer"
         >
           <option value="ALL">All Webhook Handlers</option>
           <option value="TELEGRAM">Telegram Bot</option>
@@ -183,38 +172,38 @@ export default function WebhooksPage() {
       </div>
 
       {/* Table Layout */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase text-muted-foreground">
+            <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
               <tr>
-                <th scope="col" className="px-6 py-4">Webhook Name</th>
-                <th scope="col" className="px-6 py-4">Provider</th>
-                <th scope="col" className="px-6 py-4">Endpoint URL</th>
-                <th scope="col" className="px-6 py-4">Success Rate</th>
-                <th scope="col" className="px-6 py-4">Latency</th>
-                <th scope="col" className="px-6 py-4 text-right">Actions</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Webhook Name</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Provider</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Endpoint URL</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Success Rate</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Latency</th>
+                <th scope="col" className="px-4 py-3.5 text-right sm:px-6">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-border text-sm">
               {filtered.map((item) => (
-                <tr key={item.id} className="transition hover:bg-muted/50">
-                  <td className="px-6 py-4 font-bold text-foreground">{item.name}</td>
-                  <td className="px-6 py-4">
-                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+                <tr key={item.id} className="transition hover:bg-accent/40">
+                  <td className="px-4 py-3.5 font-bold text-foreground sm:px-6">{item.name}</td>
+                  <td className="px-4 py-3.5 sm:px-6">
+                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                       {item.provider}
                     </span>
                   </td>
-                  <td className="px-6 py-4 font-mono text-xs text-muted-foreground max-w-xs truncate">{item.endpointUrl}</td>
-                  <td className="px-6 py-4 font-bold text-emerald-600 dark:text-emerald-400">{item.successRatePct}%</td>
-                  <td className="px-6 py-4 text-xs font-semibold text-foreground">{item.lastDeliveryMs} ms</td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-4 py-3.5 font-mono text-xs text-muted-foreground max-w-xs truncate sm:px-6">{item.endpointUrl}</td>
+                  <td className="px-4 py-3.5 font-bold text-emerald-600 dark:text-emerald-400 sm:px-6">{item.successRatePct}%</td>
+                  <td className="px-4 py-3.5 text-xs font-semibold text-foreground sm:px-6">{item.lastDeliveryMs} ms</td>
+                  <td className="px-4 py-3.5 text-right sm:px-6">
                     <button
                       type="button"
                       onClick={() => handleTestWebhook(item.name)}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-semibold text-foreground transition hover:bg-accent"
                     >
-                      <RefreshCw className="size-3.5" />
+                      <RefreshCw className="size-3.5 text-primary" />
                       Test Ping
                     </button>
                   </td>
@@ -224,6 +213,6 @@ export default function WebhooksPage() {
           </table>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

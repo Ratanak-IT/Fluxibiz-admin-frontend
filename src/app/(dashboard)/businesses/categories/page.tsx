@@ -32,6 +32,12 @@ interface EditorState {
 
 type FilterType = "ALL" | "PARENT_ONLY" | "HAS_SUB";
 
+const TYPE_FILTERS: Array<{ label: string; value: FilterType }> = [
+  { label: "All", value: "ALL" },
+  { label: "Main Only", value: "PARENT_ONLY" },
+  { label: "With Subcategories", value: "HAS_SUB" },
+];
+
 export default function CategoriesPage() {
   const { data: categories = [], isLoading, error } = useGetBusinessCategoriesQuery();
   const [create, createState] = useCreateBusinessCategoryMutation();
@@ -41,6 +47,7 @@ export default function CategoriesPage() {
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<FilterType>("ALL");
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   const { data: businessData } = useGetBusinessesQuery({ size: 200 });
   const businessList = businessData?.content ?? [];
@@ -162,14 +169,7 @@ export default function CategoriesPage() {
   };
 
   return (
-    <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7">
-      <nav className="mb-6 text-sm text-muted-foreground">
-        <Link href="/dashboard" className="transition hover:text-foreground">
-          Dashboard
-        </Link>
-        <span className="px-2">/</span>
-        <span className="font-medium text-foreground">Categories</span>
-      </nav>
+    <div className="w-full pt-2">
 
       <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
@@ -191,18 +191,18 @@ export default function CategoriesPage() {
         </button>
       </div>
 
-      {/* Toolbar: Search and Filter Pills */}
+      {/* Toolbar: Search, Filters */}
       {!isLoading && !error && categories.length > 0 && (
-        <div className="mt-7 flex items-center gap-2 sm:gap-3 lg:flex-wrap lg:justify-between">
+        <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* Search bar */}
-          <div className="relative min-w-0 flex-1 lg:max-w-md">
+          <div className="relative w-full sm:max-w-xs lg:max-w-md">
             <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
             <input
               type="text"
               placeholder="Search by category name or slug..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-10 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
+              className="w-full rounded-full border border-border bg-card py-2.5 pl-11 pr-10 text-sm text-foreground outline-none transition focus:border-primary"
             />
             {searchQuery && (
               <button
@@ -215,42 +215,63 @@ export default function CategoriesPage() {
             )}
           </div>
 
-          {/* Filter Pills */}
-          <div className="flex items-center gap-2 shrink-0 overflow-x-auto pb-1 sm:pb-0">
-            <SlidersHorizontal className="size-4 text-muted-foreground shrink-0 hidden sm:block" aria-hidden />
-            <button
-              type="button"
-              onClick={() => setTypeFilter("ALL")}
-              className={`rounded-full border px-4 py-2 text-sm transition ${
-                typeFilter === "ALL"
-                  ? "border-primary bg-primary-foreground text-primary dark:bg-background font-medium"
-                  : "border-border bg-primary-foreground text-foreground hover:bg-accent dark:bg-background"
-              }`}
-            >
-              All
-            </button>
-            <button
-              type="button"
-              onClick={() => setTypeFilter("PARENT_ONLY")}
-              className={`rounded-full border px-4 py-2 text-sm transition ${
-                typeFilter === "PARENT_ONLY"
-                  ? "border-primary bg-primary-foreground text-primary dark:bg-background font-medium"
-                  : "border-border bg-primary-foreground text-foreground hover:bg-accent dark:bg-background"
-              }`}
-            >
-              Main Only
-            </button>
-            <button
-              type="button"
-              onClick={() => setTypeFilter("HAS_SUB")}
-              className={`rounded-full border px-4 py-2 text-sm transition ${
-                typeFilter === "HAS_SUB"
-                  ? "border-primary bg-primary-foreground text-primary dark:bg-background font-medium"
-                  : "border-border bg-primary-foreground text-foreground hover:bg-accent dark:bg-background"
-              }`}
-            >
-              With Subcategories
-            </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Mobile dropdown filter */}
+            <div className="relative lg:hidden">
+              <button
+                type="button"
+                onClick={() => setMobileFilterOpen((prev) => !prev)}
+                className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-foreground outline-none transition hover:bg-accent"
+              >
+                <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
+                <span>{TYPE_FILTERS.find((f) => f.value === typeFilter)?.label}</span>
+                <ChevronDown className={`size-4 text-muted-foreground transition-transform ${mobileFilterOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {mobileFilterOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setMobileFilterOpen(false)} />
+                  <div role="listbox" className="absolute right-0 z-50 mt-2 min-w-[160px] overflow-hidden rounded-xl border border-border bg-popover p-1 shadow-lg">
+                    {TYPE_FILTERS.map((filter) => (
+                      <button
+                        key={filter.value}
+                        type="button"
+                        onClick={() => {
+                          setTypeFilter(filter.value);
+                          setMobileFilterOpen(false);
+                        }}
+                        className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition ${
+                          typeFilter === filter.value
+                            ? "bg-primary text-primary-foreground font-semibold"
+                            : "text-foreground hover:bg-accent"
+                        }`}
+                      >
+                        {filter.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Desktop status pill filters */}
+            <div className="hidden items-center gap-2 lg:flex">
+              <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
+              {TYPE_FILTERS.map((filter) => (
+                <button
+                  key={filter.value}
+                  type="button"
+                  onClick={() => setTypeFilter(filter.value)}
+                  className={`rounded-full border px-4 py-2 text-sm transition font-medium ${
+                    typeFilter === filter.value
+                      ? "border-primary bg-primary text-primary-foreground font-semibold"
+                      : "border-border bg-card text-foreground hover:bg-accent"
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -459,6 +480,6 @@ export default function CategoriesPage() {
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }

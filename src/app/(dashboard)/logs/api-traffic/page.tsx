@@ -106,19 +106,7 @@ export default function ApiTrafficPage() {
   }, [endpoints]);
 
   return (
-    <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
-      {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="mb-5 text-sm">
-        <Link href="/dashboard" className="text-muted-foreground transition hover:text-foreground">
-          Dashboard
-        </Link>
-        <span className="px-2 text-muted-foreground">/</span>
-        <Link href="/audit-logs" className="text-muted-foreground transition hover:text-foreground">
-          Audit Logs
-        </Link>
-        <span className="px-2 text-muted-foreground">/</span>
-        <span className="text-foreground">Platform API Traffic & Rate Limits</span>
-      </nav>
+    <div className="w-full pt-2">
 
       {/* Header */}
       <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -184,22 +172,23 @@ export default function ApiTrafficPage() {
         </div>
       </div>
 
-      {/* Search & Filter Bar (Units Style Flex) */}
+      {/* Controls Toolbar */}
       <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative w-full sm:w-80 lg:w-96">
-          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative w-full sm:max-w-xs lg:max-w-md">
+          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
           <input
+            type="text"
+            placeholder="Search API endpoint URI..."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            placeholder="Search API endpoint URI..."
-            className="w-full rounded-full border border-border bg-primary-foreground py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary dark:bg-background"
+            className="w-full rounded-full border border-border bg-card py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary"
           />
         </div>
 
         <select
           value={methodFilter}
           onChange={(e) => setMethodFilter(e.target.value)}
-          className="rounded-full border border-border bg-primary-foreground px-4 py-2.5 text-xs font-semibold text-foreground outline-none transition focus:border-primary dark:bg-background cursor-pointer"
+          className="rounded-full border border-border bg-card px-4 py-2.5 text-xs font-semibold text-foreground outline-none transition focus:border-primary cursor-pointer"
         >
           <option value="ALL">All HTTP Methods</option>
           <option value="GET">GET</option>
@@ -210,23 +199,23 @@ export default function ApiTrafficPage() {
       </div>
 
       {/* Table Layout */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase text-muted-foreground">
+            <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
               <tr>
-                <th scope="col" className="px-6 py-4">HTTP Method</th>
-                <th scope="col" className="px-6 py-4">Endpoint URI</th>
-                <th scope="col" className="px-6 py-4">Throughput</th>
-                <th scope="col" className="px-6 py-4">Avg Latency</th>
-                <th scope="col" className="px-6 py-4">Error Rate</th>
-                <th scope="col" className="px-6 py-4 text-right">Status</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">HTTP Method</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Endpoint URI</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Throughput</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Avg Latency</th>
+                <th scope="col" className="px-4 py-3.5 sm:px-6">Error Rate</th>
+                <th scope="col" className="px-4 py-3.5 text-right sm:px-6">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-border text-sm">
               {filtered.map((item) => (
-                <tr key={item.id} className="transition hover:bg-muted/50">
-                  <td className="px-6 py-4">
+                <tr key={item.id} className="transition hover:bg-accent/40">
+                  <td className="px-4 py-3.5 sm:px-6">
                     <span
                       className={`rounded-md px-2 py-1 text-xs font-bold ${
                         item.method === "GET"
@@ -237,12 +226,12 @@ export default function ApiTrafficPage() {
                       {item.method}
                     </span>
                   </td>
-                  <td className="px-6 py-4 font-mono text-xs font-bold text-foreground">{item.uri}</td>
-                  <td className="px-6 py-4 text-xs font-semibold text-foreground">{item.throughputReqSec} req/s</td>
-                  <td className="px-6 py-4 text-xs font-semibold text-foreground">{item.latencyMs} ms</td>
-                  <td className="px-6 py-4 text-xs text-muted-foreground">{item.errorRatePct}%</td>
-                  <td className="px-6 py-4 text-right">
-                    <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 flex items-center justify-end gap-1">
+                  <td className="px-4 py-3.5 font-mono text-xs font-semibold text-foreground sm:px-6">{item.uri}</td>
+                  <td className="px-4 py-3.5 text-xs font-semibold text-foreground sm:px-6">{item.throughputReqSec} req/s</td>
+                  <td className="px-4 py-3.5 text-xs font-semibold text-foreground sm:px-6">{item.latencyMs} ms</td>
+                  <td className="px-4 py-3.5 text-xs text-muted-foreground sm:px-6">{item.errorRatePct}%</td>
+                  <td className="px-4 py-3.5 text-right sm:px-6">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
                       <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
                       Operational
                     </span>
@@ -253,6 +242,6 @@ export default function ApiTrafficPage() {
           </table>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

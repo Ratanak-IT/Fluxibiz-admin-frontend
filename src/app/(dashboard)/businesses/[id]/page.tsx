@@ -57,24 +57,12 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 dark:bg-background">
-      {/* Breadcrumb & Top Action */}
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <nav className="text-xs sm:text-sm font-medium text-muted-foreground flex flex-wrap items-center gap-1.5">
-          <Link href="/dashboard" className="hover:text-foreground">
-            Dashboard
-          </Link>
-          <span>/</span>
-          <Link href="/businesses" className="hover:text-foreground">
-            Businesses
-          </Link>
-          <span>/</span>
-          <span className="text-foreground font-semibold truncate max-w-[200px] sm:max-w-none">{business.name}</span>
-        </nav>
-
+    <div className="w-full pt-2">
+      {/* Top Action */}
+      <div className="mb-6 flex items-center justify-between">
         <Link
           href="/businesses"
-          className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-xs font-bold text-foreground transition hover:bg-accent shadow-sm"
+          className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground transition hover:bg-accent shadow-xs"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to Businesses
@@ -88,11 +76,11 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
             <img
               src={business.logo || business.thumbnail || ""}
               alt={business.name}
-              className="h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 min-w-[96px] min-h-[96px] sm:min-w-[112px] sm:min-h-[112px] md:min-w-[128px] md:min-h-[128px] shrink-0 rounded-3xl border-2 border-border object-cover bg-white p-1.5 shadow-lg dark:bg-card"
+              className="h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 min-w-[96px] min-h-[96px] sm:min-w-[112px] sm:min-h-[112px] md:min-w-[128px] md:min-h-[128px] shrink-0 rounded-3xl object-cover bg-muted shadow-sm"
             />
           ) : (
-            <div className="flex h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 min-w-[96px] min-h-[96px] sm:min-w-[112px] sm:min-h-[112px] md:min-w-[128px] md:min-h-[128px] shrink-0 items-center justify-center rounded-3xl bg-muted text-3xl sm:text-4xl md:text-5xl font-black text-foreground border-2 border-border shadow-lg">
-              {business.name.charAt(0).toUpperCase()}
+            <div className="flex h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 min-w-[96px] min-h-[96px] sm:min-w-[112px] sm:min-h-[112px] md:min-w-[128px] md:min-h-[128px] shrink-0 items-center justify-center rounded-3xl bg-muted font-bold text-foreground text-3xl shadow-sm">
+              {business.name ? business.name.charAt(0).toUpperCase() : "B"}
             </div>
           )}
 
@@ -214,6 +202,6 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
           Back to All Businesses
         </Link>
       </div>
-    </main>
+    </div>
   );
 }
