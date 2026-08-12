@@ -1,7 +1,9 @@
+const DEFAULT_END_SESSION_ENDPOINT =
+  "https://auth.chanchhay.site/realms/istad-fluxipos-auth/protocol/openid-connect/logout";
+
 const DISCOVERY_PATH = "/.well-known/openid-configuration";
 
 let cachedEndSessionEndpoint: string | undefined;
-//
 
 function issuerUrl() {
   const issuer =
@@ -13,6 +15,10 @@ function issuerUrl() {
 }
 
 async function endSessionEndpoint(issuer: string) {
+  if (process.env.KEYCLOAK_END_SESSION_ENDPOINT) {
+    return process.env.KEYCLOAK_END_SESSION_ENDPOINT;
+  }
+
   if (cachedEndSessionEndpoint) return cachedEndSessionEndpoint;
 
   try {
@@ -34,7 +40,7 @@ async function endSessionEndpoint(issuer: string) {
     // Discovery is optional
   }
 
-  return `${issuer}/protocol/openid-connect/logout`;
+  return issuer ? `${issuer}/protocol/openid-connect/logout` : DEFAULT_END_SESSION_ENDPOINT;
 }
 
 export async function keycloakLogoutUrl({
@@ -45,9 +51,11 @@ export async function keycloakLogoutUrl({
   postLogoutRedirectUri: string;
 }) {
   const issuer = issuerUrl();
-  if (!issuer) return null;
+  const endpoint =
+    process.env.KEYCLOAK_END_SESSION_ENDPOINT ||
+    (issuer ? await endSessionEndpoint(issuer) : DEFAULT_END_SESSION_ENDPOINT);
 
-  const url = new URL(await endSessionEndpoint(issuer));
+  const url = new URL(endpoint);
   url.searchParams.set("post_logout_redirect_uri", postLogoutRedirectUri);
 
   const clientId =

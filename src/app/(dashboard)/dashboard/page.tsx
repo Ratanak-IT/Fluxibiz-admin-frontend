@@ -13,8 +13,8 @@ function ModuleTile({ module }: { module: AdminModule }) {
       className={[
         "grid size-[100px] place-items-center rounded-[28px] transition",
         module.available
-          ? "bg-gradient-to-br from-[#46CA22] to-[#0E8A1E] to-[72%] text-white group-hover:-translate-y-1 group-hover:shadow-lg"
-          : "bg-neutral-100 text-green-600",
+          ? "bg-gradient-to-br from-[#00932A] to-[#007a23] to-[72%] text-white group-hover:-translate-y-1 group-hover:shadow-lg"
+          : "bg-neutral-100 text-[#00932A]",
       ].join(" ")}
     >
       <Icon className="size-11" strokeWidth={1.6} aria-hidden />

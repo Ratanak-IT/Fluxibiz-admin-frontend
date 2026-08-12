@@ -9,21 +9,14 @@ import {
 } from "@/features/businessManagement/businessAdminApi";
 import { ReasonDialog } from "./ReasonDialog";
 import type { BusinessFeature, BusinessFeatureResponse } from "@/lib/types/adminTypes";
+import { AdminLoadingState } from "@/components/common/AdminLoadingState";
+import { AdminApiErrorFallback } from "@/components/common/AdminApiErrorFallback";
 
 const ICONS: Record<BusinessFeature, typeof Globe> = {
   STOREFRONT: Globe,
   TELEGRAM_BOT: Send,
   KHQR_PAYMENT: QrCode,
 };
-
-function errorMessage(error: unknown): string | undefined {
-  if (!error || typeof error !== "object") return undefined;
-  const status = "status" in error ? error.status : undefined;
-
-  if (status === 400) return "A reason is required when switching a feature off.";
-  if (status === 403) return "Your account cannot change platform features.";
-  return status ? `Request failed with status ${status}.` : "Request failed.";
-}
 
 function FeatureRow({
   feature,
@@ -42,54 +35,58 @@ function FeatureRow({
   const effectivelyOff = platformOff || !feature.enabled;
 
   return (
-    <li className="flex items-start gap-3 py-4">
-      <span
-        className={[
-          "mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg",
-          effectivelyOff
-            ? "bg-neutral-100 text-neutral-400 dark:bg-neutral-800 dark:text-neutral-500"
-            : "bg-green-50 text-green-700 dark:bg-green-950/70 dark:text-green-400",
-        ].join(" ")}
-      >
-        <Icon className="size-4" strokeWidth={1.8} aria-hidden />
-      </span>
+    <li className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-border last:border-b-0">
+      <div className="flex items-start gap-3.5 min-w-0 flex-1">
+        <span
+          className={[
+            "mt-0.5 grid size-10 shrink-0 place-items-center rounded-xl shadow-sm border border-border/50",
+            effectivelyOff
+              ? "bg-muted text-muted-foreground"
+              : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-400",
+          ].join(" ")}
+        >
+          <Icon className="size-5" strokeWidth={1.8} aria-hidden />
+        </span>
 
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-neutral-900 dark:text-neutral-50">{feature.label}</p>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">{feature.description}</p>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-bold text-foreground">{feature.label}</p>
+          <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{feature.description}</p>
 
-        {platformOff && (
-          <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-800 dark:bg-red-950/40 dark:text-red-300">
-            Switched off platform-wide, so this shop can&apos;t use it regardless of the setting below.
-          </p>
-        )}
+          {platformOff && (
+            <p className="mt-2 rounded-xl bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive">
+              Switched off platform-wide, so this shop cannot use it regardless of the setting below.
+            </p>
+          )}
 
-        {!platformOff && !feature.enabled && feature.disabledReason && (
-          <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:bg-amber-950/50 dark:text-amber-300">
-            {feature.disabledReason}
-            {feature.disabledAt && (
-              <span className="mt-0.5 block opacity-70">
-                Switched off {new Date(feature.disabledAt).toLocaleString()}
-              </span>
-            )}
-          </p>
-        )}
+          {!platformOff && !feature.enabled && feature.disabledReason && (
+            <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-700 dark:text-amber-300">
+              {feature.disabledReason}
+              {feature.disabledAt && (
+                <span className="mt-0.5 block text-[11px] opacity-75">
+                  Switched off {new Date(feature.disabledAt).toLocaleString()}
+                </span>
+              )}
+            </p>
+          )}
+        </div>
       </div>
 
-      <button
-        type="button"
-        disabled={busy || (platformOff && !feature.enabled)}
-        onClick={feature.enabled ? onDisable : onEnable}
-        title={platformOff && !feature.enabled ? "Off platform-wide — turn it back on there first" : undefined}
-        className={[
-          "shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition disabled:opacity-50",
-          feature.enabled
-            ? "border border-neutral-200 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-800"
-            : "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:text-neutral-950 dark:hover:bg-green-400",
-        ].join(" ")}
-      >
-        {feature.enabled ? "Switch off" : "Switch on"}
-      </button>
+      <div className="flex justify-end shrink-0 sm:self-center">
+        <button
+          type="button"
+          disabled={busy || (platformOff && !feature.enabled)}
+          onClick={feature.enabled ? onDisable : onEnable}
+          title={platformOff && !feature.enabled ? "Off platform-wide — turn it back on there first" : undefined}
+          className={[
+            "rounded-full px-5 py-2 text-xs font-bold transition disabled:opacity-50 shadow-sm",
+            feature.enabled
+              ? "border border-border text-foreground hover:bg-accent"
+              : "bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400",
+          ].join(" ")}
+        >
+          {feature.enabled ? "Switch off" : "Switch on"}
+        </button>
+      </div>
     </li>
   );
 }
@@ -97,7 +94,7 @@ function FeatureRow({
 export function FeatureToggleCard({ businessId }: { businessId: string }) {
   const [pending, setPending] = useState<BusinessFeatureResponse | null>(null);
 
-  const { data: features = [], isLoading, error } = useGetBusinessFeaturesQuery(businessId);
+  const { data: features = [], isLoading, error, refetch } = useGetBusinessFeaturesQuery(businessId);
   const { data: platformFeatures = [] } = useGetPlatformFeaturesQuery();
   const [toggle, toggleState] = useToggleBusinessFeatureMutation();
 
@@ -118,31 +115,33 @@ export function FeatureToggleCard({ businessId }: { businessId: string }) {
       reason,
     });
 
-    // Keep the dialog open on failure so the typed reason is not lost.
     if (!("error" in result)) setPending(null);
   };
 
   return (
     <>
-      <section className="rounded-2xl border border-neutral-200 p-6 dark:border-neutral-800">
-        <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-50">
-          Platform features
+      <section className="rounded-3xl border border-border bg-card p-5 sm:p-6 shadow-sm">
+        <h2 className="text-base font-bold text-foreground">
+          Platform Features Management
         </h2>
-        <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
-          What this shop is allowed to use. Switching something off takes effect
-          straight away.
+        <p className="mt-1 text-xs text-muted-foreground">
+          Control which customer-facing channels and tools this shop is allowed to use.
         </p>
 
         {isLoading && (
-          <p className="mt-4 text-sm text-neutral-500 dark:text-neutral-400">Loading features...</p>
+          <div className="py-4">
+            <AdminLoadingState label="Loading platform features..." />
+          </div>
         )}
 
         {error && (
-          <p className="mt-4 text-sm text-red-600 dark:text-red-400">{errorMessage(error)}</p>
+          <div className="py-4">
+            <AdminApiErrorFallback error={error} onRetry={refetch} />
+          </div>
         )}
 
         {!isLoading && !error && (
-          <ul className="mt-2 divide-y divide-neutral-100 dark:divide-neutral-800">
+          <ul className="mt-4 divide-y divide-border">
             {features.map((feature) => (
               <FeatureRow
                 key={feature.feature}

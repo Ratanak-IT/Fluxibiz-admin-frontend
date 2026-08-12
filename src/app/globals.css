@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..900&family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -5,6 +6,7 @@
 
 :root {
   --radius: 0.625rem;
+  --font-google-sans: "Google Sans", "Google Sans Flex", system-ui, -apple-system, sans-serif;
 
  
   --brand-red: #d14341;
@@ -33,6 +35,9 @@
   --ring: #00932a;
 
   --brand: #00932a;
+  --brand-green: #00932a;
+  --brand-yellow: #feb90d;
+  --brand-red: #d14341;
   --brand-foreground: #ffffff;
   --brand-subtle: #e6f4ea;
   --brand-subtle-foreground: #00932a;
@@ -48,7 +53,7 @@
     --primary: #00932a;
     --primary-foreground: #ffffff;
     --secondary: #feb90d;
-    --secondary-foreground: #f8fafc;
+    --secondary-foreground: #030712;
     --muted: #252a38;
     --muted-foreground: #94a3b8;
     --accent: #252a38;
@@ -98,7 +103,8 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  --font-sans: var(--font-google-sans), sans-serif;
+  --font-sans: "Google Sans", "Google Sans Flex", system-ui, -apple-system, sans-serif;
+  --font-google-sans: "Google Sans", "Google Sans Flex", system-ui, -apple-system, sans-serif;
 }
 
 @layer base {
@@ -107,6 +113,16 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  p, td, th, dd, dt, label {
+    font-size: clamp(16px, 1rem, 3rem);
+  }
+}
+
+@layer utilities {
+  :not(button):not(input):not(select):not(textarea).text-xs,
+  :not(button):not(input):not(select):not(textarea).text-sm {
+    font-size: 16px;
   }
 }
 

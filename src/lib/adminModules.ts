@@ -1,6 +1,5 @@
 import {
   Building2,
-  FolderTree,
   LayoutGrid,
   Ruler,
   ScrollText,
@@ -38,15 +37,6 @@ export const ADMIN_MODULES: AdminModule[] = [
     available: true,
     hint: "Platform totals and growth",
     requires: "DASHBOARD_READ",
-  },
-  {
-    key: "categories",
-    label: "Business\nCategories",
-    href: "/categories",
-    icon: FolderTree,
-    available: true,
-    hint: "The category tree shops choose from",
-    requires: "CATEGORY_READ",
   },
   {
     key: "units",

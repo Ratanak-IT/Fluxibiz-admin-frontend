@@ -1,9 +1,11 @@
 import {
   Building2,
-  FolderTree,
+  Calendar,
+  Compass,
   LayoutGrid,
   Ruler,
   ScrollText,
+  ShieldCheck,
   SlidersHorizontal,
   UserCircle,
   UserCog,
@@ -45,8 +47,12 @@ export const NAVIGATION: NavSection[] = [
     },
     children: [
       {
-        label: "All businesses",
+        label: "All Business",
         href: "/businesses",
+      },
+      {
+        label: "Categories",
+        href: "/businesses/categories",
       },
     ],
   },
@@ -64,22 +70,6 @@ export const NAVIGATION: NavSection[] = [
         label: "Overview",
         href: "/overview",
         exact: true,
-      },
-    ],
-  },
-  {
-    id: "categories",
-    label: "Business Categories",
-    icon: FolderTree,
-    app: {
-      label: "Business Categories",
-      fill: "linear-gradient(-42.95deg, #0e7e2e 5.06%, #42d00e 80.71%)",
-      ink: "#ffffff",
-    },
-    children: [
-      {
-        label: "Categories",
-        href: "/categories",
       },
     ],
   },
@@ -114,10 +104,6 @@ export const NAVIGATION: NavSection[] = [
         href: "/channels",
         exact: true,
       },
-      {
-        label: "Manage Channels",
-        href: "/channels/manage",
-      },
     ],
   },
   {
@@ -136,6 +122,7 @@ export const NAVIGATION: NavSection[] = [
       },
     ],
   },
+
   {
     id: "users",
     label: "Platform Staff",
@@ -165,10 +152,6 @@ export const NAVIGATION: NavSection[] = [
       {
         label: "Platform Features",
         href: "/settings/platform-features",
-      },
-      {
-        label: "Staff Roles",
-        href: "/settings/roles",
       },
     ],
   },
@@ -200,6 +183,10 @@ export function sectionEntryHref(section: NavSection) {
 }
 
 export function isLeafActive(leaf: NavLink, pathname: string): boolean {
+  if (leaf.href === "/businesses" && pathname.startsWith("/businesses/categories")) {
+    return false;
+  }
+
   return leaf.exact
     ? pathname === leaf.href
     : pathname === leaf.href || pathname.startsWith(`${leaf.href}/`);

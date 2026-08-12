@@ -9,6 +9,7 @@ import {
   sectionEntryHref,
   type NavSection,
 } from "@/components/layout/navigation";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import UserMenu from "@/components/layout/UserMenu";
 import BrandLogo from "@/components/brand/BrandLogo";
 import { ModeToggle } from "../mode-toggle";
@@ -64,30 +65,15 @@ export default function AppLauncher({ managerName }: { managerName: string }) {
           <span className="hidden sm:block">
             <ModeToggle />
           </span>
-          <button
-            type="button"
-            aria-label="Notifications"
-            className="relative grid size-8 place-items-center text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          >
-            <Bell className="size-5" aria-hidden="true" />
-            <span className="absolute top-0.5 right-0.5 size-2 rounded-full bg-primary" />
-          </button>
+          <NotificationBell />
           <UserMenu name={managerName} />
         </div>
       </header>
 
       <main className="mx-auto w-full max-w-[1180px] px-4 py-6 sm:px-5 sm:py-8 lg:px-8 lg:py-12">
-        <header className="mb-6 sm:mb-8 lg:mb-10">
-          <h1 className="text-2xl sm:text-[28px] lg:text-[32px] leading-tight text-foreground">
-            <span className="font-semibold">Hello,</span>{" "}
-            {managerName.split(" ")[0]}
-          </h1>
-          <p className="mt-1.5 text-sm sm:text-[16px] text-muted-foreground">
-            Choose an app to open.
-          </p>
-        </header>
+        
 
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-5 md:grid-cols-2 lg:grid-cols-4">
           {apps.map((section) => (
             <li key={section.id}>
               <AppTile
@@ -138,6 +124,7 @@ function AppTile({
       }}
       className="group flex h-full select-none flex-col items-center gap-5 rounded-[30px] px-7 pt-10 pb-9 text-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     >
+      {/* Green Icon */}
       <span
         ref={badgeRef}
         aria-hidden="true"
@@ -146,6 +133,7 @@ function AppTile({
       >
         <Icon className="size-11" strokeWidth={1.8} />
       </span>
+      {/* Text below Icon */}
       <span className="text-[21px] leading-[30px] text-foreground">
         {app.label.split(" ").map((word) => (
           <span key={word} className="block">

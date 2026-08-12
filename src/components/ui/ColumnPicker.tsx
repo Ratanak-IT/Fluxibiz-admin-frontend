@@ -7,9 +7,11 @@ import { ColumnVisibility } from "@/lib/hook/useColumnVisibility";
 export function ColumnPicker({
   state,
   align = "right",
+  buttonClassName,
 }: {
   state: ColumnVisibility;
   align?: "left" | "right";
+  buttonClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -45,7 +47,7 @@ export function ColumnPicker({
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="true"
         aria-expanded={open}
-        className="flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm text-foreground transition hover:bg-accent"
+        className={`flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm text-foreground transition hover:bg-accent ${buttonClassName ?? ""}`}
       >
         <Columns3 className="size-4" aria-hidden />
         Columns

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MoreVertical } from "lucide-react";
+import { toast } from "sonner";
 import {
   useActivateBusinessMutation,
   useCloseBusinessMutation,
@@ -13,6 +14,13 @@ import {
 } from "@/features/businessManagement/businessAdminApi";
 import type { BusinessResponse } from "@/lib/types/adminTypes";
 import { ReasonDialog } from "./ReasonDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type ReasonAction = "suspend" | "disable" | "close";
 
@@ -35,7 +43,6 @@ const DIALOG_COPY: Record<ReasonAction, { title: string; description: string; co
 };
 
 export function BusinessRowActions({ business }: { business: BusinessResponse }) {
-  const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState<ReasonAction | null>(null);
 
   const [activate] = useActivateBusinessMutation();
@@ -51,81 +58,119 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
   const runWithReason = async (reason: string) => {
     const payload = { businessId: business.id, reason };
 
-    if (dialog === "suspend") await suspend(payload);
-    if (dialog === "disable") await disable(payload);
-    if (dialog === "close") await close(payload);
+    try {
+      if (dialog === "suspend") { await suspend(payload).unwrap(); toast.success(`"${business.name}" has been suspended.`); }
+      if (dialog === "disable") { await disable(payload).unwrap(); toast.success(`Features disabled for "${business.name}".`); }
+      if (dialog === "close") { await close(payload).unwrap(); toast.success(`"${business.name}" has been closed.`); }
+    } catch {
+      toast.error(`Failed to ${dialog} "${business.name}".`);
+    }
 
     setDialog(null);
-    setOpen(false);
   };
-
-  const item = (label: string, onClick: () => void, danger = false) => (
-    <button
-      key={label}
-      type="button"
-      onClick={onClick}
-      className={`block w-full px-4 py-2.5 text-left text-sm transition hover:bg-accent ${
-        danger ? "text-red-600" : "text-foreground"
-      }`}
-    >
-      {label}
-    </button>
-  );
 
   return (
     <>
-      <div className="relative">
-        <button
-          type="button"
-          aria-label={`Actions for ${business.name}`}
-          onClick={() => setOpen((value) => !value)}
-          className="rounded-full p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-        >
-          <MoreVertical className="size-5 " />
-        </button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            aria-label={`Actions for ${business.name}`}
+            className="rounded-full p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            <MoreVertical className="size-5" />
+          </button>
+        </DropdownMenuTrigger>
 
-        {open && (
-        <>
-  <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-  <div className="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-xl border border-border bg-white py-1 shadow-lg dark:bg-popover">
-    {business.status !== "ACTIVE" &&
-      item("Activate", async () => {
-        await activate(business.id);
-        setOpen(false);
-      })}
+        <DropdownMenuContent align="end" className="w-52">
+          {business.status !== "ACTIVE" && (
+            <DropdownMenuItem
+              onClick={async () => {
+                try {
+                  await activate(business.id).unwrap();
+                  toast.success(`"${business.name}" activated.`);
+                } catch {
+                  toast.error(`Failed to activate "${business.name}".`);
+                }
+              }}
+            >
+              Activate
+            </DropdownMenuItem>
+          )}
 
-    {business.status === "ACTIVE" && item("Suspend", () => setDialog("suspend"))}
+          {business.status === "ACTIVE" && (
+            <DropdownMenuItem onClick={() => setDialog("suspend")}>
+              Suspend
+            </DropdownMenuItem>
+          )}
 
-    {business.isEnabled
-      ? item("Disable features", () => setDialog("disable"))
-      : item("Enable features", async () => {
-          await enable(business.id);
-          setOpen(false);
-        })}
+          {business.isEnabled ? (
+            <DropdownMenuItem onClick={() => setDialog("disable")}>
+              Disable features
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              onClick={async () => {
+                try {
+                  await enable(business.id).unwrap();
+                  toast.success(`Features enabled for "${business.name}".`);
+                } catch {
+                  toast.error(`Failed to enable features for "${business.name}".`);
+                }
+              }}
+            >
+              Enable features
+            </DropdownMenuItem>
+          )}
 
-    {business.isClosed
-      ? item("Reopen shop", async () => {
-          await reopen(business.id);
-          setOpen(false);
-        })
-      : item("Close shop", () => setDialog("close"))}
+          {business.isClosed ? (
+            <DropdownMenuItem
+              onClick={async () => {
+                try {
+                  await reopen(business.id).unwrap();
+                  toast.success(`"${business.name}" has been reopened.`);
+                } catch {
+                  toast.error(`Failed to reopen "${business.name}".`);
+                }
+              }}
+            >
+              Reopen shop
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem onClick={() => setDialog("close")}>
+              Close shop
+            </DropdownMenuItem>
+          )}
 
-    <div className="my-1 h-px bg-muted" />
+          <DropdownMenuSeparator />
 
-    {item(
-      "Delete",
-      async () => {
-        if (confirm(`Delete ${business.name}? This marks the account as deleted.`)) {
-          await remove(business.id);
-        }
-        setOpen(false);
-      },
-      true,
-    )}
-  </div>
-</>
-        )}
-      </div>
+          <DropdownMenuItem
+            className="text-red-600 focus:text-red-600 dark:text-red-500 dark:focus:text-red-500"
+            onClick={() => {
+              toast(`Delete "${business.name}"?`, {
+                description: "This marks the account as deleted.",
+                action: {
+                  label: "Delete",
+                  onClick: async () => {
+                    try {
+                      await remove(business.id).unwrap();
+                      toast.success(`"${business.name}" deleted.`);
+                    } catch {
+                      toast.error(`Failed to delete "${business.name}".`);
+                    }
+                  },
+                },
+                cancel: {
+                  label: "Cancel",
+                  onClick: () => {},
+                },
+              });
+            }}
+          >
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {dialog && (
         <ReasonDialog

@@ -27,9 +27,13 @@ const unwrapPage = (raw: unknown): Record<string, unknown> => {
   return box;
 };
 
-export function infiniteEndpoint<T extends { id: string }, Q extends PageableQuery>(
+export function infiniteEndpoint<T extends Record<string, any>, Q extends PageableQuery>(
   cacheKeyFields: ReadonlyArray<keyof Q>,
+  idKey: keyof T = "id" as keyof T,
 ) {
+  const getItemId = (item: T): string =>
+    String(item[idKey] ?? item.id ?? item.businessId ?? item.uuid ?? JSON.stringify(item));
+
   return {
     transformResponse: (raw: unknown, _meta: unknown, arg: Q | void): InfinitePage<T> => {
       const args = (arg ?? {}) as Q;
@@ -70,8 +74,8 @@ export function infiniteEndpoint<T extends { id: string }, Q extends PageableQue
       if (incoming.number === 0) {
         currentCache.content = incoming.content;
       } else {
-        const seen = new Set(currentCache.content.map((item) => item.id));
-        currentCache.content.push(...incoming.content.filter((item) => !seen.has(item.id)));
+        const seen = new Set(currentCache.content.map(getItemId));
+        currentCache.content.push(...incoming.content.filter((item) => !seen.has(getItemId(item))));
       }
       currentCache.number = incoming.number;
       currentCache.size = incoming.size;

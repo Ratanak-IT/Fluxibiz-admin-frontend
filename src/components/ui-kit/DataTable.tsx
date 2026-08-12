@@ -1,5 +1,4 @@
-import { Surface } from "./Surface";
-
+import React from "react";
 
 export function DataTable({
   headers,
@@ -11,23 +10,23 @@ export function DataTable({
   children: React.ReactNode;
 }) {
   return (
-    <Surface className="overflow-hidden">
+    <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
       <div className="overflow-x-auto">
-        <table className="w-full text-left" style={{ minWidth }}>
-          <thead className="bg-muted/60 text-sm font-medium text-muted-foreground">
+        <table className="w-full text-left text-sm" style={{ minWidth }}>
+          <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
             {headers}
           </thead>
           <tbody className="divide-y divide-border text-sm">{children}</tbody>
         </table>
       </div>
-    </Surface>
+    </div>
   );
 }
 
 export function EmptyRow({ colSpan, children }: { colSpan: number; children: React.ReactNode }) {
   return (
     <tr>
-      <td colSpan={colSpan} className="px-6 py-14 text-center text-sm text-muted-foreground">
+      <td colSpan={colSpan} className="px-6 py-12 text-center text-sm text-muted-foreground sm:py-14">
         {children}
       </td>
     </tr>

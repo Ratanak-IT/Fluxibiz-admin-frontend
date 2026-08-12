@@ -17,8 +17,9 @@ const ICONS: Record<BusinessFeature, typeof Globe> = {
 
 function errorMessage(error: unknown): string | undefined {
   if (!error || typeof error !== "object") return undefined;
-  const status = "status" in error ? error.status : undefined;
+  const status = "status" in error ? (error as any).status : undefined;
 
+  if (status === 401) return "Session expired. Please sign in again.";
   if (status === 400) return "A reason is required when switching a feature off.";
   if (status === 403) return "Your account cannot change platform features.";
   return status ? `Request failed with status ${status}.` : "Request failed.";
@@ -108,7 +109,7 @@ export function PlatformFeatureToggleCard() {
 
   return (
     <>
-     <section className="rounded-2xl border border-border bg-card p-6">
+     <section className="w-full rounded-2xl border border-border bg-card p-6 shadow-xs">
   <h2 className="text-sm font-semibold text-card-foreground">
     Platform-wide features
   </h2>

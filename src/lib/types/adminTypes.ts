@@ -99,6 +99,8 @@ export interface BusinessChannelResponse {
   businessId: string;
   businessName: string;
   slug: string;
+  logo?: string | null;
+  thumbnail?: string | null;
 
   storefrontPublished: boolean;
   storefrontUrl: string | null;

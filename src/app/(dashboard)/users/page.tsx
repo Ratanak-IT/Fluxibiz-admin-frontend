@@ -15,6 +15,8 @@ import { isHiddenRole, labelForRole, SUPER_ADMIN_ROLE } from "@/lib/permissionCa
 import type { PlatformUserResponse } from "@/lib/types/adminTypes";
 import { ColumnPicker } from "@/components/ui/ColumnPicker";
 import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
+import { AdminApiErrorFallback } from "@/components/common/AdminApiErrorFallback";
+import { AdminLoadingState } from "@/components/common/AdminLoadingState";
 
 type DialogState = null | "new" | PlatformUserResponse;
 
@@ -82,17 +84,7 @@ export default function PlatformStaffPage() {
   };
 
   return (
-   <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
-  <nav aria-label="Breadcrumb" className="mb-5 text-sm">
-    <Link
-      href="/dashboard"
-      className="text-muted-foreground transition hover:text-foreground"
-    >
-      Dashboard
-    </Link>
-    <span className="px-2 text-muted-foreground">/</span>
-    <span className="text-foreground">Staff</span>
-  </nav>
+    <div className="w-full pt-2">
 
   <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div>
@@ -114,63 +106,116 @@ export default function PlatformStaffPage() {
     </button>
   </div>
 
-      <div className="mt-7 flex items-center gap-2 sm:gap-3">
+   
+      <div className="mt-7 flex items-center gap-2 sm:gap-3 lg:flex-wrap lg:justify-between">
+        {/* Search */}
         <div className="relative min-w-0 flex-1 lg:max-w-md">
-          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-          <input value={keyword} onChange={(e) => setKeyword(e.target.value)}
-            placeholder="Search by name or email" aria-label="Search staff"
-            className="w-full rounded-full border border-border bg-background py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary" />
+          <Search
+            className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+
+          <input
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="Search by name or email..."
+            aria-label="Search staff"
+            className="w-full rounded-full border border-border bg-card py-2.5 pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-primary"
+          />
         </div>
 
+        {/* Filter / Column Picker */}
         <div className="shrink-0">
-          <ColumnPicker state={cols} />
+          <ColumnPicker
+            state={cols}
+            buttonClassName="bg-card border-border"
+          />
         </div>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">
+      {/* Card */}
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
         <div className="overflow-x-auto">
-          <table className={`w-full text-left ${cols.tableClassName}`}
-            style={{ minWidth: cols.minWidthRem(46) }}>
-            <thead className="bg-muted text-sm font-medium text-muted-foreground">
+          <table
+            className={`w-full text-left text-sm ${cols.tableClassName}`}
+            style={{ minWidth: cols.minWidthRem(46) }}
+          >
+            <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
               <tr>
-                <th className="px-4 py-3 sm:px-6 sm:py-4">Person</th>
-                <th className="px-4 py-3 sm:px-6 sm:py-4">Can do</th>
-                <th className="px-4 py-3 sm:px-6 sm:py-4">Status</th>
-                <th className="w-32 px-3 py-3 sm:w-40 sm:px-4 sm:py-4" />
+                {!cols.isHidden("person") && <th className="px-4 py-3.5 sm:px-6">Person</th>}
+                {!cols.isHidden("canDo") && <th className="px-4 py-3.5 sm:px-6">Can do</th>}
+                {!cols.isHidden("status") && <th className="px-4 py-3.5 sm:px-6">Status</th>}
+                {!cols.isHidden("actions") && <th className="w-24 px-4 py-3.5 text-right sm:px-6">Actions</th>}
               </tr>
             </thead>
+
             <tbody className="divide-y divide-border text-sm">
+              {isLoading && (
+                <AdminLoadingState label="Loading administrative users..." compact colSpan={4} />
+              )}
+
+              {error && !isLoading && (
+                <AdminApiErrorFallback error={error} compact colSpan={4} />
+              )}
+
+              {!isLoading && !error && staff.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                    No administrative staff members found.
+                  </td>
+                </tr>
+              )}
+
               {staff.map((user) => (
-                <tr key={user.id} className="transition hover:bg-accent">
-                  <td className="px-4 py-3 font-medium text-card-foreground sm:px-6 sm:py-4">
-                    {user.firstName} {user.lastName}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground sm:px-6 sm:py-4">
-                    {user.roles.filter((role) => !isHiddenRole(role)).join(", ")}
-                  </td>
-                  <td className="px-4 py-3 sm:px-6 sm:py-4">
-                    <span
-                      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${
-                        user.enabled
-                          ? "bg-primary/10 text-primary"
-                          : "bg-destructive/10 text-destructive"
-                      }`}
-                    >
-                      {user.enabled ? "Enabled" : "Disabled"}
-                    </span>
-                  </td>
-                  <td className="px-3 py-3 sm:px-4 sm:py-4">
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setDialog(user)}
-                        aria-label={`Edit ${user.username}`}
-                        className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
+                <tr
+                  key={user.id}
+                  className="transition hover:bg-accent/40"
+                >
+                  {!cols.isHidden("person") && (
+                    <td className="px-4 py-3.5 sm:px-6">
+                      <div className="font-semibold text-foreground">
+                        {user.firstName} {user.lastName}
+                      </div>
+                      <div className="text-xs text-muted-foreground font-mono">{user.email || user.username}</div>
+                    </td>
+                  )}
+
+                  {!cols.isHidden("canDo") && (
+                    <td className="px-4 py-3.5 text-muted-foreground sm:px-6">
+                      {user.roles
+                        .filter((role) => !isHiddenRole(role))
+                        .join(", ")}
+                    </td>
+                  )}
+
+                  {!cols.isHidden("status") && (
+                    <td className="px-4 py-3.5 sm:px-6">
+                      <span
+                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+                          user.enabled
+                            ? "bg-primary/10 text-primary"
+                            : "bg-destructive/10 text-destructive"
+                        }`}
                       >
-                        <Pencil className="size-4" />
-                      </button>
-                    </div>
-                  </td>
+                        {user.enabled ? "Enabled" : "Disabled"}
+                      </span>
+                    </td>
+                  )}
+
+                  {!cols.isHidden("actions") && (
+                    <td className="px-4 py-3.5 text-right sm:px-6">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setDialog(user)}
+                          aria-label={`Edit ${user.username}`}
+                          className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-primary"
+                        >
+                          <Pencil className="size-4" />
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -188,6 +233,6 @@ export default function PlatformStaffPage() {
       onSubmit={save}
     />
   )}
-</main>
+    </div>
   );
 }
