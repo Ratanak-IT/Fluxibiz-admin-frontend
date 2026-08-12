@@ -66,4 +66,3 @@ export const {
   useUpdateUserProfileMutation,
   useDeleteProfilePictureMutation,
 } = userProfileApi;
-

@@ -114,6 +114,16 @@
   body {
     @apply bg-background text-foreground;
   }
+  p, td, th, dd, dt, label {
+    font-size: clamp(16px, 1rem, 3rem);
+  }
+}
+
+@layer utilities {
+  :not(button):not(input):not(select):not(textarea).text-xs,
+  :not(button):not(input):not(select):not(textarea).text-sm {
+    font-size: 16px;
+  }
 }
 
 .scrollbar-hide {

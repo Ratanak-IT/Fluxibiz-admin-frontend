@@ -15,6 +15,8 @@ import { isHiddenRole, labelForRole, SUPER_ADMIN_ROLE } from "@/lib/permissionCa
 import type { PlatformUserResponse } from "@/lib/types/adminTypes";
 import { ColumnPicker } from "@/components/ui/ColumnPicker";
 import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
+import { AdminApiErrorFallback } from "@/components/common/AdminApiErrorFallback";
+import { AdminLoadingState } from "@/components/common/AdminLoadingState";
 
 type DialogState = null | "new" | PlatformUserResponse;
 
@@ -167,6 +169,22 @@ export default function PlatformStaffPage() {
       </thead>
 
       <tbody className="divide-y divide-border text-sm">
+        {isLoading && (
+          <AdminLoadingState label="Loading administrative users..." compact colSpan={4} />
+        )}
+
+        {error && !isLoading && (
+          <AdminApiErrorFallback error={error} compact colSpan={4} />
+        )}
+
+        {!isLoading && !error && staff.length === 0 && (
+          <tr>
+            <td colSpan={4} className="px-6 py-12 text-center text-sm text-muted-foreground">
+              No administrative staff members found.
+            </td>
+          </tr>
+        )}
+
         {staff.map((user) => (
           <tr
             key={user.id}

@@ -14,6 +14,8 @@ import { UnitFormDialog } from "@/components/admin/UnitFormDialog";
 import type { UnitResponse, UnitUpsertRequest } from "@/lib/types/unitTypes";
 import { ColumnPicker } from "@/components/ui/ColumnPicker";
 import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
+import { AdminApiErrorFallback } from "@/components/common/AdminApiErrorFallback";
+import { AdminLoadingState } from "@/components/common/AdminLoadingState";
 
 type DialogState = null | "new" | UnitResponse;
 
@@ -164,20 +166,12 @@ export default function UnitsPage() {
             </thead>
             <tbody className="divide-y divide-border text-sm">
               {isLoading && (
-                <tr>
-                  <td colSpan={4} className="px-4 py-12 text-center text-muted-foreground sm:px-6 sm:py-14">
-                    Loading units...
-                  </td>
-                </tr>
+                <AdminLoadingState label="Loading unit measures..." compact colSpan={4} />
               )}
 
-          {error && !isLoading && (
-            <tr>
-              <td colSpan={4} className="px-4 py-12 text-center text-destructive sm:px-6 sm:py-14">
-                {errorMessage(error)}
-              </td>
-            </tr>
-          )}
+              {error && !isLoading && (
+                <AdminApiErrorFallback error={error} compact colSpan={4} />
+              )}
 
           {!isLoading && !error && visibleUnits.length === 0 && (
             <tr>

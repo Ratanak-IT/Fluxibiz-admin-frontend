@@ -17,6 +17,8 @@ import { ColumnPicker } from "@/components/ui/ColumnPicker";
 import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 import { useInfiniteScroll } from "@/lib/hook/useInfiniteScroll";
 import { ExportReportDialog } from "@/components/admin/ExportReportDialog";
+import { AdminApiErrorFallback } from "@/components/common/AdminApiErrorFallback";
+import { AdminLoadingState } from "@/components/common/AdminLoadingState";
 
 const STATUS_FILTERS: Array<{
   label: string;
@@ -283,27 +285,17 @@ export default function BusinessesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {isLoading && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="px-6 py-12 text-center text-sm text-muted-foreground"
-                >
-                  Loading businesses...
-                </td>
-              </tr>
+            {isLoading && rows.length === 0 && (
+              <AdminLoadingState label="Loading businesses list..." compact colSpan={6} />
             )}
 
             {error && !isLoading && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="px-6 py-12 text-center text-sm text-destructive"
-                >
-                  Could not load businesses. Check that your session still has
-                  the SUPER_ADMIN role.
-                </td>
-              </tr>
+              <AdminApiErrorFallback
+                error={error}
+                colSpan={6}
+                compact
+                onRetry={loadMore}
+              />
             )}
 
             {!isLoading && !error && rows.length === 0 && (
@@ -323,15 +315,30 @@ export default function BusinessesPage() {
                 className="hover:bg-accent/50 transition-colors"
               >
                 <td className="px-6 py-4">
-                  <Link
-                    href={`/businesses/${business.id}`}
-                    className="font-medium text-card-foreground hover:text-primary"
-                  >
-                    {business.name}
-                  </Link>
-                  <span className="block text-xs text-muted-foreground">
-                    /{business.slug}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    {business.logo || business.thumbnail ? (
+                      <img
+                        src={business.logo || business.thumbnail || ""}
+                        alt={business.name}
+                        className="h-16 w-16 min-w-[64px] min-h-[64px] shrink-0 rounded-2xl object-cover border-2 border-neutral-200 shadow-md bg-white p-1 dark:border-neutral-700 dark:bg-card"
+                      />
+                    ) : (
+                      <div className="flex h-16 w-16 min-w-[64px] min-h-[64px] shrink-0 items-center justify-center rounded-2xl bg-neutral-100 font-black text-neutral-600 text-xl shadow-md border-2 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700">
+                        {business.name ? business.name.charAt(0).toUpperCase() : "B"}
+                      </div>
+                    )}
+                    <div>
+                      <Link
+                        href={`/businesses/${business.id}`}
+                        className="font-semibold text-card-foreground hover:text-primary transition-colors"
+                      >
+                        {business.name}
+                      </Link>
+                      <span className="block text-xs text-muted-foreground">
+                        /{business.slug}
+                      </span>
+                    </div>
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-muted-foreground">
                   {business.category?.name ?? "—"}

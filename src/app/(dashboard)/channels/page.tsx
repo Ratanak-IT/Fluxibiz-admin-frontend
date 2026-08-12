@@ -6,10 +6,13 @@ import { ChevronDown, ExternalLink, Search, Send, SlidersHorizontal } from "luci
 import {
   useGetBusinessChannelsQuery,
   useGetPlatformFeaturesQuery,
+  useGetBusinessesQuery,
 } from "@/features/businessManagement/businessAdminApi";
 import type { BusinessChannelResponse } from "@/lib/types/adminTypes";
 import { ColumnPicker } from "@/components/ui/ColumnPicker";
 import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
+import { AdminApiErrorFallback } from "@/components/common/AdminApiErrorFallback";
+import { AdminLoadingState } from "@/components/common/AdminLoadingState";
 
 type Filter = "all" | "storefront" | "telegram" | "bakong" | "none";
 
@@ -83,6 +86,17 @@ export default function ChannelsPage() {
 
   const { data: channels = [], isLoading, error } = useGetBusinessChannelsQuery();
   const { data: platformFeatures = [] } = useGetPlatformFeaturesQuery();
+  const { data: businessData } = useGetBusinessesQuery({ size: 200 });
+
+  const businessLogoMap = useMemo(() => {
+    const map: Record<string, { logo?: string | null; thumbnail?: string | null }> = {};
+    if (businessData?.content) {
+      businessData.content.forEach((b) => {
+        map[b.id] = { logo: b.logo, thumbnail: b.thumbnail };
+      });
+    }
+    return map;
+  }, [businessData]);
 
   const telegramOffPlatformWide = platformFeatures.some(
     (row) => row.feature === "TELEGRAM_BOT" && !row.enabled,
@@ -265,19 +279,11 @@ export default function ChannelsPage() {
             </thead>
             <tbody className="divide-y divide-border text-sm">
               {isLoading && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground sm:px-6 sm:py-14">
-                    Loading channels...
-                  </td>
-                </tr>
+                <AdminLoadingState label="Loading sales channels..." compact colSpan={5} />
               )}
 
               {error && !isLoading && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-destructive sm:px-6 sm:py-14 font-medium">
-                    {errorMessage(error)}
-                  </td>
-                </tr>
+                <AdminApiErrorFallback error={error} compact colSpan={5} />
               )}
 
               {!isLoading && !error && rows.length === 0 && (
@@ -288,21 +294,43 @@ export default function ChannelsPage() {
                 </tr>
               )}
 
-              {rows.map((row) => (
-                <tr
-                  key={row.businessId}
-                  className="transition hover:bg-accent/40"
-                >
-                  <td className="px-4 py-3 sm:px-6 sm:py-4">
-                    <Link
-                      href={`/businesses/${row.businessId}`}
-                      className="font-medium text-foreground hover:text-primary"
-                    >
-                      {row.businessName}
-                    </Link>
-                    <span className="block text-xs text-muted-foreground font-mono">
-                      /{row.slug}
-                    </span>
+              {rows.map((row) => {
+                const logoUrl =
+                  row.logo ||
+                  row.thumbnail ||
+                  businessLogoMap[row.businessId]?.logo ||
+                  businessLogoMap[row.businessId]?.thumbnail;
+
+                return (
+                  <tr
+                    key={row.businessId}
+                    className="transition hover:bg-accent/40"
+                  >
+                    <td className="px-4 py-3 sm:px-6 sm:py-4">
+                      <div className="flex items-center gap-3">
+                        {logoUrl ? (
+                          <img
+                            src={logoUrl}
+                            alt={row.businessName}
+                            className="h-16 w-16 min-w-[64px] min-h-[64px] shrink-0 rounded-2xl object-cover border-2 border-neutral-200 shadow-md bg-white p-1 dark:border-neutral-700 dark:bg-card"
+                          />
+                        ) : (
+                          <div className="flex h-16 w-16 min-w-[64px] min-h-[64px] shrink-0 items-center justify-center rounded-2xl bg-neutral-100 font-black text-neutral-600 text-xl shadow-md border-2 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700">
+                            {row.businessName ? row.businessName.charAt(0).toUpperCase() : "S"}
+                          </div>
+                        )}
+                      <div>
+                        <Link
+                          href={`/businesses/${row.businessId}`}
+                          className="font-semibold text-foreground hover:text-primary transition-colors"
+                        >
+                          {row.businessName}
+                        </Link>
+                        <span className="block text-xs text-muted-foreground font-mono">
+                          /{row.slug}
+                        </span>
+                      </div>
+                    </div>
                   </td>
 
                   <td className="px-4 py-3 sm:px-6 sm:py-4">
@@ -363,8 +391,9 @@ export default function ChannelsPage() {
                   <td className="px-4 py-3 text-muted-foreground sm:px-6 sm:py-4">
                     {row.registeredAt ? row.registeredAt.slice(0, 10) : "—"}
                   </td>
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

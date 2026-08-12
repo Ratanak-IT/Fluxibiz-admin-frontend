@@ -9,6 +9,8 @@ import { ColumnPicker } from "@/components/ui/ColumnPicker";
 import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 import { useInfiniteScroll } from "@/lib/hook/useInfiniteScroll";
 import { ExportReportDialog } from "@/components/admin/ExportReportDialog";
+import { AdminApiErrorFallback } from "@/components/common/AdminApiErrorFallback";
+import { AdminLoadingState } from "@/components/common/AdminLoadingState";
 
 const ACTION_LABELS: Record<AdminActionType, string> = {
   BUSINESS_ACTIVATED: "Activated",
@@ -454,29 +456,11 @@ export function AuditLogTable({
 
             <tbody className="divide-y divide-border">
               {isLoading && (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-10 text-center text-sm text-muted-foreground sm:px-6 sm:py-12"
-                  >
-                    Loading audit log...
-                  </td>
-                </tr>
+                <AdminLoadingState label="Loading audit logs..." compact colSpan={6} />
               )}
 
               {error && !isLoading && (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-10 text-center text-sm text-red-600 sm:px-6 sm:py-12"
-                  >
-                    Request failed
-                    {"status" in error
-                      ? ` with status ${error.status}`
-                      : ""}
-                    .
-                  </td>
-                </tr>
+                <AdminApiErrorFallback error={error} compact colSpan={6} />
               )}
 
               {!isLoading &&
