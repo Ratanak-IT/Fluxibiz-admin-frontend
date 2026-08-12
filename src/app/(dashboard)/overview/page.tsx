@@ -197,16 +197,7 @@ export default function OverviewPage() {
 
   return (
    <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8 bg-[var(--background)] text-[var(--foreground)]">
-  <nav aria-label="Breadcrumb" className="mb-5 text-sm">
-    <Link
-      href="/dashboard"
-      className="text-neutral-500 transition hover:text-neutral-900 dark:text-[var(--muted-foreground)] dark:hover:text-[var(--foreground)]"
-    >
-      Dashboard
-    </Link>
-    <span className="px-2 text-neutral-400 dark:text-[var(--muted-foreground)]">/</span>
-    <span className="text-neutral-900 dark:text-[var(--foreground)]">Overview</span>
-  </nav>
+
 
   <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl dark:text-foreground">
     Platform overview

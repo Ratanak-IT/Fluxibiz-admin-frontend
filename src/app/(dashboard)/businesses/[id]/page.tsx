@@ -47,17 +47,7 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
 
   return (
     <main className="px-8 py-7 dark:bg-background">
-      <nav className="mb-6 text-[15px] text-neutral-400">
-        <Link href="/dashboard" className="hover:text-neutral-600">
-          Dashboard
-        </Link>
-        <span className="px-2">/</span>
-        <Link href="/businesses" className="hover:text-neutral-600">
-          Businesses
-        </Link>
-        <span className="px-2">/</span>
-        <span className="text-neutral-700">{business.name}</span>
-      </nav>
+
 
       <div className="flex items-start justify-between gap-6">
         <div className="flex items-start gap-4">

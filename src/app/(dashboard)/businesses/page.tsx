@@ -128,13 +128,6 @@ export default function BusinessesPage() {
 
   return (
     <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8 bg-background">
-      <nav className="mb-5 flex flex-wrap items-center text-sm text-muted-foreground">
-        <Link href="/dashboard" className="transition hover:text-foreground">
-          Dashboard
-        </Link>
-        <span className="px-2 opacity-60">/</span>
-        <span className="text-foreground">Businesses</span>
-      </nav>
 
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-0">
         <div>
@@ -194,7 +187,6 @@ export default function BusinessesPage() {
         className="flex w-full items-center justify-between gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm text-foreground transition hover:bg-accent"
       >
         <span className="flex items-center gap-2">
-          <SlidersHorizontal className="size-4 text-muted-foreground" aria-hidden />
           {activeFilter.label}
         </span>
         <ChevronDown
@@ -245,10 +237,6 @@ export default function BusinessesPage() {
 
   {/* Desktop only: original pill row + ColumnPicker inline */}
   <div className="hidden items-center gap-2 lg:flex">
-    <SlidersHorizontal
-      className="size-4 text-muted-foreground"
-      aria-hidden
-    />
     {STATUS_FILTERS.map((filter) => (
       <button
         key={filter.value}

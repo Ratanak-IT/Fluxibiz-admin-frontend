@@ -24,7 +24,15 @@ export default function CategoriesPage() {
   const [remove] = useDeleteBusinessCategoryMutation();
 
   const [editor, setEditor] = useState<EditorState | null>(null);
+  const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
   const busy = createState.isLoading || updateState.isLoading;
+
+  const toggleCategory = (id: string) => {
+    setCollapsedCategories((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   const save = async () => {
     if (!editor?.name.trim()) return;
@@ -50,13 +58,7 @@ export default function CategoriesPage() {
 
   return (
   <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7 bg-[var(--background)] text-[var(--foreground)]">
-  <nav className="mb-6 text-sm sm:text-[15px] text-neutral-400 dark:text-[var(--muted-foreground)]">
-    <Link href="/dashboard" className="hover:text-neutral-600 dark:hover:text-[var(--foreground)]">
-      Dashboard
-    </Link>
-    <span className="px-2">/</span>
-    <span className="text-neutral-700 dark:text-[var(--foreground)]">Categories</span>
-  </nav>
+
 
   <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div>
@@ -90,87 +92,110 @@ export default function CategoriesPage() {
   )}
 
   <div className="mt-7 space-y-3">
-    {categories.map((parent) => (
-      <div key={parent.id} className="rounded-2xl border border-neutral-200 dark:border-[var(--border)] dark:bg-[var(--card)]">
-        <div className="flex items-center justify-between gap-2 px-4 py-3 sm:px-5 sm:py-4">
-          <div className="min-w-0">
-            <span className="font-medium text-neutral-900 dark:text-[var(--card-foreground)] break-words">{parent.name}</span>
-            <span className="ml-2 text-xs text-neutral-400 dark:text-[var(--muted-foreground)]">/{parent.slug}</span>
-          </div>
+    {categories.map((parent) => {
+      const hasSubCategories = (parent.subCategories?.length ?? 0) > 0;
+      const isExpanded = !collapsedCategories[parent.id];
 
-          <div className="flex shrink-0 items-center gap-1">
-            <button
-              type="button"
-              title="Add sub category"
-              onClick={() => setEditor({ mode: "create", name: "", parentId: parent.id })}
-              className="rounded-full p-2 text-neutral-400 dark:text-[var(--muted-foreground)] hover:bg-neutral-100 dark:hover:bg-[var(--accent)] hover:text-neutral-700 dark:hover:text-[var(--accent-foreground)]"
-            >
-              <Plus className="size-4" />
-            </button>
-            <button
-              type="button"
-              title="Rename"
-              onClick={() =>
-                setEditor({ mode: "edit", categoryId: parent.id, name: parent.name, parentId: null })
-              }
-              className="rounded-full p-2 text-neutral-400 dark:text-[var(--muted-foreground)] hover:bg-neutral-100 dark:hover:bg-[var(--accent)] hover:text-neutral-700 dark:hover:text-[var(--accent-foreground)]"
-            >
-              <Pencil className="size-4" />
-            </button>
-            <button
-              type="button"
-              title="Delete"
-              onClick={() => confirmDelete(parent.id, parent.name)}
-              className="rounded-full p-2 text-neutral-400 dark:text-[var(--muted-foreground)] hover:bg-red-50 dark:hover:bg-[var(--destructive)]/20 hover:text-red-600 dark:hover:text-[var(--destructive)]"
-            >
-              <Trash2 className="size-4" />
-            </button>
-          </div>
-        </div>
+      return (
+        <div key={parent.id} className="rounded-2xl border border-neutral-200 dark:border-[var(--border)] dark:bg-[var(--card)]">
+          <div className="flex items-center justify-between gap-2 px-4 py-3 sm:px-5 sm:py-4">
+            <div className="flex items-center gap-2 min-w-0">
+              {hasSubCategories ? (
+                <button
+                  type="button"
+                  onClick={() => toggleCategory(parent.id)}
+                  aria-label={isExpanded ? "Collapse subcategories" : "Expand subcategories"}
+                  title={isExpanded ? "Collapse subcategories" : "Expand subcategories"}
+                  className="grid size-7 shrink-0 place-items-center rounded-lg text-neutral-400 dark:text-[var(--muted-foreground)] hover:bg-neutral-100 dark:hover:bg-[var(--accent)] hover:text-neutral-700 dark:hover:text-[var(--foreground)] transition-colors"
+                >
+                  <ChevronRight
+                    className={`size-4 transition-transform duration-200 ${
+                      isExpanded ? "rotate-90 text-neutral-700 dark:text-[var(--foreground)]" : "rotate-0"
+                    }`}
+                  />
+                </button>
+              ) : (
+                <span className="size-7 shrink-0" />
+              )}
+              <div className="min-w-0">
+                <span className="font-medium text-neutral-900 dark:text-[var(--card-foreground)] break-words">{parent.name}</span>
+                <span className="ml-2 text-xs text-neutral-400 dark:text-[var(--muted-foreground)]">/{parent.slug}</span>
+              </div>
+            </div>
 
-        {parent.subCategories?.length > 0 && (
-          <ul className="border-t border-neutral-100 dark:border-[var(--border)]">
-            {parent.subCategories.map((child) => (
-              <li
-                key={child.id}
-                className="flex items-center justify-between gap-2 px-4 py-3 pl-6 sm:px-5 sm:pl-8 lg:pl-10 text-sm"
+            <div className="flex shrink-0 items-center gap-1">
+              <button
+                type="button"
+                title="Add sub category"
+                onClick={() => setEditor({ mode: "create", name: "", parentId: parent.id })}
+                className="rounded-full p-2 text-neutral-400 dark:text-[var(--muted-foreground)] hover:bg-neutral-100 dark:hover:bg-[var(--accent)] hover:text-neutral-700 dark:hover:text-[var(--accent-foreground)]"
               >
-                <span className="flex min-w-0 items-center gap-2 text-neutral-700 dark:text-[var(--card-foreground)]">
-                  <ChevronRight className="size-3.5 shrink-0 text-neutral-300 dark:text-[var(--muted-foreground)]" aria-hidden />
-                  <span className="break-words">{child.name}</span>
-                </span>
+                <Plus className="size-4" />
+              </button>
+              <button
+                type="button"
+                title="Rename"
+                onClick={() =>
+                  setEditor({ mode: "edit", categoryId: parent.id, name: parent.name, parentId: null })
+                }
+                className="rounded-full p-2 text-neutral-400 dark:text-[var(--muted-foreground)] hover:bg-neutral-100 dark:hover:bg-[var(--accent)] hover:text-neutral-700 dark:hover:text-[var(--accent-foreground)]"
+              >
+                <Pencil className="size-4 text-neutral-400 dark:text-muted-foreground" />
+              </button>
+              <button
+                type="button"
+                title="Delete"
+                onClick={() => confirmDelete(parent.id, parent.name)}
+                className="rounded-full p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-300 transition-colors"
+              >
+                <Trash2 className="size-4" />
+              </button>
+            </div>
+          </div>
 
-                <div className="flex shrink-0 items-center gap-1">
-                  <button
-                    type="button"
-                    title="Rename"
-                    onClick={() =>
-                      setEditor({
-                        mode: "edit",
-                        categoryId: child.id,
-                        name: child.name,
-                        parentId: parent.id,
-                      })
-                    }
-                    className="rounded-full p-2 text-neutral-400 dark:text-muted-foreground hover:bg-neutral-100 dark:hover:bg-accent hover:text-neutral-700 dark:hover:text-accent-foreground"
-                  >
-                    <Pencil className="size-4" />
-                  </button>
-                  <button
-                    type="button"
-                    title="Delete"
-                    onClick={() => confirmDelete(child.id, child.name)}
-                    className="rounded-full p-2 text-neutral-400 dark:text-muted-foreground)] hover:bg-red-50 dark:hover:bg-destructive/20 hover:text-red-600 dark:hover:text-destructive"
-                  >
-                    <Trash2 className="size-4" />
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    ))}
+          {hasSubCategories && isExpanded && (
+            <ul className="border-t border-neutral-100 dark:border-[var(--border)]">
+              {parent.subCategories.map((child) => (
+                <li
+                  key={child.id}
+                  className="flex items-center justify-between gap-2 px-4 py-3 pl-6 sm:px-5 sm:pl-8 lg:pl-10 text-sm"
+                >
+                  <span className="flex min-w-0 items-center gap-2 text-neutral-700 dark:text-[var(--card-foreground)]">
+                    <span className="break-words">{child.name}</span>
+                  </span>
+
+                  <div className="flex shrink-0 items-center gap-1">
+                    <button
+                      type="button"
+                      title="Rename"
+                      onClick={() =>
+                        setEditor({
+                          mode: "edit",
+                          categoryId: child.id,
+                          name: child.name,
+                          parentId: parent.id,
+                        })
+                      }
+                      className="rounded-full p-2 text-neutral-400 dark:text-muted-foreground hover:bg-neutral-100 dark:hover:bg-accent hover:text-neutral-700 dark:hover:text-accent-foreground"
+                    >
+                      <Pencil className="size-4 text-neutral-400 dark:text-muted-foreground" />
+                    </button>
+                    <button
+                      type="button"
+                      title="Delete"
+                      onClick={() => confirmDelete(child.id, child.name)}
+                      className="rounded-full p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-300 transition-colors"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      );
+    })}
   </div>
 
   {editor && (

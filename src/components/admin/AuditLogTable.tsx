@@ -156,17 +156,6 @@ export function AuditLogTable({
 
   return (
   <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-7 bg-background text-foreground">
-  <nav className="mb-6 text-sm sm:text-[15px] text-muted-foreground">
-    <Link href="/dashboard" className="transition hover:text-foreground">
-      Dashboard
-    </Link>
-    <span className="px-2 text-muted-foreground">/</span>
-    <Link href="/audit-logs" className="transition hover:text-foreground">
-      Audit
-    </Link>
-    <span className="px-2 text-muted-foreground">/</span>
-    <span className="text-foreground">{breadcrumb}</span>
-  </nav>
 
   <h1 className="text-xl font-bold text-foreground sm:text-2xl lg:text-3xl">{title}</h1>
   <p className="mt-1 text-sm text-muted-foreground sm:text-[15px]">{subtitle}</p>
@@ -191,7 +180,6 @@ export function AuditLogTable({
               aria-expanded={actionFilterOpen}
               className="flex w-full items-center gap-2 rounded-full border border-border bg-background py-2.5 pl-4 pr-4 text-sm text-foreground outline-none transition hover:bg-accent hover:text-foreground focus:border-brand"
             >
-              <SlidersHorizontal className="size-4 shrink-0 text-muted-foreground" aria-hidden />
               <span className="flex-1 truncate text-left">{actionFilterLabel}</span>
               <ChevronDown
                 className={`size-4 shrink-0 text-muted-foreground transition-transform ${actionFilterOpen ? "rotate-180" : ""}`}

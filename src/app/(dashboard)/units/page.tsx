@@ -81,16 +81,7 @@ export default function UnitsPage() {
 
   return (
     <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
-  <nav aria-label="Breadcrumb" className="mb-5 text-sm">
-    <Link
-      href="/dashboard"
-      className="text-muted-foreground transition hover:text-foreground"
-    >
-      Dashboard
-    </Link>
-    <span className="px-2 text-muted-foreground">/</span>
-    <span className="text-foreground">Units</span>
-  </nav>
+
 
   <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div>
@@ -187,15 +178,15 @@ export default function UnitsPage() {
                     type="button"
                     onClick={() => setDialog(unit)}
                     aria-label={`Edit ${unit.name}`}
-                    className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-accent-foreground"
+                    className="rounded-full p-2 text-neutral-400 dark:text-muted-foreground transition hover:bg-accent hover:text-foreground"
                   >
-                    <Pencil className="size-4" />
+                    <Pencil className="size-4 text-neutral-400 dark:text-muted-foreground" />
                   </button>
                   <button
                     type="button"
                     onClick={() => remove(unit)}
                     aria-label={`Delete ${unit.name}`}
-                    className="rounded-full p-2 text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive"
+                    className="rounded-full p-2 text-red-500 dark:text-red-400 transition hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-300"
                   >
                     <Trash2 className="size-4" />
                   </button>

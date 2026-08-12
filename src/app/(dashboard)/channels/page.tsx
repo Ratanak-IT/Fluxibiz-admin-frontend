@@ -105,16 +105,6 @@ export default function ChannelsPage() {
 
   return (
     <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 bg-background text-foreground">
-      <nav aria-label="Breadcrumb" className="mb-5 text-sm">
-        <Link
-          href="/dashboard"
-          className="text-muted-foreground transition hover:text-foreground"
-        >
-          Dashboard
-        </Link>
-        <span className="px-2 text-muted-foreground">/</span>
-        <span className="text-foreground">Channels</span>
-      </nav>
 
       <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
         Shop channels
@@ -154,7 +144,6 @@ export default function ChannelsPage() {
               aria-expanded={filterOpen}
               className="flex w-full items-center gap-2 rounded-full border border-border bg-background py-2.5 pl-4 pr-4 text-sm text-foreground outline-none transition hover:bg-accent hover:text-accent-foreground focus:border-primary"
             >
-              <SlidersHorizontal className="size-4 shrink-0 text-muted-foreground" aria-hidden />
               <span className="flex-1 text-left">
                 {FILTERS.find((option) => option.value === filter)?.label}
               </span>
