@@ -12,9 +12,9 @@ import {
   Globe,
   Server,
   Shield,
-  Radio,
 } from "lucide-react";
 import { useAdminNotifications } from "@/lib/hook/useAdminNotifications";
+import { formatFullDateTime, formatRelativeTime } from "@/lib/dateUtils";
 import type { NotificationCategory } from "@/lib/types/notificationTypes";
 
 export function NotificationBell() {
@@ -92,19 +92,7 @@ export function NotificationBell() {
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              {/* WebSocket Status Pill */}
-              <span
-                title={isConnected ? "Real-time socket active" : "Polling mode active"}
-                className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                  isConnected
-                    ? "bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/25 dark:text-emerald-400"
-                    : "bg-amber-500/15 text-amber-600 dark:bg-amber-500/25 dark:text-amber-400"
-                }`}
-              >
-                <Radio className="h-2.5 w-2.5 animate-pulse" />
-                {isConnected ? "LIVE" : "SYNCING"}
-              </span>
+            <div className="flex items-center gap-1">
 
               {unreadCount > 0 && (
                 <button
@@ -171,8 +159,11 @@ export function NotificationBell() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-1">
                         <span className="font-semibold text-foreground truncate">{notif.title}</span>
-                        <span className="text-[10px] text-muted-foreground shrink-0 font-mono">
-                          {new Date(notif.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                        <span
+                          title={formatFullDateTime(notif.createdAt)}
+                          className="text-[10px] text-muted-foreground shrink-0 font-medium"
+                        >
+                          {formatRelativeTime(notif.createdAt)}
                         </span>
                       </div>
 

@@ -7,7 +7,6 @@ import {
   Building2,
   CheckCheck,
   Globe,
-  Radio,
   Search,
   Server,
   Shield,
@@ -15,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { useAdminNotifications } from "@/lib/hook/useAdminNotifications";
+import { formatFullDateTime, formatRelativeTime } from "@/lib/dateUtils";
 import type {
   NotificationCategory,
   NotificationSeverity,
@@ -83,22 +83,10 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-foreground sm:text-3xl flex items-center gap-2">
-              <Bell className="h-6 w-6 text-primary" />
-              Notification Center
-            </h1>
-            <span
-              className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-                isConnected
-                  ? "bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/25 dark:text-emerald-400"
-                  : "bg-amber-500/15 text-amber-600 dark:bg-amber-500/25 dark:text-amber-400"
-              }`}
-            >
-              <Radio className="h-3 w-3 animate-pulse" />
-              {isConnected ? "LIVE STREAM" : "POLLING STREAM"}
-            </span>
-          </div>
+          <h1 className="text-2xl font-bold text-foreground sm:text-3xl flex items-center gap-2">
+            <Bell className="h-6 w-6 text-primary" />
+            Notification Center
+          </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Real-time platform notifications, webhooks, and administrative event stream directly from the backend.
           </p>
@@ -229,7 +217,9 @@ export default function NotificationsPage() {
                       </strong>
                     </span>
                     <span>•</span>
-                    <span>{new Date(notif.createdAt).toLocaleString("en-GB")}</span>
+                    <span title={formatFullDateTime(notif.createdAt)}>
+                      {formatFullDateTime(notif.createdAt)} ({formatRelativeTime(notif.createdAt)})
+                    </span>
                     {notif.actionUrl && (
                       <>
                         <span>•</span>
