@@ -18,7 +18,9 @@ import {
   FileText,
   Server,
   Download,
+  FileSpreadsheet,
 } from "lucide-react";
+import { exportOverviewToExcel } from "@/lib/exportReportService";
 import { ExportReportDialog } from "@/components/admin/ExportReportDialog";
 import { RegionalGrowthWidget } from "@/components/admin/RegionalGrowthWidget";
 import { MerchantHealthRadarWidget } from "@/components/admin/MerchantHealthRadarWidget";
@@ -678,12 +680,6 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      <ExportReportDialog
-        open={exportDialogOpen}
-        onOpenChange={setExportDialogOpen}
-        defaultType="overview"
-      />
-
       {isLoading && <OverviewSkeleton />}
 
       {error && (
@@ -793,6 +789,13 @@ export default function OverviewPage() {
           </div>
         </>
       )}
+
+      <ExportReportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        defaultType="overview"
+        overviewData={data}
+      />
     </div>
   );
 }

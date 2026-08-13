@@ -3,13 +3,12 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Eye, Search, Plus, ChevronDown, Download, Building2 } from "lucide-react";
-import { toast } from "sonner";
 import {
   useGetBusinessesInfiniteQuery,
   useGetBusinessCategoriesQuery,
-  useCreateBusinessMutation,
 } from "@/features/businessManagement/businessAdminApi";
 import { BusinessInspectorDrawer } from "@/components/admin/BusinessInspectorDrawer";
+import { CreateBusinessDialog } from "@/components/admin/CreateBusinessDialog";
 import { BusinessRowActions } from "@/components/admin/BusinessRowActions";
 import { Flag, StatusPill } from "@/components/admin/StatusPill";
 import type { BusinessOwnerStatus, BusinessResponse } from "@/lib/types/adminTypes";
@@ -40,18 +39,6 @@ const COLUMNS: ColumnDef[] = [
 ];
 
 const PAGE_SIZE = 20;
-
-interface CreateFormState {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  phone: string;
-  businessName: string;
-  businessCategoryId: string;
-  businessAddress: string;
-}
 
 function TableSkeletonRows() {
   return (
@@ -97,7 +84,7 @@ export default function BusinessesPage() {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [inspectedBusiness, setInspectedBusiness] = useState<BusinessResponse | null>(null);
 
-  const [createForm, setCreateForm] = useState<CreateFormState | null>(null);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const query = useMemo(
     () => ({
@@ -118,8 +105,6 @@ export default function BusinessesPage() {
     setPage,
   });
   const { data: categories = [] } = useGetBusinessCategoriesQuery();
-  const [createBusiness, createResult] = useCreateBusinessMutation();
-
   const rows = data?.content ?? [];
 
   const subCategories = useMemo(() => {
@@ -127,42 +112,6 @@ export default function BusinessesPage() {
   }, [categories]);
 
   const activeFilter = STATUS_FILTERS.find((f) => f.value === status) ?? STATUS_FILTERS[0];
-
-  const handleCreate = async () => {
-    if (!createForm) return;
-    if (createForm.password !== createForm.confirmPassword) {
-      toast.error("Passwords do not match.");
-      return;
-    }
-    try {
-      await createBusiness({
-        username: createForm.email,
-        password: createForm.password,
-        confirmPassword: createForm.confirmPassword,
-        email: createForm.email,
-        firstName: createForm.firstName,
-        lastName: createForm.lastName,
-        phoneNumber: createForm.phone,
-        gender: "UNSPECIFIED",
-        businessName: createForm.businessName,
-        businessAddress: createForm.businessAddress,
-        businessCategoryId: createForm.businessCategoryId,
-      }).unwrap();
-      toast.success("Business registered successfully!");
-      setCreateForm(null);
-    } catch (err: any) {
-      const msg =
-        err?.data?.message ||
-        err?.data?.error ||
-        err?.data?.detail ||
-        "Registration failed. Please check your information and try again.";
-      toast.error(msg);
-    }
-  };
-
-  const inputCls =
-    "mt-1.5 w-full rounded-xl border border-border bg-card px-3.5 py-2 text-sm text-foreground outline-none transition focus:border-primary";
-  const labelCls = "block text-xs font-semibold uppercase tracking-wider text-muted-foreground";
 
   return (
     <div className="w-full pt-2">
@@ -181,19 +130,7 @@ export default function BusinessesPage() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() =>
-              setCreateForm({
-                firstName: "",
-                lastName: "",
-                email: "",
-                password: "",
-                confirmPassword: "",
-                phone: "",
-                businessName: "",
-                businessCategoryId: subCategories[0]?.id ?? "",
-                businessAddress: "",
-              })
-            }
+            onClick={() => setCreateDialogOpen(true)}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90 shadow-sm"
           >
             <Plus className="size-4" />
@@ -286,20 +223,13 @@ export default function BusinessesPage() {
             onClick={() => setExportDialogOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-accent"
           >
-            <Download className="size-4" />
+            <Download className="size-3.5 text-muted-foreground" />
             Export
           </button>
 
           <ColumnPicker state={cols} buttonClassName="bg-card border-border" />
         </div>
       </div>
-
-      <ExportReportDialog
-        open={exportDialogOpen}
-        onOpenChange={setExportDialogOpen}
-        defaultType="businesses"
-        businessData={rows}
-      />
 
       {/* Table Container */}
       <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
@@ -454,169 +384,18 @@ export default function BusinessesPage() {
       />
 
       {/* Register Business Modal */}
-      {createForm && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 overflow-y-auto backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-2xl bg-card p-5 shadow-2xl border border-border my-8 sm:p-6 text-card-foreground">
-            <h2 className="text-lg font-bold text-foreground">Register New Business</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Create a Keycloak owner account and provision a new shop.
-            </p>
+      <CreateBusinessDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        subCategories={subCategories}
+      />
 
-            <div className="mt-5 space-y-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                Owner Account Details
-              </p>
-
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div>
-                  <label className={labelCls} htmlFor="firstName">
-                    First Name
-                  </label>
-                  <input
-                    id="firstName"
-                    value={createForm.firstName}
-                    placeholder="Sokha"
-                    onChange={(e) => setCreateForm({ ...createForm, firstName: e.target.value })}
-                    className={inputCls}
-                  />
-                </div>
-                <div>
-                  <label className={labelCls} htmlFor="lastName">
-                    Last Name
-                  </label>
-                  <input
-                    id="lastName"
-                    value={createForm.lastName}
-                    placeholder="Chan"
-                    onChange={(e) => setCreateForm({ ...createForm, lastName: e.target.value })}
-                    className={inputCls}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className={labelCls} htmlFor="email">
-                  Email (Username)
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={createForm.email}
-                  placeholder="sokha@example.com"
-                  onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
-                  className={inputCls}
-                />
-              </div>
-
-              <div>
-                <label className={labelCls} htmlFor="phone">
-                  Phone Number
-                </label>
-                <input
-                  id="phone"
-                  value={createForm.phone}
-                  placeholder="+855 12 345 678"
-                  onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
-                  className={inputCls}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div>
-                  <label className={labelCls} htmlFor="password">
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    type="password"
-                    value={createForm.password}
-                    onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
-                    className={inputCls}
-                  />
-                </div>
-                <div>
-                  <label className={labelCls} htmlFor="confirmPassword">
-                    Confirm Password
-                  </label>
-                  <input
-                    id="confirmPassword"
-                    type="password"
-                    value={createForm.confirmPassword}
-                    onChange={(e) => setCreateForm({ ...createForm, confirmPassword: e.target.value })}
-                    className={inputCls}
-                  />
-                </div>
-              </div>
-
-              <p className="pt-2 text-xs font-semibold uppercase tracking-wider text-primary">
-                Shop Information
-              </p>
-
-              <div>
-                <label className={labelCls} htmlFor="businessName">
-                  Business Name
-                </label>
-                <input
-                  id="businessName"
-                  value={createForm.businessName}
-                  placeholder="Lucky Coffee Shop"
-                  onChange={(e) => setCreateForm({ ...createForm, businessName: e.target.value })}
-                  className={inputCls}
-                />
-              </div>
-
-              <div>
-                <label className={labelCls} htmlFor="businessCategory">
-                  Category
-                </label>
-                <select
-                  id="businessCategory"
-                  value={createForm.businessCategoryId}
-                  onChange={(e) => setCreateForm({ ...createForm, businessCategoryId: e.target.value })}
-                  className={inputCls}
-                >
-                  {subCategories.map((sub) => (
-                    <option key={sub.id} value={sub.id}>
-                      {sub.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className={labelCls} htmlFor="businessAddress">
-                  Address / Location
-                </label>
-                <input
-                  id="businessAddress"
-                  value={createForm.businessAddress}
-                  placeholder="Street 2004, Phnom Penh"
-                  onChange={(e) => setCreateForm({ ...createForm, businessAddress: e.target.value })}
-                  className={inputCls}
-                />
-              </div>
-            </div>
-
-            <div className="mt-6 flex items-center justify-end gap-3 border-t border-border pt-4">
-              <button
-                type="button"
-                onClick={() => setCreateForm(null)}
-                className="rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-accent"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                disabled={createResult.isLoading}
-                onClick={handleCreate}
-                className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
-              >
-                {createResult.isLoading ? "Creating..." : "Create Business"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ExportReportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        defaultType="businesses"
+        businessData={rows}
+      />
     </div>
   );
 }

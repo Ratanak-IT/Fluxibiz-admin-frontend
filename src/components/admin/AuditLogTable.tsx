@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Download, Search, SlidersHorizontal, X } from "lucide-react";
+import { ChevronDown, Download, FileSpreadsheet, Search, SlidersHorizontal, X } from "lucide-react";
 import { useGetAuditLogsInfiniteQuery } from "@/features/businessManagement/businessAdminApi";
 import type { AdminActionType } from "@/lib/types/adminTypes";
 import { ColumnPicker } from "@/components/ui/ColumnPicker";
 import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 import { useInfiniteScroll } from "@/lib/hook/useInfiniteScroll";
+import { exportAuditLogsToExcel } from "@/lib/exportReportService";
 import { ExportReportDialog } from "@/components/admin/ExportReportDialog";
 import { AdminApiErrorFallback } from "@/components/common/AdminApiErrorFallback";
 import { AdminLoadingState } from "@/components/common/AdminLoadingState";
@@ -419,8 +420,8 @@ function formatDateDMY(isoString: string) {
             onClick={() => setExportDialogOpen(true)}
             className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2.5 text-xs font-semibold text-foreground transition hover:bg-accent"
           >
-            <Download className="size-4" />
-            Export Logs
+            <Download className="size-3.5 text-muted-foreground" />
+            Export
           </button>
 
           {/* Column Picker */}
@@ -444,13 +445,6 @@ function formatDateDMY(isoString: string) {
           )}
         </div>
       </div>
-
-      <ExportReportDialog
-        open={exportDialogOpen}
-        onOpenChange={setExportDialogOpen}
-        defaultType="audit"
-        auditData={filteredRows}
-      />
 
       {/* Table Card */}
       <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
@@ -579,6 +573,13 @@ function formatDateDMY(isoString: string) {
           </span>
         )}
       </div>
+
+      <ExportReportDialog
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        defaultType="audit"
+        auditData={filteredRows}
+      />
     </div>
   );
 }
