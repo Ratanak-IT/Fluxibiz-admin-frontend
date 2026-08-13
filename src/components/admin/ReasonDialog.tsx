@@ -55,7 +55,7 @@ export function ReasonDialog({
           autoFocus
           onChange={(event) => setReason(event.target.value)}
           placeholder="Recorded in the audit log"
-          className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground text-left outline-none transition placeholder:text-muted-foreground focus:border-brand"
+          className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground text-left outline-none transition placeholder:text-muted-foreground focus:border-gray-400 dark:focus:border-gray-500"
           dir="ltr"
         />
 

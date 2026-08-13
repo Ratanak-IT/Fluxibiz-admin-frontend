@@ -72,7 +72,7 @@ export function UnitFormDialog({ unit, busy, error, onCancel, onSubmit }: Props)
       placeholder="Kilogram"
       onChange={(event) => setName(event.target.value)}
       onKeyDown={(event) => event.key === "Enter" && submit()}
-      className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-ring"
+      className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gray-400 dark:focus:border-gray-500"
     />
 
     <label
@@ -88,7 +88,7 @@ export function UnitFormDialog({ unit, busy, error, onCancel, onSubmit }: Props)
       maxLength={NOTE_MAX_LENGTH}
       placeholder="Used for weighing rice and other dry goods"
       onChange={(event) => setNote(event.target.value)}
-      className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-ring"
+      className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-gray-400 dark:focus:border-gray-500"
     />
     <p className="mt-1.5 text-xs text-muted-foreground">
       The web address is generated from the name automatically.

@@ -164,8 +164,9 @@ export default function ChannelsPage() {
         trading figures.
       </p>
 
-      <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative w-full sm:max-w-xs lg:max-w-md">
+      {/* Toolbar: Search, Filters, Column Picker all in ONE single row */}
+      <div className="mt-7 flex flex-row items-center justify-between gap-3 overflow-x-auto pb-1 flex-nowrap">
+        <div className="relative min-w-[200px] flex-1 max-w-sm shrink-0 sm:shrink">
           <Search
             className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
             aria-hidden
@@ -182,17 +183,17 @@ export default function ChannelsPage() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0 flex-nowrap">
           {/* Mobile dropdown filter */}
-          <div className="relative lg:hidden" ref={filterRef}>
+          <div className="relative sm:hidden" ref={filterRef}>
             <button
               type="button"
               onClick={() => setFilterOpen((open) => !open)}
               aria-haspopup="listbox"
               aria-expanded={filterOpen}
-              className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-foreground outline-none transition hover:bg-accent focus:border-primary"
+              className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm text-foreground outline-none transition hover:bg-accent focus:border-primary whitespace-nowrap"
             >
-              <span className="truncate">
+              <span className="truncate max-w-[120px]">
                 {FILTERS.find((option) => option.value === filter)?.label}
               </span>
               <ChevronDown
@@ -230,8 +231,8 @@ export default function ChannelsPage() {
             )}
           </div>
 
-          {/* Desktop pill filters */}
-          <div className="hidden items-center gap-2 lg:flex">
+          {/* Desktop/Tablet filter pills */}
+          <div className="hidden items-center gap-2 sm:flex flex-nowrap">
             {FILTERS.map((option) => (
               <button
                 key={option.value}
@@ -240,7 +241,7 @@ export default function ChannelsPage() {
                   setFilter(option.value);
                   setPage(0);
                 }}
-                className={`rounded-full border px-4 py-2 text-sm transition font-medium ${
+                className={`rounded-full border px-4 py-2.5 text-sm font-medium transition whitespace-nowrap ${
                   filter === option.value
                     ? "border-primary bg-primary text-primary-foreground font-semibold"
                     : "border-border bg-card text-foreground hover:bg-accent"
@@ -251,7 +252,7 @@ export default function ChannelsPage() {
             ))}
           </div>
 
-          <ColumnPicker state={cols} buttonClassName="bg-card border-border" />
+          <ColumnPicker state={cols} buttonClassName="bg-card border-border whitespace-nowrap" />
         </div>
       </div>
 

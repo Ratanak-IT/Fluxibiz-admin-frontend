@@ -47,15 +47,10 @@ export function ColumnPicker({
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="true"
         aria-expanded={open}
-        className={`flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm text-foreground transition hover:bg-accent ${buttonClassName ?? ""}`}
+        className={`flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm font-normal text-foreground transition hover:bg-accent ${buttonClassName ?? ""}`}
       >
         <Columns3 className="size-4" aria-hidden />
         Columns
-        {hiddenCount > 0 && (
-          <span className="rounded-full bg-muted px-1.5 text-xs text-muted-foreground">
-            {state.visibleCount}/{state.columns.length}
-          </span>
-        )}
       </button>
 
       {open && (

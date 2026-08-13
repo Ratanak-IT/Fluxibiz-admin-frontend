@@ -466,7 +466,7 @@ export default function CategoriesPage() {
               onChange={(event) => setEditor({ ...editor, name: event.target.value })}
               onKeyDown={(event) => event.key === "Enter" && save()}
               placeholder="e.g. Food & Beverage"
-              className="mt-1.5 w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm text-foreground outline-none transition focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
+              className="mt-1.5 w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm text-foreground outline-none transition focus:border-gray-400 dark:focus:border-gray-500 placeholder:text-muted-foreground"
             />
             <p className="mt-2 text-xs text-muted-foreground">
               The web address slug will be generated automatically from the name.

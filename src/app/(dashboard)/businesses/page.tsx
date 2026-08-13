@@ -112,7 +112,6 @@ export default function BusinessesPage() {
   }, [categories]);
 
   const activeFilter = STATUS_FILTERS.find((f) => f.value === status) ?? STATUS_FILTERS[0];
-
   return (
     <div className="w-full pt-2">
       {/* Header & Primary Actions */}

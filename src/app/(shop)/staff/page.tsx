@@ -178,7 +178,7 @@ export default function ShopStaffPage() {
                         userId: person.userId,
                         businessRoleId: e.target.value,
                       })}
-                      className="rounded-lg border border-neutral-300 bg-white px-2 py-1 text-sm text-neutral-900 outline-none focus:border-green-600 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-50"
+                      className="rounded-lg border border-neutral-300 bg-white px-2 py-1 text-sm text-neutral-900 outline-none focus:border-gray-400 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-50 dark:focus:border-gray-500"
                     >
                       {roles.map((role) => (
                         <option key={role.id} value={role.id}>{role.name}</option>

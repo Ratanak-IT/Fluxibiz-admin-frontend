@@ -218,7 +218,7 @@ export default function CategoriesPage() {
           autoFocus
           onChange={(event) => setEditor({ ...editor, name: event.target.value })}
           onKeyDown={(event) => event.key === "Enter" && save()}
-          className="mt-1.5 w-full rounded-lg border border-neutral-300 dark:border-input bg-transparent dark:text-foreground px-3 py-2 text-sm outline-none focus:border-ring"
+          className="mt-1.5 w-full rounded-lg border border-neutral-300 dark:border-input bg-transparent dark:text-foreground px-3 py-2 text-sm outline-none focus:border-gray-400 dark:focus:border-gray-500"
         />
         <p className="mt-2 text-xs text-neutral-500 dark:text-muted-foreground">
           The web address is generated from the name.
