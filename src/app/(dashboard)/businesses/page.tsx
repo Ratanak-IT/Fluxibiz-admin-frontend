@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Eye, Search, SlidersHorizontal, Plus, ChevronDown, Download, Building2 } from "lucide-react";
+import { Eye, Search, Plus, ChevronDown, Download, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   useGetBusinessesInfiniteQuery,
@@ -231,7 +231,6 @@ export default function BusinessesPage() {
               aria-haspopup="listbox"
               className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-foreground transition hover:bg-accent"
             >
-              <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
               <span>{activeFilter.label}</span>
               <ChevronDown className={`size-4 text-muted-foreground transition-transform ${filterMenuOpen ? "rotate-180" : ""}`} />
             </button>
@@ -263,7 +262,6 @@ export default function BusinessesPage() {
 
           {/* Desktop status pill filters */}
           <div className="hidden items-center gap-2 lg:flex">
-            <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
             {STATUS_FILTERS.map((filter) => (
               <button
                 key={filter.value}
