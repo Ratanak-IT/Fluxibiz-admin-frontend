@@ -41,9 +41,10 @@ export function AdminHeader() {
         <button
           type="button"
           aria-label="Notifications"
-          className="relative rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          title="Notifications"
+          className="relative grid size-9 sm:size-10 place-items-center rounded-lg border-0 bg-transparent text-[#16181c] dark:text-[#f8fafc] outline-none transition-colors hover:bg-black/5 dark:hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#00932a]"
         >
-          <Bell className="size-5" />
+          <Bell className="size-6 text-neutral-600 dark:text-[#94a3b8]" aria-hidden="true" />
         </button>
 
         <div className="relative">

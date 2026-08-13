@@ -14,7 +14,7 @@ export default function PlatformFeaturesPage() {
         the per-business setting on each shop&apos;s page.
       </p>
 
-      <div className="mt-7 w-full">
+      <div className="mt-7 w-full max-h-[calc(100dvh-13rem)] overflow-y-auto pr-1">
         <PlatformFeatureToggleCard />
       </div>
     </div>
