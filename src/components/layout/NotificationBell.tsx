@@ -66,10 +66,11 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
+        aria-label="Admin Notifications"
         title="Admin Notifications"
-        className="relative rounded-full p-2 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+        className="relative grid size-9 sm:size-10 place-items-center rounded-lg border-0 bg-transparent text-[#16181c] dark:text-[#f8fafc] outline-none transition-colors hover:bg-black/5 dark:hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#00932a]"
       >
-        <Bell className="h-5 w-5" />
+        <Bell className="size-6 text-neutral-600 dark:text-[#94a3b8]" aria-hidden="true" />
         {unreadCount > 0 && (
           <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-xs animate-pulse">
             {unreadCount > 9 ? "9+" : unreadCount}
