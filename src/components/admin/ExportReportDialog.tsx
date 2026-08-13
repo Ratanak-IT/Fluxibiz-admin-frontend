@@ -121,7 +121,7 @@ export function ExportReportDialog({
                 value={customTitle}
                 onChange={(e) => setCustomTitle(e.target.value)}
                 placeholder={titleMap[defaultType]}
-                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none focus:border-primary"
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none transition focus:border-gray-400 dark:focus:border-gray-500"
               />
             </div>
 
@@ -134,7 +134,7 @@ export function ExportReportDialog({
                 value={customNotes}
                 onChange={(e) => setCustomNotes(e.target.value)}
                 placeholder="Add executive comments or notes to the Excel header..."
-                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none focus:border-primary"
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none transition focus:border-gray-400 dark:focus:border-gray-500"
               />
             </div>
           </div>
