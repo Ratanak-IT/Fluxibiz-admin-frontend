@@ -82,7 +82,7 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
           </button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuContent align="end" className="w-52 text-left">
           {business.status !== "ACTIVE" && (
             <DropdownMenuItem
               onClick={async () => {
