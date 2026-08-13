@@ -235,12 +235,12 @@ export default function BusinessesPage() {
         <table className={`w-full min-w-[720px] text-left text-sm ${cols.tableClassName}`}>
           <thead className="sticky top-0 z-10 bg-card border-b border-border shadow-2xs text-xs sm:text-sm font-bold text-foreground">
             <tr>
-              {!cols.isHidden("business") && <th className="px-6 py-4 bg-card">Business</th>}
+              {!cols.isHidden("business") && <th className="px-6 py-4 bg-card first:rounded-tl-2xl">Business</th>}
               {!cols.isHidden("category") && <th className="px-6 py-4 bg-card">Category</th>}
               {!cols.isHidden("status") && <th className="px-6 py-4 bg-card">Status</th>}
               {!cols.isHidden("storefront") && <th className="px-6 py-4 bg-card">Storefront</th>}
               {!cols.isHidden("features") && <th className="px-6 py-4 bg-card">Features</th>}
-              {!cols.isHidden("actions") && <th className="w-20 px-4 py-4 text-right bg-card">Actions</th>}
+              {!cols.isHidden("actions") && <th className="w-20 px-4 py-4 text-right bg-card last:rounded-tr-2xl">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-border">

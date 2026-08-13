@@ -446,132 +446,130 @@ function formatDateDMY(isoString: string) {
         </div>
       </div>
 
-      {/* Table Card */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
-        <div className="overflow-x-auto">
-          <table
-            className={`w-full text-left text-sm ${cols.tableClassName}`}
-            style={{
-              minWidth: cols.minWidthRem(72),
-            }}
-          >
-            <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
-              <tr>
-                {!cols.isHidden("when") && <th className="px-4 py-3.5 sm:px-6">Date</th>}
-                {!cols.isHidden("administrator") && <th className="px-4 py-3.5 sm:px-6">Administrator</th>}
-                {!cols.isHidden("action") && <th className="px-4 py-3.5 sm:px-6">Action</th>}
-                {!cols.isHidden("target") && <th className="px-4 py-3.5 sm:px-6">Target</th>}
-                {!cols.isHidden("change") && <th className="px-4 py-3.5 sm:px-6">Change</th>}
-                {!cols.isHidden("reason") && <th className="px-4 py-3.5 sm:px-6">Reason</th>}
-              </tr>
-            </thead>
+      {/* Table Card - Scrollable area */}
+      <div className="mt-6 max-h-[calc(100dvh-15rem)] overflow-auto rounded-2xl border border-border bg-card shadow-xs">
+        <table
+          className={`w-full text-left text-sm ${cols.tableClassName}`}
+          style={{
+            minWidth: cols.minWidthRem(72),
+          }}
+        >
+          <thead className="sticky top-0 z-10 bg-card border-b border-border shadow-2xs text-xs sm:text-sm font-bold text-foreground">
+            <tr>
+              {!cols.isHidden("when") && <th className="px-4 py-3.5 sm:px-6 bg-card first:rounded-tl-2xl">Date</th>}
+              {!cols.isHidden("administrator") && <th className="px-4 py-3.5 sm:px-6 bg-card">Administrator</th>}
+              {!cols.isHidden("action") && <th className="px-4 py-3.5 sm:px-6 bg-card">Action</th>}
+              {!cols.isHidden("target") && <th className="px-4 py-3.5 sm:px-6 bg-card">Target</th>}
+              {!cols.isHidden("change") && <th className="px-4 py-3.5 sm:px-6 bg-card">Change</th>}
+              {!cols.isHidden("reason") && <th className="px-4 py-3.5 sm:px-6 bg-card last:rounded-tr-2xl">Reason</th>}
+            </tr>
+          </thead>
 
-            <tbody className="divide-y divide-border">
-              {isLoading && rows.length === 0 && (
-                <AdminLoadingState label="Loading audit logs..." compact colSpan={6} />
+          <tbody className="divide-y divide-border">
+            {isLoading && rows.length === 0 && (
+              <AdminLoadingState label="Loading audit logs..." compact colSpan={6} />
+            )}
+
+            {error && !isLoading && rows.length === 0 && (
+              <AdminApiErrorFallback error={error} compact colSpan={6} />
+            )}
+
+            {!isLoading &&
+              (!error || rows.length > 0) &&
+              filteredRows.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-4 py-10 text-center text-sm text-muted-foreground sm:px-6 sm:py-12"
+                  >
+                    {hasActiveFilters
+                      ? "No entry matches these filters. Try clearing them."
+                      : "Nothing recorded yet. Take an action and it will appear here."}
+                  </td>
+                </tr>
               )}
 
-              {error && !isLoading && rows.length === 0 && (
-                <AdminApiErrorFallback error={error} compact colSpan={6} />
-              )}
-
-              {!isLoading &&
-                (!error || rows.length > 0) &&
-                filteredRows.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-4 py-10 text-center text-sm text-muted-foreground sm:px-6 sm:py-12"
-                    >
-                      {hasActiveFilters
-                        ? "No entry matches these filters. Try clearing them."
-                        : "Nothing recorded yet. Take an action and it will appear here."}
-                    </td>
-                  </tr>
+            {filteredRows.map((log) => (
+              <tr
+                key={log.id}
+                className="transition hover:bg-accent/40"
+              >
+                {!cols.isHidden("when") && (
+                  <td className="whitespace-nowrap px-4 py-3.5 text-xs text-muted-foreground sm:px-6">
+                    {formatDateDMY(log.createdAt)}
+                  </td>
                 )}
 
-              {filteredRows.map((log) => (
-                <tr
-                  key={log.id}
-                  className="transition hover:bg-accent/40"
-                >
-                  {!cols.isHidden("when") && (
-                    <td className="whitespace-nowrap px-4 py-3.5 text-xs text-muted-foreground sm:px-6">
-                      {formatDateDMY(log.createdAt)}
-                    </td>
-                  )}
+                {!cols.isHidden("administrator") && (
+                  <td className="px-4 py-3.5 font-medium text-foreground sm:px-6">
+                    {log.actorUsername}
+                  </td>
+                )}
 
-                  {!cols.isHidden("administrator") && (
-                    <td className="px-4 py-3.5 font-medium text-foreground sm:px-6">
-                      {log.actorUsername}
-                    </td>
-                  )}
+                {!cols.isHidden("action") && (
+                  <td className="px-4 py-3.5 font-semibold text-foreground sm:px-6">
+                    {ACTION_LABELS[log.actionType] ?? log.actionType}
+                  </td>
+                )}
 
-                  {!cols.isHidden("action") && (
-                    <td className="px-4 py-3.5 font-semibold text-foreground sm:px-6">
-                      {ACTION_LABELS[log.actionType] ?? log.actionType}
-                    </td>
-                  )}
+                {!cols.isHidden("target") && (
+                  <td className="px-4 py-3.5 text-muted-foreground sm:px-6">
+                    {log.targetLabel ?? "—"}
+                  </td>
+                )}
 
-                  {!cols.isHidden("target") && (
-                    <td className="px-4 py-3.5 text-muted-foreground sm:px-6">
-                      {log.targetLabel ?? "—"}
-                    </td>
-                  )}
+                {!cols.isHidden("change") && (
+                  <td className="px-4 py-3.5 text-muted-foreground font-mono text-xs sm:px-6">
+                    {log.previousState || log.newState
+                      ? `${log.previousState ?? "—"} → ${log.newState ?? "—"}`
+                      : "—"}
+                  </td>
+                )}
 
-                  {!cols.isHidden("change") && (
-                    <td className="px-4 py-3.5 text-muted-foreground font-mono text-xs sm:px-6">
-                      {log.previousState || log.newState
-                        ? `${log.previousState ?? "—"} → ${log.newState ?? "—"}`
-                        : "—"}
-                    </td>
-                  )}
+                {!cols.isHidden("reason") && (
+                  <td className="max-w-xs px-4 py-3.5 text-muted-foreground sm:px-6">
+                    {log.reason ?? "—"}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-                  {!cols.isHidden("reason") && (
-                    <td className="max-w-xs px-4 py-3.5 text-muted-foreground sm:px-6">
-                      {log.reason ?? "—"}
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Infinite Scroll */}
+        <div
+          ref={sentinelRef}
+          className="flex flex-col items-center gap-3 py-6 text-sm"
+        >
+          {isFetching && !isLoading && (
+            <span className="text-muted-foreground">
+              Loading more entries...
+            </span>
+          )}
+
+          {!isFetching && hasMore && (
+            <button
+              type="button"
+              onClick={loadMore}
+              className="rounded-full border border-border bg-white px-5 py-2 text-foreground transition hover:bg-accent dark:bg-background"
+            >
+              Load more
+            </button>
+          )}
+
+          {data && rows.length > 0 && (
+            <span className="text-muted-foreground">
+              Showing {rows.length}
+              {data.totalElements >= 0
+                ? ` of ${data.totalElements}`
+                : ""}{" "}
+              entries
+              {!hasMore && !isFetching
+                ? " · end of log"
+                : ""}
+            </span>
+          )}
         </div>
-      </div>
-
-      {/* Infinite Scroll */}
-      <div
-        ref={sentinelRef}
-        className="mt-5 flex flex-col items-center gap-3 py-6 text-sm"
-      >
-        {isFetching && !isLoading && (
-          <span className="text-muted-foreground">
-            Loading more entries...
-          </span>
-        )}
-
-        {!isFetching && hasMore && (
-          <button
-            type="button"
-            onClick={loadMore}
-            className="rounded-full border border-border bg-white px-5 py-2 text-foreground transition hover:bg-accent dark:bg-background"
-          >
-            Load more
-          </button>
-        )}
-
-        {data && rows.length > 0 && (
-          <span className="text-muted-foreground">
-            Showing {rows.length}
-            {data.totalElements >= 0
-              ? ` of ${data.totalElements}`
-              : ""}{" "}
-            entries
-            {!hasMore && !isFetching
-              ? " · end of log"
-              : ""}
-          </span>
-        )}
       </div>
 
       <ExportReportDialog
