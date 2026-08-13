@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { X } from "lucide-react";
 
 interface Props {
   isOpen: boolean;
@@ -34,8 +35,18 @@ export default function ApprovalModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl border border-gray-100">
-        <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+      <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl border border-gray-100 dark:bg-card dark:border-border text-card-foreground">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-foreground">{title}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close modal"
+            className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:text-muted-foreground dark:hover:bg-accent dark:hover:text-foreground transition shrink-0"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
         <p className="mt-2 text-sm text-gray-600">
           Review subscription request for <span className="font-semibold text-gray-900">{businessName}</span>.
         </p>
