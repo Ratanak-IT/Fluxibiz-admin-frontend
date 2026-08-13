@@ -8,8 +8,6 @@ import {
   CheckCheck,
   Globe,
   Search,
-  Server,
-  Shield,
   Trash2,
   X,
 } from "lucide-react";
@@ -136,7 +134,7 @@ export default function NotificationsPage() {
 
         {/* Category Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 text-xs">
-          {(["ALL", "BUSINESS", "CHANNEL", "SECURITY", "SYSTEM"] as const).map((cat) => (
+          {(["ALL", "BUSINESS", "CHANNEL"] as const).map((cat) => (
             <button
               key={cat}
               type="button"
@@ -188,12 +186,8 @@ export default function NotificationsPage() {
                 <div className="mt-0.5 rounded-full p-2 bg-primary/10 text-primary border border-primary/20 dark:bg-primary/20 dark:border-primary/30 shrink-0">
                   {notif.category === "BUSINESS" ? (
                     <Building2 className="h-4 w-4 text-primary" />
-                  ) : notif.category === "CHANNEL" ? (
-                    <Globe className="h-4 w-4 text-primary" />
-                  ) : notif.category === "SECURITY" ? (
-                    <Shield className="h-4 w-4 text-primary" />
                   ) : (
-                    <Server className="h-4 w-4 text-primary" />
+                    <Globe className="h-4 w-4 text-primary" />
                   )}
                 </div>
 

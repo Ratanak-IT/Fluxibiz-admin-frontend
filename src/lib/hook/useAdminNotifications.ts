@@ -68,11 +68,7 @@ export function useAdminNotifications() {
       const type = log.actionType;
       const category: NotificationCategory = type.startsWith("BUSINESS")
         ? "BUSINESS"
-        : type.includes("FEATURE")
-          ? "CHANNEL"
-          : type.startsWith("STAFF")
-            ? "SECURITY"
-            : "SYSTEM";
+        : "CHANNEL";
 
       const severity: NotificationSeverity =
         type.includes("SUSPENDED") || type.includes("DELETED")

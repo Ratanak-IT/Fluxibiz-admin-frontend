@@ -116,11 +116,9 @@ class NotificationSocketService {
   }
 
   private mapCategory(type?: string): NotificationCategory {
-    if (!type) return "SYSTEM";
+    if (!type) return "BUSINESS";
     if (type.startsWith("BUSINESS")) return "BUSINESS";
-    if (type.includes("STOREFRONT") || type.includes("TELEGRAM") || type.includes("KHQR")) return "CHANNEL";
-    if (type.startsWith("STAFF") || type.includes("SECURITY")) return "SECURITY";
-    return "SYSTEM";
+    return "CHANNEL";
   }
 
   private handleIncomingMessage(message: Message) {

@@ -1,4 +1,4 @@
-export type NotificationCategory = "BUSINESS" | "CHANNEL" | "SECURITY" | "SYSTEM";
+export type NotificationCategory = "BUSINESS" | "CHANNEL";
 export type NotificationSeverity = "INFO" | "SUCCESS" | "WARNING" | "CRITICAL";
 
 export type AdminNotificationType =
