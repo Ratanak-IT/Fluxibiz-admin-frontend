@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useGetAuditLogsQuery } from "@/features/businessManagement/businessAdminApi";
 import { notificationSocket } from "@/lib/notification-socket";
+import { parseApiDate } from "@/lib/dateUtils";
 import type {
   AdminNotification,
   NotificationCategory,
@@ -147,7 +148,7 @@ export function useAdminNotifications() {
     }
 
     return Array.from(combinedMap.values()).sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      (a, b) => parseApiDate(b.createdAt).getTime() - parseApiDate(a.createdAt).getTime(),
     );
   }, [socketNotifications, apiNotifications, readIds, deletedIds]);
 

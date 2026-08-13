@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetAuditLogsQuery } from "@/features/businessManagement/businessAdminApi";
+import { formatFullDateTime, formatRelativeTime } from "@/lib/dateUtils";
 import { Clock } from "lucide-react";
 import Link from "next/link";
 
@@ -31,9 +32,9 @@ export function LiveAuditTicker() {
       </div>
 
       <div className="flex items-center gap-3 shrink-0 text-muted-foreground">
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-1" title={formatFullDateTime(latest.createdAt)}>
           <Clock className="h-3.5 w-3.5" />
-          {new Date(latest.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+          {formatRelativeTime(latest.createdAt)}
         </span>
 
         <Link
