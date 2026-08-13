@@ -1,162 +1,113 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Bell,
   Building2,
   CheckCheck,
   Globe,
+  Radio,
   Search,
   Server,
   Shield,
-  SlidersHorizontal,
   Trash2,
   X,
 } from "lucide-react";
-import { useGetAuditLogsQuery } from "@/features/businessManagement/businessAdminApi";
-import { notificationSocket } from "@/lib/notification-socket";
+import { useAdminNotifications } from "@/lib/hook/useAdminNotifications";
 import type {
-  AdminNotification,
   NotificationCategory,
   NotificationSeverity,
 } from "@/lib/types/notificationTypes";
 
-function getReadIds(): Set<string> {
-  if (typeof window === "undefined") return new Set();
-  try {
-    const raw = localStorage.getItem("admin_read_notification_ids");
-    return raw ? new Set(JSON.parse(raw)) : new Set();
-  } catch {
-    return new Set();
-  }
-}
-
-function saveReadIds(ids: Set<string>) {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem("admin_read_notification_ids", JSON.stringify(Array.from(ids)));
-  } catch {
-    // Ignore
-  }
-}
-
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<"ALL" | NotificationCategory>("ALL");
   const [severityFilter, setSeverityFilter] = useState<"ALL" | NotificationSeverity>("ALL");
 
-  const { data: auditData, isLoading } = useGetAuditLogsQuery(
-    { page: 0, size: 50 },
-    { pollingInterval: 5000 },
-  );
-
-  useEffect(() => {
-    if (!auditData?.content) return;
-    const readIds = getReadIds();
-
-    const mapped: AdminNotification[] = auditData.content.map((log) => {
-      const type = log.actionType;
-      const category: NotificationCategory = type.startsWith("BUSINESS")
-        ? "BUSINESS"
-        : type.includes("FEATURE")
-          ? "CHANNEL"
-          : type.startsWith("STAFF")
-            ? "SECURITY"
-            : "SYSTEM";
-
-      const severity: NotificationSeverity = type.includes("SUSPENDED") || type.includes("DELETED")
-        ? "CRITICAL"
-        : type.includes("DISABLED") || type.includes("CLOSED")
-          ? "WARNING"
-          : "SUCCESS";
-
-      return {
-        id: log.id,
-        type: type as any,
-        category,
-        severity,
-        title: type.replace(/_/g, " "),
-        message: log.reason || (log.targetLabel ? `Action performed on ${log.targetLabel}` : "System administrative event"),
-        targetId: log.targetId,
-        read: readIds.has(log.id),
-        createdAt: log.createdAt,
-        actorUsername: log.actorUsername,
-        actionUrl: log.targetId ? `/businesses/${log.targetId}` : undefined,
-      };
-    });
-
-    setNotifications((prev) => {
-      const existingIds = new Set(prev.map((n) => n.id));
-      const newItems = mapped.filter((n) => !existingIds.has(n.id));
-      return [...newItems, ...prev];
-    });
-  }, [auditData]);
-
-  useEffect(() => {
-    notificationSocket.connect();
-    const readIds = getReadIds();
-    const unsubscribe = notificationSocket.subscribe((newNotif) => {
-      const formatted = { ...newNotif, read: readIds.has(newNotif.id) };
-      setNotifications((prev) => [formatted, ...prev.filter((n) => n.id !== newNotif.id)]);
-    });
-    return () => unsubscribe();
-  }, []);
+  const {
+    notifications,
+    isLoading,
+    isConnected,
+    markAllAsRead,
+    markAsRead,
+    deleteNotification,
+    clearAll,
+  } = useAdminNotifications();
 
   const filteredNotifications = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return notifications.filter((n) => {
-      const matchesSearch = !q || n.title.toLowerCase().includes(q) || n.message.toLowerCase().includes(q) || (n.actorUsername ?? "").toLowerCase().includes(q);
+      const matchesSearch =
+        !q ||
+        n.title.toLowerCase().includes(q) ||
+        n.message.toLowerCase().includes(q) ||
+        (n.actorUsername ?? "").toLowerCase().includes(q);
       const matchesCategory = categoryFilter === "ALL" || n.category === categoryFilter;
       const matchesSeverity = severityFilter === "ALL" || n.severity === severityFilter;
       return matchesSearch && matchesCategory && matchesSeverity;
     });
   }, [notifications, searchQuery, categoryFilter, severityFilter]);
 
-  const markAllRead = () => {
-    const readIds = getReadIds();
-    notifications.forEach((n) => readIds.add(n.id));
-    saveReadIds(readIds);
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-  const clearAll = () => setNotifications([]);
-  const deleteNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
-
   const getSeverityBadge = (sev: NotificationSeverity) => {
     switch (sev) {
       case "CRITICAL":
-        return <span className="rounded-full bg-rose-500/15 text-rose-600 px-2.5 py-0.5 text-xs font-bold dark:bg-rose-500/25 dark:text-rose-400">CRITICAL</span>;
+        return (
+          <span className="rounded-full bg-rose-500/15 text-rose-600 px-2.5 py-0.5 text-xs font-bold dark:bg-rose-500/25 dark:text-rose-400">
+            CRITICAL
+          </span>
+        );
       case "WARNING":
-        return <span className="rounded-full bg-amber-500/15 text-amber-600 px-2.5 py-0.5 text-xs font-bold dark:bg-amber-500/25 dark:text-amber-400">WARNING</span>;
+        return (
+          <span className="rounded-full bg-amber-500/15 text-amber-600 px-2.5 py-0.5 text-xs font-bold dark:bg-amber-500/25 dark:text-amber-400">
+            WARNING
+          </span>
+        );
       case "SUCCESS":
-        return <span className="rounded-full bg-emerald-500/15 text-emerald-600 px-2.5 py-0.5 text-xs font-bold dark:bg-emerald-500/25 dark:text-emerald-400 font-mono">SUCCESS</span>;
+        return (
+          <span className="rounded-full bg-emerald-500/15 text-emerald-600 px-2.5 py-0.5 text-xs font-bold dark:bg-emerald-500/25 dark:text-emerald-400 font-mono">
+            SUCCESS
+          </span>
+        );
       default:
-        return <span className="rounded-full bg-blue-500/15 text-blue-600 px-2.5 py-0.5 text-xs font-bold dark:bg-blue-500/25 dark:text-blue-400 font-mono">INFO</span>;
+        return (
+          <span className="rounded-full bg-blue-500/15 text-blue-600 px-2.5 py-0.5 text-xs font-bold dark:bg-blue-500/25 dark:text-blue-400 font-mono">
+            INFO
+          </span>
+        );
     }
   };
 
   return (
     <div className="w-full pt-2">
-
       {/* Header */}
       <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground sm:text-3xl flex items-center gap-2">
-            <Bell className="h-6 w-6 text-primary" />
-            Notification Center
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-foreground sm:text-3xl flex items-center gap-2">
+              <Bell className="h-6 w-6 text-primary" />
+              Notification Center
+            </h1>
+            <span
+              className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+                isConnected
+                  ? "bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/25 dark:text-emerald-400"
+                  : "bg-amber-500/15 text-amber-600 dark:bg-amber-500/25 dark:text-amber-400"
+              }`}
+            >
+              <Radio className="h-3 w-3 animate-pulse" />
+              {isConnected ? "LIVE STREAM" : "POLLING STREAM"}
+            </span>
+          </div>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            Real-time platform notifications, webhooks, and administrative event stream.
+            Real-time platform notifications, webhooks, and administrative event stream directly from the backend.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={markAllRead}
+            onClick={markAllAsRead}
             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground transition hover:bg-accent"
           >
             <CheckCheck className="h-3.5 w-3.5" />
@@ -217,7 +168,9 @@ export default function NotificationsPage() {
       {/* List */}
       <div className="mt-6 space-y-3">
         {isLoading && notifications.length === 0 && (
-          <p className="text-sm text-muted-foreground py-8 text-center">Loading notifications...</p>
+          <p className="text-sm text-muted-foreground py-8 text-center">
+            Loading notifications from backend API...
+          </p>
         )}
 
         {!isLoading && filteredNotifications.length === 0 && (
@@ -227,7 +180,9 @@ export default function NotificationsPage() {
             </div>
             <p className="mt-3 text-base font-semibold text-foreground">No notifications found</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {searchQuery ? "Try adjusting your search query or filters." : "You're all caught up!"}
+              {searchQuery
+                ? "Try adjusting your search query or filters."
+                : "You're all caught up! No active administrative notifications."}
             </p>
           </div>
         )}
@@ -235,7 +190,10 @@ export default function NotificationsPage() {
         {filteredNotifications.map((notif) => (
           <div
             key={notif.id}
-            className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-xs transition hover:border-border/80 text-card-foreground"
+            onClick={() => markAsRead(notif.id)}
+            className={`rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-xs transition hover:border-border/80 text-card-foreground cursor-pointer ${
+              !notif.read ? "border-l-4 border-l-primary bg-primary/5 dark:bg-primary/10" : ""
+            }`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3 min-w-0">
@@ -255,19 +213,30 @@ export default function NotificationsPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="text-base font-bold text-foreground">{notif.title}</h3>
                     {getSeverityBadge(notif.severity)}
+                    {!notif.read && (
+                      <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
+                        NEW
+                      </span>
+                    )}
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">{notif.message}</p>
 
                   <div className="mt-2.5 flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
                     <span>
-                      Actor: <strong className="text-foreground font-semibold">{notif.actorUsername || "System"}</strong>
+                      Actor:{" "}
+                      <strong className="text-foreground font-semibold">
+                        {notif.actorUsername || "System"}
+                      </strong>
                     </span>
                     <span>•</span>
                     <span>{new Date(notif.createdAt).toLocaleString("en-GB")}</span>
                     {notif.actionUrl && (
                       <>
                         <span>•</span>
-                        <Link href={notif.actionUrl} className="font-semibold text-primary hover:underline">
+                        <Link
+                          href={notif.actionUrl}
+                          className="font-semibold text-primary hover:underline"
+                        >
                           View details →
                         </Link>
                       </>
@@ -278,7 +247,10 @@ export default function NotificationsPage() {
 
               <button
                 type="button"
-                onClick={() => deleteNotification(notif.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteNotification(notif.id);
+                }}
                 aria-label="Delete notification"
                 title="Delete"
                 className="rounded-full p-2 text-destructive transition hover:bg-destructive/15 hover:text-destructive shrink-0"

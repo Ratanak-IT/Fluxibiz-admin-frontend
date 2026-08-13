@@ -6,107 +6,31 @@ import {
   Bell,
   CheckCheck,
   ChevronRight,
-  ShieldAlert,
   Sparkles,
   Trash2,
-  X,
   Building2,
   Globe,
   Server,
   Shield,
+  Radio,
 } from "lucide-react";
-import { useGetAuditLogsQuery } from "@/features/businessManagement/businessAdminApi";
-import { notificationSocket } from "@/lib/notification-socket";
-import type {
-  AdminNotification,
-  NotificationCategory,
-} from "@/lib/types/notificationTypes";
-
-function getReadIds(): Set<string> {
-  if (typeof window === "undefined") return new Set();
-  try {
-    const raw = localStorage.getItem("admin_read_notification_ids");
-    return raw ? new Set(JSON.parse(raw)) : new Set();
-  } catch {
-    return new Set();
-  }
-}
-
-function saveReadIds(ids: Set<string>) {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem("admin_read_notification_ids", JSON.stringify(Array.from(ids)));
-  } catch {
-    // Ignore
-  }
-}
+import { useAdminNotifications } from "@/lib/hook/useAdminNotifications";
+import type { NotificationCategory } from "@/lib/types/notificationTypes";
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
   const [activeCategory, setActiveCategory] = useState<"ALL" | NotificationCategory>("ALL");
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Fallback API query to populate initial audit notifications
-  const { data: auditData } = useGetAuditLogsQuery({ page: 0, size: 10 }, { pollingInterval: 5000 });
-
-  // Map API audit logs to AdminNotification format with localStorage read state
-  useEffect(() => {
-    if (!auditData?.content) return;
-    const readIds = getReadIds();
-
-    const mapped: AdminNotification[] = auditData.content.map((log) => {
-      const type = log.actionType;
-      const category: NotificationCategory = type.startsWith("BUSINESS")
-        ? "BUSINESS"
-        : type.includes("FEATURE")
-          ? "CHANNEL"
-          : type.startsWith("STAFF")
-            ? "SECURITY"
-            : "SYSTEM";
-
-      const severity = type.includes("SUSPENDED") || type.includes("DELETED")
-        ? "CRITICAL"
-        : type.includes("DISABLED") || type.includes("CLOSED")
-          ? "WARNING"
-          : "SUCCESS";
-
-      return {
-        id: log.id,
-        type: type as any,
-        category,
-        severity,
-        title: type.replace(/_/g, " "),
-        message: log.reason || (log.targetLabel ? `Action performed on ${log.targetLabel}` : "System administrative event"),
-        targetId: log.targetId,
-        read: readIds.has(log.id),
-        createdAt: log.createdAt,
-        actorUsername: log.actorUsername,
-        actionUrl: log.targetId ? `/businesses/${log.targetId}` : undefined,
-      };
-    });
-
-    setNotifications((prev) => {
-      const existingIds = new Set(prev.map((n) => n.id));
-      const newItems = mapped.filter((n) => !existingIds.has(n.id));
-      return [...newItems, ...prev].slice(0, 30);
-    });
-  }, [auditData]);
-
-  // Subscribe to real-time WebSockets
-  useEffect(() => {
-    notificationSocket.connect();
-    const readIds = getReadIds();
-
-    const unsubscribe = notificationSocket.subscribe((newNotif) => {
-      const formatted = { ...newNotif, read: readIds.has(newNotif.id) };
-      setNotifications((prev) => [formatted, ...prev.filter((n) => n.id !== newNotif.id)].slice(0, 30));
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    clearAll,
+    isConnected,
+  } = useAdminNotifications();
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -118,32 +42,6 @@ export function NotificationBell() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const markAllRead = () => {
-    const readIds = getReadIds();
-    notifications.forEach((n) => readIds.add(n.id));
-    saveReadIds(readIds);
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  const markRead = (id: string) => {
-    const readIds = getReadIds();
-    readIds.add(id);
-    saveReadIds(readIds);
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-    );
-  };
-
-  const clearAll = () => {
-    setNotifications([]);
-  };
-
-  const deleteNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
 
   const filteredNotifications = notifications.filter((n) =>
     activeCategory === "ALL" ? true : n.category === activeCategory,
@@ -194,11 +92,24 @@ export function NotificationBell() {
               )}
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
+              {/* WebSocket Status Pill */}
+              <span
+                title={isConnected ? "Real-time socket active" : "Polling mode active"}
+                className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                  isConnected
+                    ? "bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/25 dark:text-emerald-400"
+                    : "bg-amber-500/15 text-amber-600 dark:bg-amber-500/25 dark:text-amber-400"
+                }`}
+              >
+                <Radio className="h-2.5 w-2.5 animate-pulse" />
+                {isConnected ? "LIVE" : "SYNCING"}
+              </span>
+
               {unreadCount > 0 && (
                 <button
                   type="button"
-                  onClick={markAllRead}
+                  onClick={markAllAsRead}
                   title="Mark all as read"
                   className="rounded-full p-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition"
                 >
@@ -247,7 +158,7 @@ export function NotificationBell() {
               filteredNotifications.map((notif) => (
                 <div
                   key={notif.id}
-                  onClick={() => markRead(notif.id)}
+                  onClick={() => markAsRead(notif.id)}
                   className={`flex items-start justify-between gap-3 p-3.5 text-xs transition cursor-pointer hover:bg-accent/40 ${
                     !notif.read ? "bg-primary/5 dark:bg-primary/10" : ""
                   }`}
@@ -272,6 +183,7 @@ export function NotificationBell() {
                         {notif.actionUrl && (
                           <Link
                             href={notif.actionUrl}
+                            onClick={() => setOpen(false)}
                             className="font-medium text-primary hover:underline flex items-center gap-0.5"
                           >
                             View <ChevronRight className="h-3 w-3" />

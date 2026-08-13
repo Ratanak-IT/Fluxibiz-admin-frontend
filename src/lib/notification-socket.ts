@@ -3,6 +3,7 @@
 import { Client, Message, StompSubscription } from "@stomp/stompjs";
 import { toast } from "sonner";
 import { playNotificationSound } from "./audio-alert";
+import { tokenStore } from "./auth/tokenStore";
 import type {
   AdminNotification,
   AdminNotificationType,
@@ -63,8 +64,15 @@ class NotificationSocketService {
 
     this.isConnecting = true;
 
+    const token = tokenStore.getAccessToken();
+    const connectHeaders: Record<string, string> = {};
+    if (token) {
+      connectHeaders["Authorization"] = `Bearer ${token}`;
+    }
+
     const client = new Client({
       brokerURL: url,
+      connectHeaders,
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
@@ -93,6 +101,10 @@ class NotificationSocketService {
 
     this.client = client;
     client.activate();
+  }
+
+  public isConnected(): boolean {
+    return Boolean(this.client?.connected);
   }
 
   private mapSeverity(type?: string): NotificationSeverity {
