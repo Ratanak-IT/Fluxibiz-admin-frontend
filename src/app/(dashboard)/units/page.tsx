@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Search } from "lucide-react";
+import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   useGetUnitsQuery,
@@ -165,17 +165,19 @@ export default function UnitsPage() {
                           type="button"
                           onClick={() => setDialog(unit)}
                           aria-label={`Edit ${unit.name}`}
-                          className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-primary"
+                          title="Edit"
+                          className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
                         >
-                          Edit
+                          <Pencil className="size-4" />
                         </button>
                         <button
                           type="button"
                           onClick={() => remove(unit)}
                           aria-label={`Delete ${unit.name}`}
-                          className="rounded-full p-2 text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive"
+                          title="Delete"
+                          className="rounded-full p-2 text-destructive transition hover:bg-destructive/15 hover:text-destructive"
                         >
-                          Delete
+                          <Trash2 className="size-4" />
                         </button>
                       </div>
                     </td>

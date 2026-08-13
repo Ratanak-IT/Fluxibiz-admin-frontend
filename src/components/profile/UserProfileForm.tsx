@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useEffect,
   useRef,
   useState,
   type FormEvent,
@@ -16,6 +17,7 @@ import {
   MapPin,
   Phone,
   UserRound,
+  X,
 } from "lucide-react";
 import { z } from "zod";
 import { ImagePicker, useStagedImage } from "@/components/ui/image-picker";
@@ -79,14 +81,15 @@ function getFieldErrors(error: z.ZodError<UserProfileInput>): FieldErrors {
   return fieldErrors;
 }
 
-function withFreshPicture(updated: UserProfile, previous: string) {
+function withFreshPicture(updated: UserProfile) {
   const picture = updated.profilePicture;
-  if (!picture || picture !== previous) {
+  if (!picture) {
     return updated;
   }
+  const cleanUrl = picture.split("?")[0];
   return {
     ...updated,
-    profilePicture: `${picture}${picture.includes("?") ? "&" : "?"}v=${Date.now()}`,
+    profilePicture: `${cleanUrl}?v=${Date.now()}`,
   };
 }
 
@@ -150,7 +153,7 @@ function GenderSelect({
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="inline-flex h-11 w-full items-center justify-between rounded-xl border border-[#e2e2de] bg-white px-4 text-left text-[14px] font-semibold text-[#16181c] outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-input dark:bg-card dark:text-foreground dark:focus-visible:ring-offset-card">
+      <DropdownMenuTrigger className="inline-flex h-11 w-full items-center justify-between rounded-xl border border-[#e2e2de] bg-white px-4 text-left text-[14px] font-semibold text-[#16181c] outline-none focus-visible:border-gray-400 focus-visible:ring-2 focus-visible:ring-gray-400/20 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-input dark:bg-card dark:text-foreground dark:focus-visible:border-gray-500 dark:focus-visible:ring-offset-card">
         <span>{labels[value]}</span>
         <ChevronDown className="size-4 text-[#7a8478] dark:text-muted-foreground" />
       </DropdownMenuTrigger>
@@ -215,6 +218,17 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
   const [gender, setGender] = useState(initialGender);
   const picture = useStagedImage(profilePictureRules, storedPicture);
   const [pictureNote, setPictureNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("profile-picture-preview-change", {
+          detail: { preview: picture.preview },
+        })
+      );
+    }
+  }, [picture.preview]);
+  const [showImageModal, setShowImageModal] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<{
     type: "success" | "error";
@@ -301,7 +315,7 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
 
       publishProfile(
         picture.file
-          ? withFreshPicture(updated, storedPicture)
+          ? withFreshPicture(updated)
           : updated
       );
       picture.reset();
@@ -335,12 +349,23 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
           <span className="relative inline-flex size-28 sm:size-32 items-center justify-center">
             <span className="flex size-full items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[linear-gradient(145deg,#dff5e2,#b9e5bf)] text-3xl font-bold text-[#00932a] shadow-md dark:border-card dark:bg-[linear-gradient(145deg,#0f2818,#163d21)]">
               {picture.preview ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={picture.preview}
-                  alt={`${profileName} profile`}
-                  className="size-full object-cover"
-                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowImageModal(true);
+                  }}
+                  title="Click to view full image"
+                  className="group/img relative size-full overflow-hidden rounded-full cursor-pointer focus:outline-none"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={picture.preview}
+                    alt={`${profileName} profile`}
+                    className="size-full object-cover transition-transform duration-200 group-hover/img:scale-105"
+                  />
+                </button>
               ) : (
                 getInitials(firstName, lastName, profile.username)
               )}
@@ -368,7 +393,7 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
               type="button"
               disabled={isSaving || isRemovingPicture}
               onClick={handlePictureRemove}
-              className="px-0 text-sm font-medium text-[#2563eb] hover:underline dark:text-blue-400"
+              className="px-0 text-sm font-medium text-[#d14341] hover:underline dark:text-red-400"
             >
               {isRemovingPicture ? "Removing…" : "Remove photo"}
             </button>
@@ -454,7 +479,7 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
           onChange={(e) => setFirstName(e.target.value)}
           maxLength={255}
           autoComplete="given-name"
-          className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white px-4 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25 dark:border-input dark:bg-card dark:text-foreground"
+          className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white px-4 text-[14px] text-[#16181c] outline-none focus-visible:border-gray-400 focus-visible:ring-2 focus-visible:ring-gray-400/20 dark:border-input dark:bg-card dark:text-foreground dark:focus-visible:border-gray-500"
         />
       </Field>
 
@@ -470,7 +495,7 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
           onChange={(e) => setLastName(e.target.value)}
           maxLength={255}
           autoComplete="family-name"
-          className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white px-4 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25 dark:border-input dark:bg-card dark:text-foreground"
+          className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white px-4 text-[14px] text-[#16181c] outline-none focus-visible:border-gray-400 focus-visible:ring-2 focus-visible:ring-gray-400/20 dark:border-input dark:bg-card dark:text-foreground dark:focus-visible:border-gray-500"
         />
       </Field>
 
@@ -488,7 +513,7 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
             defaultValue={profile.phoneNumber || ""}
             maxLength={30}
             autoComplete="tel"
-            className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white pr-4 pl-11 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25 dark:border-input dark:bg-card dark:text-foreground"
+            className="h-11 w-full rounded-xl border border-[#e2e2de] bg-white pr-4 pl-11 text-[14px] text-[#16181c] outline-none focus-visible:border-gray-400 focus-visible:ring-2 focus-visible:ring-gray-400/20 dark:border-input dark:bg-card dark:text-foreground dark:focus-visible:border-gray-500"
           />
         </div>
       </Field>
@@ -523,14 +548,14 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
               defaultValue={profile.address || ""}
               rows={3}
               autoComplete="street-address"
-              className="w-full min-h-28 rounded-xl border border-[#e2e2de] bg-white py-3 pr-4 pl-11 text-[14px] text-[#16181c] outline-none focus-visible:border-[#00932a] focus-visible:ring-2 focus-visible:ring-[#00932a]/25 dark:border-input dark:bg-card dark:text-foreground"
+              className="w-full min-h-28 rounded-xl border border-[#e2e2de] bg-white py-3 pr-4 pl-11 text-[14px] text-[#16181c] outline-none focus-visible:border-gray-400 focus-visible:ring-2 focus-visible:ring-gray-400/20 dark:border-input dark:bg-card dark:text-foreground dark:focus-visible:border-gray-500"
             />
           </div>
         </Field>
       </div>
     </div>
 
-    <div className="mt-8 flex flex-col gap-4 border-t border-[#edf0ec] pt-6 sm:flex-row sm:items-center dark:border-border">
+    <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
       <div className="min-h-5 flex-1 text-sm" aria-live="polite">
         {status ? (
           <p
@@ -561,6 +586,33 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
       </button>
     </div>
   </form>
+
+  {showImageModal && picture.preview && (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={() => setShowImageModal(false)}
+    >
+      <div
+        className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-3xl bg-card p-2 shadow-2xl border border-border"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={() => setShowImageModal(false)}
+          aria-label="Close preview"
+          className="absolute top-4 right-4 z-10 grid size-9 place-items-center rounded-full bg-black/60 text-white transition hover:bg-black/80 focus:outline-none"
+        >
+          <X className="size-5" />
+        </button>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={picture.preview}
+          alt={`${profileName} full preview`}
+          className="max-h-[80vh] max-w-[80vw] rounded-2xl object-contain"
+        />
+      </div>
+    </div>
+  )}
 </div>
   );
 }

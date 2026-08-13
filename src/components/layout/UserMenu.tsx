@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { LogOut, UserRound, ChevronDown } from "lucide-react";
 import { useGetUserProfileQuery } from "@/services/userProfileApi";
@@ -21,7 +21,30 @@ function initialsOf(name: string) {
 export default function UserMenu({ name }: { name: string }) {
   const signOutForm = useRef<HTMLFormElement>(null);
   const [open, setOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [stagedPreview, setStagedPreview] = useState<string | null>(null);
   const { data: profile } = useGetUserProfileQuery();
+
+  useEffect(() => {
+    const handlePreviewChange = (event: Event) => {
+      const customEvt = event as CustomEvent<{ preview?: string } | string | null>;
+      const detail = customEvt.detail;
+      const previewVal =
+        typeof detail === "object" && detail !== null && "preview" in detail
+          ? detail.preview ?? null
+          : typeof detail === "string"
+          ? detail
+          : null;
+
+      setStagedPreview(previewVal);
+      setImgError(false);
+    };
+
+    window.addEventListener("profile-picture-preview-change", handlePreviewChange);
+    return () => {
+      window.removeEventListener("profile-picture-preview-change", handlePreviewChange);
+    };
+  }, []);
 
   const profileName =
     [profile?.firstName, profile?.lastName]
@@ -30,7 +53,9 @@ export default function UserMenu({ name }: { name: string }) {
       .join(" ") ||
     profile?.username ||
     name;
-  const picture = profile?.profilePicture;
+
+  const savedPicture = profile?.profilePicture;
+  const activePicture = stagedPreview !== null ? stagedPreview : savedPicture;
 
   return (
    <div className="relative">
@@ -43,13 +68,15 @@ export default function UserMenu({ name }: { name: string }) {
   >
     <span
       aria-hidden="true"
-      className="grid size-8 place-items-center overflow-hidden rounded-full border border-primary bg-primary text-[13px] font-medium text-primary-foreground"
+      className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-full border border-[#e2e2de] bg-muted text-[13px] font-medium text-foreground dark:border-border"
     >
-      {picture ? (
+      {activePicture && !imgError ? (
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
-          src={picture}
+          key={activePicture}
+          src={activePicture}
           alt=""
+          onError={() => setImgError(true)}
           className="size-full object-cover"
         />
       ) : (

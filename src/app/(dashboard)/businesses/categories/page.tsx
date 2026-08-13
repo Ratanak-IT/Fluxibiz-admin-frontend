@@ -10,7 +10,6 @@ import {
   Pencil,
   Plus,
   Search,
-  SlidersHorizontal,
   Trash2,
   X,
 } from "lucide-react";
@@ -223,7 +222,6 @@ export default function CategoriesPage() {
                 onClick={() => setMobileFilterOpen((prev) => !prev)}
                 className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-foreground outline-none transition hover:bg-accent"
               >
-                <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
                 <span>{TYPE_FILTERS.find((f) => f.value === typeFilter)?.label}</span>
                 <ChevronDown className={`size-4 text-muted-foreground transition-transform ${mobileFilterOpen ? "rotate-180" : ""}`} />
               </button>
@@ -256,7 +254,6 @@ export default function CategoriesPage() {
 
             {/* Desktop status pill filters */}
             <div className="hidden items-center gap-2 lg:flex">
-              <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
               {TYPE_FILTERS.map((filter) => (
                 <button
                   key={filter.value}
@@ -319,13 +316,29 @@ export default function CategoriesPage() {
           const totalCategoryBusinesses = parentDirectCount + subTotalCount;
           const subCount = parent.subCategories?.length ?? 0;
 
+          const isExpanded = expandedParents[parent.id] !== false;
+
           return (
             <div
               key={parent.id}
               className="overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-sm transition hover:border-border/80"
             >
               <div className="flex items-center justify-between gap-2 px-5 py-4">
-                <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {subCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(parent.id)}
+                      aria-expanded={isExpanded}
+                      title={isExpanded ? "Collapse subcategories" : "Expand subcategories"}
+                      className="rounded-full p-1 text-muted-foreground transition hover:bg-accent hover:text-foreground shrink-0"
+                    >
+                      <ChevronRight
+                        className={`size-4 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`}
+                        aria-hidden
+                      />
+                    </button>
+                  )}
                   <span className="font-semibold text-card-foreground text-base break-words">
                     {parent.name}
                   </span>
@@ -378,7 +391,7 @@ export default function CategoriesPage() {
                 </div>
               </div>
 
-              {parent.subCategories && parent.subCategories.length > 0 && (
+              {parent.subCategories && parent.subCategories.length > 0 && isExpanded && (
                 <ul className="divide-y divide-border border-t border-border bg-muted/20">
                   {parent.subCategories.map((child) => {
                     const childBusinessCount = categoryBusinessCountMap[child.id] ?? 0;
@@ -388,7 +401,6 @@ export default function CategoriesPage() {
                         className="flex items-center justify-between gap-2 px-5 py-3 pl-8 sm:pl-10 text-sm hover:bg-accent/40 transition-colors"
                       >
                         <span className="flex min-w-0 items-center gap-2.5 text-foreground">
-                          <ChevronRight className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
                           <span className="break-words font-medium">{child.name}</span>
                           <span className="text-xs text-muted-foreground font-mono hidden sm:inline">/{child.slug}</span>
                           <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2 py-0.5 text-xs font-medium text-muted-foreground shrink-0">

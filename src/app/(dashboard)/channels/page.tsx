@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Building2, ChevronDown, ExternalLink, Search, Send, SlidersHorizontal } from "lucide-react";
+import { Building2, ChevronDown, ExternalLink, Search, Send } from "lucide-react";
 import {
   useGetBusinessChannelsQuery,
   useGetPlatformFeaturesQuery,
@@ -192,7 +192,6 @@ export default function ChannelsPage() {
               aria-expanded={filterOpen}
               className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-foreground outline-none transition hover:bg-accent focus:border-primary"
             >
-              <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
               <span className="truncate">
                 {FILTERS.find((option) => option.value === filter)?.label}
               </span>
@@ -233,7 +232,6 @@ export default function ChannelsPage() {
 
           {/* Desktop pill filters */}
           <div className="hidden items-center gap-2 lg:flex">
-            <SlidersHorizontal className="size-4 fill-primary text-primary" aria-hidden />
             {FILTERS.map((option) => (
               <button
                 key={option.value}
