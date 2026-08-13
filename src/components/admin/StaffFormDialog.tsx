@@ -51,7 +51,7 @@ export function StaffFormDialog({
     roles.length > 0 && !busy && (editing || (username.trim() !== "" && email.trim() !== ""));
 
   const field =
-    "mt-1.5 w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none transition focus:border-green-600 disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-50 dark:focus:border-green-500";
+    "mt-1.5 w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none transition focus:border-gray-400 disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-50 dark:focus:border-gray-500";
   const labelClass = "block text-sm font-medium text-neutral-900 dark:text-neutral-50";
 
   return (

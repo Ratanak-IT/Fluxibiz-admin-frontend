@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Eye, Search, Plus, ChevronDown, Download, Building2 } from "lucide-react";
 import { toast } from "sonner";
@@ -98,6 +98,19 @@ export default function BusinessesPage() {
   const [inspectedBusiness, setInspectedBusiness] = useState<BusinessResponse | null>(null);
 
   const [createForm, setCreateForm] = useState<CreateFormState | null>(null);
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+  const categoryRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!categoryMenuOpen) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (categoryRef.current && !categoryRef.current.contains(event.target as Node)) {
+        setCategoryMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [categoryMenuOpen]);
 
   const query = useMemo(
     () => ({
@@ -125,6 +138,20 @@ export default function BusinessesPage() {
   const subCategories = useMemo(() => {
     return categories.flatMap((cat) => cat.subCategories ?? []);
   }, [categories]);
+
+  const selectedCategoryInfo = useMemo(() => {
+    if (!createForm?.businessCategoryId) return null;
+    for (const cat of categories) {
+      if (cat.id === createForm.businessCategoryId) {
+        return { parent: cat.name, sub: null };
+      }
+      const foundSub = cat.subCategories?.find((sub) => sub.id === createForm.businessCategoryId);
+      if (foundSub) {
+        return { parent: cat.name, sub: foundSub.name };
+      }
+    }
+    return null;
+  }, [categories, createForm?.businessCategoryId]);
 
   const activeFilter = STATUS_FILTERS.find((f) => f.value === status) ?? STATUS_FILTERS[0];
 
@@ -161,7 +188,7 @@ export default function BusinessesPage() {
   };
 
   const inputCls =
-    "mt-1.5 w-full rounded-xl border border-border bg-card px-3.5 py-2 text-sm text-foreground outline-none transition focus:border-primary";
+    "mt-1.5 w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-card px-3.5 py-2 text-sm text-foreground outline-none transition focus:border-gray-400 dark:focus:border-gray-500";
   const labelCls = "block text-xs font-semibold uppercase tracking-wider text-muted-foreground";
 
   return (
@@ -190,7 +217,8 @@ export default function BusinessesPage() {
                 confirmPassword: "",
                 phone: "",
                 businessName: "",
-                businessCategoryId: subCategories[0]?.id ?? "",
+                businessCategoryId:
+                  categories[0]?.subCategories?.[0]?.id ?? categories[0]?.id ?? subCategories[0]?.id ?? "",
                 businessAddress: "",
               })
             }
@@ -565,22 +593,84 @@ export default function BusinessesPage() {
                 />
               </div>
 
-              <div>
+              <div className="relative" ref={categoryRef}>
                 <label className={labelCls} htmlFor="businessCategory">
                   Category
                 </label>
-                <select
+
+                <button
                   id="businessCategory"
-                  value={createForm.businessCategoryId}
-                  onChange={(e) => setCreateForm({ ...createForm, businessCategoryId: e.target.value })}
-                  className={inputCls}
+                  type="button"
+                  onClick={() => setCategoryMenuOpen((prev) => !prev)}
+                  aria-expanded={categoryMenuOpen}
+                  aria-haspopup="listbox"
+                  className="mt-1.5 flex w-full items-center justify-between gap-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition hover:bg-accent/50 focus:border-gray-400 dark:focus:border-gray-500 cursor-pointer"
                 >
-                  {subCategories.map((sub) => (
-                    <option key={sub.id} value={sub.id}>
-                      {sub.name}
-                    </option>
-                  ))}
-                </select>
+                  <span className="truncate font-medium text-foreground">
+                    {selectedCategoryInfo
+                      ? selectedCategoryInfo.sub
+                        ? `${selectedCategoryInfo.parent} / ${selectedCategoryInfo.sub}`
+                        : selectedCategoryInfo.parent
+                      : "Select Category"}
+                  </span>
+                  <ChevronDown
+                    className={`size-4 shrink-0 text-muted-foreground transition-transform ${
+                      categoryMenuOpen ? "rotate-180" : ""
+                    }`}
+                    aria-hidden
+                  />
+                </button>
+
+                {categoryMenuOpen && (
+                  <div
+                    role="listbox"
+                    className="absolute left-0 right-0 top-full z-30 mt-1.5 max-h-64 overflow-y-auto rounded-2xl border border-border bg-popover p-1.5 shadow-xl animate-in fade-in-50 zoom-in-95 duration-100"
+                  >
+                    {categories.length > 0 ? (
+                      categories.map((cat) => {
+                        const subs =
+                          cat.subCategories && cat.subCategories.length > 0
+                            ? cat.subCategories
+                            : [{ id: cat.id, name: cat.name }];
+
+                        return (
+                          <div key={cat.id} className="mb-2 last:mb-0">
+                            <div className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                              {cat.name}
+                            </div>
+                            {subs.map((sub) => {
+                              const isSelected = createForm.businessCategoryId === sub.id;
+                              return (
+                                <button
+                                  key={sub.id}
+                                  type="button"
+                                  role="option"
+                                  aria-selected={isSelected}
+                                  onClick={() => {
+                                    setCreateForm((prev) =>
+                                      prev ? { ...prev, businessCategoryId: sub.id } : null,
+                                    );
+                                    setCategoryMenuOpen(false);
+                                  }}
+                                  className={`flex w-full items-center justify-between rounded-xl px-3.5 py-2 text-left text-sm font-medium transition ${
+                                    isSelected
+                                      ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                                      : "text-foreground hover:bg-accent"
+                                  }`}
+                                >
+                                  <span>{sub.name}</span>
+                                  {isSelected && <span className="text-xs font-bold">✓</span>}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="px-3 py-2 text-xs text-muted-foreground">No categories available</div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div>

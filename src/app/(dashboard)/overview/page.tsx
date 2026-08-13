@@ -90,14 +90,16 @@ function StatCard({
           : "text-neutral-900 dark:text-neutral-50";
 
   const card = (
-    <div className="rounded-2xl border border-neutral-200 bg-card p-6 transition hover:border-[#00932A]/40 dark:border-border dark:hover:border-[#00932A]/40 shadow-xs">
-      <p className="text-sm font-medium text-neutral-500 dark:text-muted-foreground">{label}</p>
-      <p className={`mt-2 text-3xl font-semibold tabular-nums sm:text-4xl ${tone}`}>{value}</p>
-      {hint && <p className="mt-1 text-xs text-neutral-400 dark:text-muted-foreground">{hint}</p>}
+    <div className="flex h-full min-h-[128px] flex-col justify-between rounded-2xl border border-neutral-200 bg-card p-6 transition hover:border-[#00932A]/40 dark:border-border dark:hover:border-[#00932A]/40 shadow-xs">
+      <div>
+        <p className="text-sm font-medium text-neutral-500 dark:text-muted-foreground">{label}</p>
+        <p className={`mt-2 text-3xl font-semibold tabular-nums sm:text-4xl ${tone}`}>{value}</p>
+      </div>
+      {hint && <p className="mt-2 text-xs text-neutral-400 dark:text-muted-foreground">{hint}</p>}
     </div>
   );
 
-  return href ? <Link href={href}>{card}</Link> : card;
+  return href ? <Link href={href} className="h-full block">{card}</Link> : card;
 }
 
 function OverviewAreaChart({ data }: { data: Array<{ label: string; value: number }> }) {
@@ -539,10 +541,12 @@ function OverviewSkeleton() {
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border shadow-xs">
-              <div className="h-4 w-32 rounded bg-neutral-200 dark:bg-neutral-800" />
-              <div className="mt-2 h-9 w-16 rounded bg-neutral-200 dark:bg-neutral-800" />
-              <div className="mt-1 h-3.5 w-36 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
+            <div key={i} className="flex h-full min-h-[128px] flex-col justify-between rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border shadow-xs">
+              <div>
+                <div className="h-4 w-32 rounded bg-neutral-200 dark:bg-neutral-800" />
+                <div className="mt-2 h-9 w-16 rounded bg-neutral-200 dark:bg-neutral-800" />
+              </div>
+              <div className="mt-2 h-3.5 w-36 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
             </div>
           ))}
         </div>
@@ -555,10 +559,12 @@ function OverviewSkeleton() {
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border shadow-xs">
-              <div className="h-4 w-32 rounded bg-neutral-200 dark:bg-neutral-800" />
-              <div className="mt-2 h-9 w-16 rounded bg-neutral-200 dark:bg-neutral-800" />
-              <div className="mt-1 h-3.5 w-36 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
+            <div key={i} className="flex h-full min-h-[128px] flex-col justify-between rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border shadow-xs">
+              <div>
+                <div className="h-4 w-32 rounded bg-neutral-200 dark:bg-neutral-800" />
+                <div className="mt-2 h-9 w-16 rounded bg-neutral-200 dark:bg-neutral-800" />
+              </div>
+              <div className="mt-2 h-3.5 w-36 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
             </div>
           ))}
         </div>
@@ -707,16 +713,16 @@ export default function OverviewPage() {
               href="/businesses"
             />
             <StatCard
-              label="New Signups (30 Days)"
+              label="New Signups (30d)"
               value={data.newBusinessesLast30Days}
               hint="Newly registered shops"
               accent="green"
               href="/businesses"
             />
             <StatCard
-              label="Store Menus Live"
+              label="Live Storefronts"
               value={data.storefrontsPublished}
-              hint="Published to public directory"
+              hint="Published to directory"
               accent="amber"
               href="/channels"
             />
@@ -738,12 +744,12 @@ export default function OverviewPage() {
             <StatCard
               label="Suspended Shops"
               value={data.suspendedBusinesses}
-              hint="Blocked by administrator"
+              hint="Suspended by admin"
               accent="amber"
               href="/businesses"
             />
-            <StatCard label="Closed Shops" value={data.closedBusinesses} hint="Shop closed by merchant" accent="red" href="/businesses" />
-            <StatCard label="Deleted Accounts" value={data.deletedBusinesses} hint="Account marked deleted" accent="red" href="/businesses" />
+            <StatCard label="Closed Shops" value={data.closedBusinesses} hint="Closed by merchant" accent="red" href="/businesses" />
+            <StatCard label="Deleted Accounts" value={data.deletedBusinesses} hint="Marked as deleted" accent="red" href="/businesses" />
           </div>
 
           {/* Analytics Charts & Adoption Rates */}

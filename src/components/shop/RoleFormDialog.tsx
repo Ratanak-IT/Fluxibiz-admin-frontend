@@ -38,7 +38,7 @@ export function RoleFormDialog({
   const canSubmit = name.trim() !== "" && !busy;
 
   const field =
-    "mt-1.5 w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none transition focus:border-green-600 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-50 dark:focus:border-green-500";
+    "mt-1.5 w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none transition focus:border-gray-400 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-50 dark:focus:border-gray-500";
   const labelClass = "block text-sm font-medium text-neutral-900 dark:text-neutral-50";
 
   return (

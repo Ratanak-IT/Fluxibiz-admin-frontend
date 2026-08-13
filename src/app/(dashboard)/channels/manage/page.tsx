@@ -203,7 +203,7 @@ export default function ConfigureChannelsPage() {
                   value={editor.name}
                   placeholder="e.g. Telegram Bot"
                   onChange={(event) => setEditor({ ...editor, name: event.target.value })}
-                  className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-green-600"
+                  className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-gray-400 dark:focus:border-gray-500"
                 />
               </div>
 
@@ -216,7 +216,7 @@ export default function ConfigureChannelsPage() {
                   value={editor.code}
                   placeholder="e.g. TELEGRAM"
                   onChange={(event) => setEditor({ ...editor, code: event.target.value })}
-                  className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-green-600 uppercase"
+                  className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-gray-400 dark:focus:border-gray-500 uppercase"
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
                   Alphanumeric code used to match application logic.
