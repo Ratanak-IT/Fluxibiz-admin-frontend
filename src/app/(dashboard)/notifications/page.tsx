@@ -121,6 +121,9 @@ export default function NotificationsPage() {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
   const clearAll = () => setNotifications([]);
+  const deleteNotification = (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
 
   const getSeverityBadge = (sev: NotificationSeverity) => {
     switch (sev) {
@@ -219,7 +222,9 @@ export default function NotificationsPage() {
 
         {!isLoading && filteredNotifications.length === 0 && (
           <div className="rounded-2xl border border-border bg-card p-12 text-center text-muted-foreground shadow-sm">
-            <Bell className="mx-auto h-10 w-10 text-muted-foreground/40" />
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20 dark:bg-primary/20 dark:border-primary/30">
+              <Bell className="h-7 w-7 text-primary" />
+            </div>
             <p className="mt-3 text-base font-semibold text-foreground">No notifications found</p>
             <p className="mt-1 text-sm text-muted-foreground">
               {searchQuery ? "Try adjusting your search query or filters." : "You're all caught up!"}
@@ -234,15 +239,15 @@ export default function NotificationsPage() {
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3 min-w-0">
-                <div className="mt-0.5 rounded-full p-2 bg-muted shrink-0">
+                <div className="mt-0.5 rounded-full p-2 bg-primary/10 text-primary border border-primary/20 dark:bg-primary/20 dark:border-primary/30 shrink-0">
                   {notif.category === "BUSINESS" ? (
-                    <Building2 className="h-4 w-4 text-emerald-500" />
+                    <Building2 className="h-4 w-4 text-primary" />
                   ) : notif.category === "CHANNEL" ? (
-                    <Globe className="h-4 w-4 text-amber-500" />
+                    <Globe className="h-4 w-4 text-primary" />
                   ) : notif.category === "SECURITY" ? (
-                    <Shield className="h-4 w-4 text-purple-500" />
+                    <Shield className="h-4 w-4 text-primary" />
                   ) : (
-                    <Server className="h-4 w-4 text-blue-500" />
+                    <Server className="h-4 w-4 text-primary" />
                   )}
                 </div>
 
@@ -270,6 +275,16 @@ export default function NotificationsPage() {
                   </div>
                 </div>
               </div>
+
+              <button
+                type="button"
+                onClick={() => deleteNotification(notif.id)}
+                aria-label="Delete notification"
+                title="Delete"
+                className="rounded-full p-2 text-destructive transition hover:bg-destructive/15 hover:text-destructive shrink-0"
+              >
+                <Trash2 className="size-4" />
+              </button>
             </div>
           </div>
         ))}

@@ -141,6 +141,10 @@ export function NotificationBell() {
     setNotifications([]);
   };
 
+  const deleteNotification = (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
   const filteredNotifications = notifications.filter((n) =>
     activeCategory === "ALL" ? true : n.category === activeCategory,
   );
@@ -148,13 +152,13 @@ export function NotificationBell() {
   const getCategoryIcon = (category: NotificationCategory) => {
     switch (category) {
       case "BUSINESS":
-        return <Building2 className="h-3.5 w-3.5 text-emerald-500" />;
+        return <Building2 className="h-3.5 w-3.5 text-primary" />;
       case "CHANNEL":
-        return <Globe className="h-3.5 w-3.5 text-amber-500" />;
+        return <Globe className="h-3.5 w-3.5 text-primary" />;
       case "SECURITY":
-        return <Shield className="h-3.5 w-3.5 text-purple-500" />;
+        return <Shield className="h-3.5 w-3.5 text-primary" />;
       default:
-        return <Server className="h-3.5 w-3.5 text-blue-500" />;
+        return <Server className="h-3.5 w-3.5 text-primary" />;
     }
   };
 
@@ -205,10 +209,11 @@ export function NotificationBell() {
                 <button
                   type="button"
                   onClick={clearAll}
+                  aria-label="Clear all notifications"
                   title="Clear all notifications"
-                  className="rounded-full p-1.5 text-xs text-muted-foreground hover:bg-destructive/15 hover:text-destructive transition"
+                  className="rounded-full p-2 text-destructive transition hover:bg-destructive/15 hover:text-destructive"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="size-4" />
                 </button>
               )}
             </div>
@@ -243,36 +248,51 @@ export function NotificationBell() {
                 <div
                   key={notif.id}
                   onClick={() => markRead(notif.id)}
-                  className={`flex items-start gap-3 p-3.5 text-xs transition cursor-pointer hover:bg-accent/40 ${
+                  className={`flex items-start justify-between gap-3 p-3.5 text-xs transition cursor-pointer hover:bg-accent/40 ${
                     !notif.read ? "bg-primary/5 dark:bg-primary/10" : ""
                   }`}
                 >
-                  <div className="mt-0.5 shrink-0 rounded-full p-1.5 bg-card border border-border shadow-2xs">
-                    {getCategoryIcon(notif.category)}
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-1">
-                      <span className="font-semibold text-foreground truncate">{notif.title}</span>
-                      <span className="text-[10px] text-muted-foreground shrink-0 font-mono">
-                        {new Date(notif.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
-                      </span>
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
+                    <div className="mt-0.5 shrink-0 rounded-full p-1.5 bg-primary/10 text-primary border border-primary/20 dark:bg-primary/20 dark:border-primary/30 shadow-2xs">
+                      {getCategoryIcon(notif.category)}
                     </div>
 
-                    <p className="mt-0.5 text-muted-foreground line-clamp-2">{notif.message}</p>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="font-semibold text-foreground truncate">{notif.title}</span>
+                        <span className="text-[10px] text-muted-foreground shrink-0 font-mono">
+                          {new Date(notif.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
 
-                    <div className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
-                      <span>By <strong className="text-foreground">{notif.actorUsername || "System"}</strong></span>
-                      {notif.actionUrl && (
-                        <Link
-                          href={notif.actionUrl}
-                          className="font-medium text-primary hover:underline flex items-center gap-0.5"
-                        >
-                          View <ChevronRight className="h-3 w-3" />
-                        </Link>
-                      )}
+                      <p className="mt-0.5 text-muted-foreground line-clamp-2">{notif.message}</p>
+
+                      <div className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
+                        <span>By <strong className="text-foreground">{notif.actorUsername || "System"}</strong></span>
+                        {notif.actionUrl && (
+                          <Link
+                            href={notif.actionUrl}
+                            className="font-medium text-primary hover:underline flex items-center gap-0.5"
+                          >
+                            View <ChevronRight className="h-3 w-3" />
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteNotification(notif.id);
+                    }}
+                    aria-label="Delete notification"
+                    title="Delete"
+                    className="rounded-full p-1.5 text-destructive transition hover:bg-destructive/15 hover:text-destructive shrink-0"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
                 </div>
               ))
             )}

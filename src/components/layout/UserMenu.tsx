@@ -77,7 +77,7 @@ export default function UserMenu({ name }: { name: string }) {
           src={activePicture}
           alt=""
           onError={() => setImgError(true)}
-          className="size-full object-cover"
+          className="size-full  object-cover"
         />
       ) : (
         initialsOf(profileName)
