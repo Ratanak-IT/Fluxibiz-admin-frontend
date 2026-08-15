@@ -10,8 +10,6 @@ import {
   Trash2,
   Building2,
   Globe,
-  Server,
-  Shield,
 } from "lucide-react";
 import { useAdminNotifications } from "@/lib/hook/useAdminNotifications";
 import { formatFullDateTime, formatRelativeTime } from "@/lib/dateUtils";
@@ -48,16 +46,10 @@ export function NotificationBell() {
   );
 
   const getCategoryIcon = (category: NotificationCategory) => {
-    switch (category) {
-      case "BUSINESS":
-        return <Building2 className="h-3.5 w-3.5 text-primary" />;
-      case "CHANNEL":
-        return <Globe className="h-3.5 w-3.5 text-primary" />;
-      case "SECURITY":
-        return <Shield className="h-3.5 w-3.5 text-primary" />;
-      default:
-        return <Server className="h-3.5 w-3.5 text-primary" />;
+    if (category === "BUSINESS") {
+      return <Building2 className="h-3.5 w-3.5 text-primary" />;
     }
+    return <Globe className="h-3.5 w-3.5 text-primary" />;
   };
 
   return (
@@ -83,7 +75,7 @@ export function NotificationBell() {
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border px-4 py-3 bg-muted/20">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
+              {/* <Sparkles className="h-4 w-4 text-primary" /> */}
               <h3 className="text-sm font-bold text-foreground">Notifications</h3>
               {unreadCount > 0 && (
                 <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
@@ -120,7 +112,7 @@ export function NotificationBell() {
 
           {/* Category Tabs */}
           <div className="flex items-center gap-1 border-b border-border bg-muted/10 p-1.5 overflow-x-auto text-xs">
-            {(["ALL", "BUSINESS", "CHANNEL", "SECURITY", "SYSTEM"] as const).map((cat) => (
+            {(["ALL", "BUSINESS", "CHANNEL"] as const).map((cat) => (
               <button
                 key={cat}
                 type="button"
