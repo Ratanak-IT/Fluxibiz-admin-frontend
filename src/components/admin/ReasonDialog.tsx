@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { ActionButton } from "@/components/ui-kit/Button";
 
 
@@ -39,10 +40,20 @@ export function ReasonDialog({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="w-full text-left rounded-2xl border border-border bg-card p-6 shadow-xl sm:max-w-md"
+        className="relative w-full text-left rounded-2xl border border-border bg-card p-6 shadow-xl sm:max-w-md"
         dir="ltr"
       >
-        <h2 className="text-lg font-semibold text-foreground text-left">{title}</h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-foreground text-left">{title}</h2>
+          <button
+            type="button"
+            onClick={onCancel}
+            aria-label="Close dialog"
+            className="rounded-full p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition shrink-0"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
         <p className="mt-1 text-sm text-muted-foreground text-left">{description}</p>
 
         <label className="mt-5 block text-sm font-medium text-foreground text-left" htmlFor="reason">

@@ -230,150 +230,148 @@ export default function BusinessesPage() {
         </div>
       </div>
 
-      {/* Table Container */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
-        <div className="overflow-x-auto">
-          <table className={`w-full min-w-[720px] text-left text-sm ${cols.tableClassName}`}>
-            <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
+      {/* Table Container - Scrollable area */}
+      <div className="mt-6 max-h-[calc(100dvh-15rem)] overflow-auto rounded-2xl border border-border bg-card shadow-xs">
+        <table className={`w-full min-w-[720px] text-left text-sm ${cols.tableClassName}`}>
+          <thead className="sticky top-0 z-10 bg-card border-b border-border shadow-2xs text-xs sm:text-sm font-bold text-foreground">
+            <tr>
+              {!cols.isHidden("business") && <th className="px-6 py-4 bg-card first:rounded-tl-2xl">Business</th>}
+              {!cols.isHidden("category") && <th className="px-6 py-4 bg-card">Category</th>}
+              {!cols.isHidden("status") && <th className="px-6 py-4 bg-card">Status</th>}
+              {!cols.isHidden("storefront") && <th className="px-6 py-4 bg-card">Storefront</th>}
+              {!cols.isHidden("features") && <th className="px-6 py-4 bg-card">Features</th>}
+              {!cols.isHidden("actions") && <th className="w-20 px-4 py-4 text-right bg-card last:rounded-tr-2xl">Actions</th>}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {isLoading && rows.length === 0 && <TableSkeletonRows />}
+
+            {error && !isLoading && (
+              <AdminApiErrorFallback
+                error={error}
+                colSpan={6}
+                compact
+                onRetry={loadMore}
+              />
+            )}
+
+            {!isLoading && !error && rows.length === 0 && (
               <tr>
-                {!cols.isHidden("business") && <th className="px-6 py-4">Business</th>}
-                {!cols.isHidden("category") && <th className="px-6 py-4">Category</th>}
-                {!cols.isHidden("status") && <th className="px-6 py-4">Status</th>}
-                {!cols.isHidden("storefront") && <th className="px-6 py-4">Storefront</th>}
-                {!cols.isHidden("features") && <th className="px-6 py-4">Features</th>}
-                {!cols.isHidden("actions") && <th className="w-20 px-4 py-4 text-right">Actions</th>}
+                <td colSpan={6} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                  No business matches this filter. Try clearing the search.
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {isLoading && rows.length === 0 && <TableSkeletonRows />}
+            )}
 
-              {error && !isLoading && (
-                <AdminApiErrorFallback
-                  error={error}
-                  colSpan={6}
-                  compact
-                  onRetry={loadMore}
-                />
-              )}
-
-              {!isLoading && !error && rows.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-muted-foreground">
-                    No business matches this filter. Try clearing the search.
-                  </td>
-                </tr>
-              )}
-
-              {rows.map((business) => (
-                <tr key={business.id} className="hover:bg-accent/40 transition-colors">
-                  {!cols.isHidden("business") && (
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        {business.logo || business.thumbnail ? (
-                          <img
-                            src={business.logo || business.thumbnail || ""}
-                            alt={business.name}
-                            className="h-12 w-12 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl object-cover shadow-xs bg-muted"
-                          />
-                        ) : (
-                          <div className="flex h-12 w-12 min-w-[48px] min-h-[48px] shrink-0 items-center justify-center rounded-2xl bg-primary/10 font-bold text-primary text-base shadow-xs">
-                            {business.name ? business.name.charAt(0).toUpperCase() : "B"}
-                          </div>
-                        )}
-                        <div>
-                          <Link
-                            href={`/businesses/${business.id}`}
-                            className="font-semibold text-foreground hover:text-primary transition-colors text-sm"
-                          >
-                            {business.name}
-                          </Link>
-                          <span className="block text-xs text-muted-foreground font-mono mt-0.5">
-                            /{business.slug}
-                          </span>
+            {rows.map((business) => (
+              <tr key={business.id} className="hover:bg-accent/40 transition-colors">
+                {!cols.isHidden("business") && (
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      {business.logo || business.thumbnail ? (
+                        <img
+                          src={business.logo || business.thumbnail || ""}
+                          alt={business.name}
+                          className="h-12 w-12 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl object-cover shadow-xs bg-muted"
+                        />
+                      ) : (
+                        <div className="flex h-12 w-12 min-w-[48px] min-h-[48px] shrink-0 items-center justify-center rounded-2xl bg-primary/10 font-bold text-primary text-base shadow-xs">
+                          {business.name ? business.name.charAt(0).toUpperCase() : "B"}
                         </div>
-                      </div>
-                    </td>
-                  )}
-
-                  {!cols.isHidden("category") && (
-                    <td className="px-6 py-4 text-sm text-muted-foreground font-medium">
-                      {business.category?.name ?? "—"}
-                    </td>
-                  )}
-
-                  {!cols.isHidden("status") && (
-                    <td className="px-6 py-4">
-                      <StatusPill status={business.status} />
-                    </td>
-                  )}
-
-                  {!cols.isHidden("storefront") && (
-                    <td className="px-6 py-4">
-                      <Flag
-                        on={business.isListing && !business.isClosed}
-                        onLabel="Listed"
-                        offLabel="Hidden"
-                      />
-                    </td>
-                  )}
-
-                  {!cols.isHidden("features") && (
-                    <td className="px-6 py-4">
-                      <Flag
-                        on={business.isEnabled}
-                        onLabel="Enabled"
-                        offLabel="Disabled"
-                      />
-                    </td>
-                  )}
-
-                  {!cols.isHidden("actions") && (
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          type="button"
-                          title="Quick Inspect"
-                          onClick={() => setInspectedBusiness(business)}
-                          className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-primary"
+                      )}
+                      <div>
+                        <Link
+                          href={`/businesses/${business.id}`}
+                          className="font-semibold text-foreground hover:text-primary transition-colors text-sm"
                         >
-                          <Eye className="size-4" />
-                        </button>
-                        <BusinessRowActions business={business} />
+                          {business.name}
+                        </Link>
+                        <span className="block text-xs text-muted-foreground font-mono mt-0.5">
+                          /{business.slug}
+                        </span>
                       </div>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </div>
+                  </td>
+                )}
+
+                {!cols.isHidden("category") && (
+                  <td className="px-6 py-4 text-sm text-muted-foreground font-medium">
+                    {business.category?.name ?? "—"}
+                  </td>
+                )}
+
+                {!cols.isHidden("status") && (
+                  <td className="px-6 py-4">
+                    <StatusPill status={business.status} />
+                  </td>
+                )}
+
+                {!cols.isHidden("storefront") && (
+                  <td className="px-6 py-4">
+                    <Flag
+                      on={business.isListing && !business.isClosed}
+                      onLabel="Listed"
+                      offLabel="Hidden"
+                    />
+                  </td>
+                )}
+
+                {!cols.isHidden("features") && (
+                  <td className="px-6 py-4">
+                    <Flag
+                      on={business.isEnabled}
+                      onLabel="Enabled"
+                      offLabel="Disabled"
+                    />
+                  </td>
+                )}
+
+                {!cols.isHidden("actions") && (
+                  <td className="px-4 py-4 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        title="Quick Inspect"
+                        onClick={() => setInspectedBusiness(business)}
+                        className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-primary"
+                      >
+                        <Eye className="size-4" />
+                      </button>
+                      <BusinessRowActions business={business} />
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Infinite Scroll Footer inside table scroll area */}
+        <div ref={sentinelRef} className="flex flex-col items-center gap-3 py-6 text-sm">
+          {isFetching && !isLoading && (
+            <span className="text-muted-foreground font-medium text-xs">
+              Loading more businesses...
+            </span>
+          )}
+
+          {!isFetching && hasMore && (
+            <button
+              type="button"
+              onClick={loadMore}
+              className="rounded-full border border-border bg-card px-5 py-2 text-xs font-semibold text-foreground transition hover:bg-accent"
+            >
+              Load more businesses
+            </button>
+          )}
+
+          {data && rows.length > 0 && (
+            <span className="text-muted-foreground text-xs">
+              Showing {rows.length}
+              {data.totalElements >= 0 ? ` of ${data.totalElements}` : ""} businesses
+              {!hasMore && !isFetching ? " · End of list" : ""}
+            </span>
+          )}
         </div>
-      </div>
-
-      {/* Infinite Scroll Footer */}
-      <div ref={sentinelRef} className="mt-5 flex flex-col items-center gap-3 py-6 text-sm">
-        {isFetching && !isLoading && (
-          <span className="text-muted-foreground font-medium text-xs">
-            Loading more businesses...
-          </span>
-        )}
-
-        {!isFetching && hasMore && (
-          <button
-            type="button"
-            onClick={loadMore}
-            className="rounded-full border border-border bg-card px-5 py-2 text-xs font-semibold text-foreground transition hover:bg-accent"
-          >
-            Load more businesses
-          </button>
-        )}
-
-        {data && rows.length > 0 && (
-          <span className="text-muted-foreground text-xs">
-            Showing {rows.length}
-            {data.totalElements >= 0 ? ` of ${data.totalElements}` : ""} businesses
-            {!hasMore && !isFetching ? " · End of list" : ""}
-          </span>
-        )}
       </div>
 
       {/* Inspect Slide-Over Drawer */}

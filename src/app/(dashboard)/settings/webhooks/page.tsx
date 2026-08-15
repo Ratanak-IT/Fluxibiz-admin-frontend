@@ -171,20 +171,19 @@ export default function WebhooksPage() {
         </select>
       </div>
 
-      {/* Table Layout */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
-              <tr>
-                <th scope="col" className="px-4 py-3.5 sm:px-6">Webhook Name</th>
-                <th scope="col" className="px-4 py-3.5 sm:px-6">Provider</th>
-                <th scope="col" className="px-4 py-3.5 sm:px-6">Endpoint URL</th>
-                <th scope="col" className="px-4 py-3.5 sm:px-6">Success Rate</th>
-                <th scope="col" className="px-4 py-3.5 sm:px-6">Latency</th>
-                <th scope="col" className="px-4 py-3.5 text-right sm:px-6">Actions</th>
-              </tr>
-            </thead>
+      {/* Table Layout - Scrollable area */}
+      <div className="mt-6 max-h-[calc(100dvh-17rem)] overflow-auto rounded-2xl border border-border bg-card shadow-xs">
+        <table className="w-full text-left text-sm">
+          <thead className="sticky top-0 z-10 bg-card border-b border-border shadow-2xs text-xs sm:text-sm font-bold text-foreground">
+            <tr>
+              <th scope="col" className="px-4 py-3.5 sm:px-6 bg-card first:rounded-tl-2xl">Webhook Name</th>
+              <th scope="col" className="px-4 py-3.5 sm:px-6 bg-card">Provider</th>
+              <th scope="col" className="px-4 py-3.5 sm:px-6 bg-card">Endpoint URL</th>
+              <th scope="col" className="px-4 py-3.5 sm:px-6 bg-card">Success Rate</th>
+              <th scope="col" className="px-4 py-3.5 sm:px-6 bg-card">Latency</th>
+              <th scope="col" className="px-4 py-3.5 text-right sm:px-6 bg-card last:rounded-tr-2xl">Actions</th>
+            </tr>
+          </thead>
             <tbody className="divide-y divide-border text-sm">
               {filtered.map((item) => (
                 <tr key={item.id} className="transition hover:bg-accent/40">
@@ -211,7 +210,6 @@ export default function WebhooksPage() {
               ))}
             </tbody>
           </table>
-        </div>
       </div>
     </div>
   );

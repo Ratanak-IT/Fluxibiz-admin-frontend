@@ -113,80 +113,79 @@ export default function UnitsPage() {
         </div>
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
-        <div className="overflow-x-auto">
-          <table className={`w-full text-left text-sm ${cols.tableClassName}`}>
-            <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
+      {/* Table Container - Scrollable area */}
+      <div className="mt-6 max-h-[calc(100dvh-15rem)] overflow-auto rounded-2xl border border-border bg-card shadow-xs">
+        <table className={`w-full text-left text-sm ${cols.tableClassName}`}>
+          <thead className="sticky top-0 z-10 bg-card border-b border-border shadow-2xs text-xs sm:text-sm font-bold text-foreground">
+            <tr>
+              {!cols.isHidden("name") && <th className="px-4 py-3 sm:px-6 sm:py-4 bg-card first:rounded-tl-2xl">Name</th>}
+              {!cols.isHidden("slug") && <th className="px-4 py-3 sm:px-6 sm:py-4 bg-card">Slug / Code</th>}
+              {!cols.isHidden("note") && <th className="px-4 py-3 sm:px-6 sm:py-4 bg-card">Note</th>}
+              {!cols.isHidden("actions") && <th className="w-20 px-3 py-3 sm:w-24 sm:px-4 sm:py-4 text-right bg-card last:rounded-tr-2xl">Actions</th>}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border text-sm">
+            {isLoading && (
+              <AdminLoadingState label="Loading unit measures..." compact colSpan={4} />
+            )}
+
+            {error && !isLoading && (
+              <AdminApiErrorFallback error={error} compact colSpan={4} />
+            )}
+
+            {!isLoading && !error && visibleUnits.length === 0 && (
               <tr>
-                {!cols.isHidden("name") && <th className="px-4 py-3 sm:px-6 sm:py-4">Name</th>}
-                {!cols.isHidden("slug") && <th className="px-4 py-3 sm:px-6 sm:py-4">Slug / Code</th>}
-                {!cols.isHidden("note") && <th className="px-4 py-3 sm:px-6 sm:py-4">Note</th>}
-                {!cols.isHidden("actions") && <th className="w-20 px-3 py-3 sm:w-24 sm:px-4 sm:py-4 text-right">Actions</th>}
+                <td colSpan={4} className="px-4 py-12 text-center text-muted-foreground sm:px-6 sm:py-14">
+                  {keyword ? "No unit matches that search." : "No unit yet. Add the first one."}
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-border text-sm">
-              {isLoading && (
-                <AdminLoadingState label="Loading unit measures..." compact colSpan={4} />
-              )}
+            )}
 
-              {error && !isLoading && (
-                <AdminApiErrorFallback error={error} compact colSpan={4} />
-              )}
-
-              {!isLoading && !error && visibleUnits.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="px-4 py-12 text-center text-muted-foreground sm:px-6 sm:py-14">
-                    {keyword ? "No unit matches that search." : "No unit yet. Add the first one."}
+            {visibleUnits.map((unit: UnitResponse) => (
+              <tr key={unit.id} className="transition hover:bg-accent/40">
+                {!cols.isHidden("name") && (
+                  <td className="px-4 py-3 font-semibold text-foreground sm:px-6 sm:py-4">
+                    {unit.name}
                   </td>
-                </tr>
-              )}
-
-              {visibleUnits.map((unit: UnitResponse) => (
-                <tr key={unit.id} className="transition hover:bg-accent/40">
-                  {!cols.isHidden("name") && (
-                    <td className="px-4 py-3 font-semibold text-foreground sm:px-6 sm:py-4">
-                      {unit.name}
-                    </td>
-                  )}
-                  {!cols.isHidden("slug") && (
-                    <td className="px-4 py-3 text-muted-foreground font-mono text-xs sm:px-6 sm:py-4">
-                      /{unit.slug}
-                    </td>
-                  )}
-                  {!cols.isHidden("note") && (
-                    <td className="px-4 py-3 text-muted-foreground sm:px-6 sm:py-4">
-                      {unit.note || "—"}
-                    </td>
-                  )}
-                  {!cols.isHidden("actions") && (
-                    <td className="px-3 py-3 sm:px-4 sm:py-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          type="button"
-                          onClick={() => setDialog(unit)}
-                          aria-label={`Edit ${unit.name}`}
-                          title="Edit"
-                          className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-                        >
-                          <Pencil className="size-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => remove(unit)}
-                          aria-label={`Delete ${unit.name}`}
-                          title="Delete"
-                          className="rounded-full p-2 text-destructive transition hover:bg-destructive/15 hover:text-destructive"
-                        >
-                          <Trash2 className="size-4" />
-                        </button>
-                      </div>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                )}
+                {!cols.isHidden("slug") && (
+                  <td className="px-4 py-3 text-muted-foreground font-mono text-xs sm:px-6 sm:py-4">
+                    /{unit.slug}
+                  </td>
+                )}
+                {!cols.isHidden("note") && (
+                  <td className="px-4 py-3 text-muted-foreground sm:px-6 sm:py-4">
+                    {unit.note || "—"}
+                  </td>
+                )}
+                {!cols.isHidden("actions") && (
+                  <td className="px-3 py-3 sm:px-4 sm:py-4 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setDialog(unit)}
+                        aria-label={`Edit ${unit.name}`}
+                        title="Edit"
+                        className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                      >
+                        <Pencil className="size-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => remove(unit)}
+                        aria-label={`Delete ${unit.name}`}
+                        title="Delete"
+                        className="rounded-full p-2 text-destructive transition hover:bg-destructive/15 hover:text-destructive"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {dialog && (

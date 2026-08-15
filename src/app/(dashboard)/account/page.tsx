@@ -10,7 +10,9 @@ export default function AccountPage() {
         </p>
       </div>
 
-      <UserProfileForm />
+      <div className="mt-4 max-h-[calc(100dvh-11rem)] overflow-y-auto pr-1 pb-4">
+        <UserProfileForm />
+      </div>
     </div>
   );
 }

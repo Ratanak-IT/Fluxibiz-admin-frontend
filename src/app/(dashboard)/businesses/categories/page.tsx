@@ -306,7 +306,7 @@ export default function CategoriesPage() {
         </div>
       )}
 
-      <div className="mt-6 space-y-3">
+      <div className="mt-6 max-h-[calc(100dvh-14rem)] min-h-[300px] overflow-y-auto space-y-3 pr-1">
         {filteredCategories.map((parent) => {
           const parentDirectCount = categoryBusinessCountMap[parent.id] ?? 0;
           const subTotalCount = (parent.subCategories ?? []).reduce(
