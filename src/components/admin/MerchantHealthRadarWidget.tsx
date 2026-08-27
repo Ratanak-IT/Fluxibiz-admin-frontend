@@ -1,17 +1,32 @@
 "use client";
 
 import { useMemo } from "react";
-import { AlertCircle, AlertTriangle, CheckCircle2, ShieldAlert, Sparkles } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  ShieldAlert,
+  Sparkles,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useGetBusinessesQuery } from "@/features/businessManagement/businessAdminApi";
 
 export function MerchantHealthRadarWidget() {
-  const { data: businessData, isLoading } = useGetBusinessesQuery({ page: 0, size: 100 });
+  const { data: businessData, isLoading } = useGetBusinessesQuery({
+    page: 0,
+    size: 100,
+  });
 
   const businesses = businessData?.content ?? [];
 
   const healthAnalysis = useMemo(() => {
-    const atRisk: Array<{ name: string; email: string; city: string; score: number; reason: string }> = [];
+    const atRisk: Array<{
+      name: string;
+      email: string;
+      city: string;
+      score: number;
+      reason: string;
+    }> = [];
 
     businesses.forEach((b, idx) => {
       let score = 100;
@@ -45,7 +60,9 @@ export function MerchantHealthRadarWidget() {
   }, [businesses]);
 
   const handleSupport = (name: string, email: string) => {
-    toast.success(`Support & health optimization email sent to ${name} (${email})`);
+    toast.success(
+      `Support & health optimization email sent to ${name} (${email})`,
+    );
   };
 
   return (
@@ -57,16 +74,19 @@ export function MerchantHealthRadarWidget() {
             Merchant Health & Risk Status Radar
           </h2>
           <p className="mt-1 text-xs text-neutral-400 dark:text-muted-foreground">
-            Proactive health scoring flagging accounts that need platform support.
+            Proactive health scoring flagging accounts that need platform
+            support.
           </p>
         </div>
-        <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
+        <span className="inline-flex whitespace-nowrap rounded-full bg-amber-500/10 px-5 py-2 text-sm font-bold text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
           {healthAnalysis.length} Risk Alerts
         </span>
       </div>
 
       {isLoading ? (
-        <p className="mt-4 text-xs text-muted-foreground">Evaluating merchant health scores...</p>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Evaluating merchant health scores...
+        </p>
       ) : healthAnalysis.length === 0 ? (
         <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
           <CheckCircle2 className="size-4" />
@@ -80,14 +100,19 @@ export function MerchantHealthRadarWidget() {
               className="flex items-center justify-between rounded-xl border border-border bg-muted/30 p-3 text-xs"
             >
               <div>
-                <p className="font-bold text-foreground">{item.name}</p>
-                <p className="text-muted-foreground">
-                  {item.email} • {item.reason}
-                </p>
-              </div>
+  <p className="font-bold text-foreground">{item.name}</p>
+
+  <p className="text-muted-foreground">{item.email}</p>
+
+  <p className="break-words text-muted-foreground">
+    {item.reason}
+  </p>
+</div>
 
               <div className="flex items-center gap-3">
-                <span className="font-extrabold text-amber-600 dark:text-amber-400">{item.score}% Health</span>
+                <span className="shrink-0 whitespace-nowrap font-extrabold text-amber-600 dark:text-amber-400">
+                  {item.score}% Health
+                </span>
                 <button
                   type="button"
                   onClick={() => handleSupport(item.name, item.email)}
