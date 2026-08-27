@@ -17,6 +17,7 @@ import { ColumnDef, useColumnVisibility } from "@/lib/hook/useColumnVisibility";
 import { AdminApiErrorFallback } from "@/components/common/AdminApiErrorFallback";
 import { AdminLoadingState } from "@/components/common/AdminLoadingState";
 import { UnitFormDialog } from "@/components/admin/UnitFormDialog";
+import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
 
 const COLUMNS: ColumnDef[] = [
   { id: "name", label: "Name", locked: true },
@@ -29,11 +30,12 @@ export default function UnitsPage() {
   const cols = useColumnVisibility("units", COLUMNS);
   const [keyword, setKeyword] = useState("");
   const [dialog, setDialog] = useState<"new" | UnitResponse | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<UnitResponse | null>(null);
 
   const { data: units = [], isLoading, error } = useGetUnitsQuery(undefined, { pollingInterval: 5000 });
   const [createUnit, createStatus] = useCreateUnitMutation();
   const [updateUnit, updateStatus] = useUpdateUnitMutation();
-  const [deleteUnit] = useDeleteUnitMutation();
+  const [deleteUnit, deleteStatus] = useDeleteUnitMutation();
 
   const visibleUnits = useMemo(() => {
     const q = keyword.trim().toLowerCase();
@@ -65,8 +67,9 @@ export default function UnitsPage() {
     try {
       await deleteUnit(unit.id).unwrap();
       toast.success(`Unit "${unit.name}" deleted.`);
-    } catch {
-      toast.error("Failed to delete unit.");
+      setDeleteTarget(null);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to delete unit.");
     }
   };
 
@@ -172,7 +175,7 @@ export default function UnitsPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => remove(unit)}
+                        onClick={() => setDeleteTarget(unit)}
                         aria-label={`Delete ${unit.name}`}
                         title="Delete"
                         className="rounded-full p-2 text-destructive transition hover:bg-destructive/15 hover:text-destructive"
@@ -194,6 +197,21 @@ export default function UnitsPage() {
           busy={createStatus.isLoading || updateStatus.isLoading}
           onCancel={() => setDialog(null)}
           onSubmit={save}
+        />
+      )}
+
+      {deleteTarget && (
+        <DeleteConfirmDialog
+          title={`Delete ${deleteTarget.name}?`}
+          description={
+            <>
+              Are you sure you want to delete <strong className="text-foreground">{deleteTarget.name}</strong>? This
+              action cannot be undone.
+            </>
+          }
+          busy={deleteStatus.isLoading}
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={() => remove(deleteTarget)}
         />
       )}
     </div>
