@@ -57,7 +57,7 @@ function errorMessage(error: unknown): string {
 }
 
 const COLUMNS: ColumnDef[] = [
-  { id: "shop", label: "Shop" },
+  { id: "shop", label: "Shop", locked: true },
   { id: "storefront", label: "Store Menu" },
   { id: "telegram", label: "Telegram" },
   { id: "khqr", label: "KHQR" },
@@ -121,7 +121,6 @@ export default function ChannelsPage() {
     });
   }, [channels, keyword, filter]);
 
-  // Reset to showing strictly 10 items when keyword or filter changes
   useEffect(() => {
     setPage(1);
   }, [keyword, filter]);
@@ -164,8 +163,7 @@ export default function ChannelsPage() {
         trading figures.
       </p>
 
-      {/* Toolbar: Search, Filters, Column Picker all in ONE single row */}
-      <div className="mt-7 flex flex-row items-center justify-between gap-3 overflow-x-auto pb-1 flex-nowrap">
+      <div className="mt-7 flex flex-row items-center justify-between gap-3 flex-nowrap">
         <div className="relative min-w-[200px] flex-1 max-w-sm shrink-0 sm:shrink">
           <Search
             className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
@@ -184,7 +182,6 @@ export default function ChannelsPage() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0 flex-nowrap">
-          {/* Mobile dropdown filter */}
           <div className="relative sm:hidden" ref={filterRef}>
             <button
               type="button"
@@ -231,8 +228,7 @@ export default function ChannelsPage() {
             )}
           </div>
 
-          {/* Desktop/Tablet filter pills */}
-          <div className="hidden items-center gap-2 sm:flex flex-nowrap">
+          <div className="hidden items-center gap-2 overflow-x-auto pb-1 sm:flex flex-nowrap">
             {FILTERS.map((option) => (
               <button
                 key={option.value}
@@ -256,7 +252,6 @@ export default function ChannelsPage() {
         </div>
       </div>
 
-      {/* Table Container - Scrollable area */}
       <div className="mt-6 max-h-[calc(100dvh-15rem)] overflow-auto rounded-2xl border border-border bg-card shadow-xs">
         <table
           className={`w-full text-left text-sm ${cols.tableClassName}`}
@@ -265,9 +260,48 @@ export default function ChannelsPage() {
           <thead className="sticky top-0 z-10 bg-card border-b border-border shadow-2xs text-xs sm:text-sm font-bold text-foreground">
             <tr>
               {!cols.isHidden("shop") && <th className="px-6 py-4 bg-card first:rounded-tl-2xl">Shop</th>}
-              {!cols.isHidden("storefront") && <th className="px-6 py-4 bg-card">Store Menu</th>}
-              {!cols.isHidden("telegram") && <th className="px-6 py-4 bg-card">Telegram</th>}
-              {!cols.isHidden("khqr") && <th className="px-6 py-4 bg-card">KHQR</th>}
+              {!cols.isHidden("storefront") && (
+                <th className="bg-card p-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilter("storefront");
+                      setPage(0);
+                    }}
+                    className={`w-full px-6 py-4 text-left transition hover:text-primary ${filter === "storefront" ? "text-primary" : ""}`}
+                  >
+                    Store Menu
+                  </button>
+                </th>
+              )}
+              {!cols.isHidden("telegram") && (
+                <th className="bg-card p-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilter("telegram");
+                      setPage(0);
+                    }}
+                    className={`w-full px-6 py-4 text-left transition hover:text-primary ${filter === "telegram" ? "text-primary" : ""}`}
+                  >
+                    Telegram
+                  </button>
+                </th>
+              )}
+              {!cols.isHidden("khqr") && (
+                <th className="bg-card p-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilter("bakong");
+                      setPage(0);
+                    }}
+                    className={`w-full px-6 py-4 text-left transition hover:text-primary ${filter === "bakong" ? "text-primary" : ""}`}
+                  >
+                    KHQR
+                  </button>
+                </th>
+              )}
               {!cols.isHidden("registered") && <th className="px-6 py-4 bg-card last:rounded-tr-2xl">Registered</th>}
             </tr>
           </thead>
@@ -407,7 +441,6 @@ export default function ChannelsPage() {
           </tbody>
         </table>
 
-        {/* scroll sentinel + status footer */}
         <div
           ref={sentinelRef}
           className="flex flex-col items-center gap-3 py-6 text-sm"
