@@ -2,7 +2,7 @@ import "server-only";
 
 import { headers } from "next/headers";
 import { jwtDecode } from "jwt-decode";
-import { auth } from "./auth";
+import { resolveKeycloakAccessToken } from "./keycloak-token";
 import { SUPER_ADMIN_ROLE } from "@/lib/permissionCatalog";
 
 interface AccessTokenClaims {
@@ -20,19 +20,15 @@ export interface ServerIdentity {
   isSuperAdmin: boolean;
 }
 
-
 export async function getServerIdentity(): Promise<ServerIdentity | null> {
   try {
     const requestHeaders = await headers();
 
-    const tokens = await auth.api.getAccessToken({
-      headers: requestHeaders,
-      body: { providerId: "keycloak" },
-    });
+    const { accessToken } = await resolveKeycloakAccessToken(requestHeaders);
 
-    if (!tokens?.accessToken) return null;
+    if (!accessToken) return null;
 
-    const claims = jwtDecode<AccessTokenClaims>(tokens.accessToken);
+    const claims = jwtDecode<AccessTokenClaims>(accessToken);
 
     const realmRoles = claims.realm_access?.roles ?? [];
     const clientRoles = Object.values(claims.resource_access ?? {}).flatMap(
