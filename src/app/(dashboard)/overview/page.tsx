@@ -2,8 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { checkAllServices, type SystemHealthSummary } from "@/lib/healthService";
-import { Area, AreaChart as RechartsAreaChart, CartesianGrid, XAxis } from "recharts";
+import {
+  checkAllServices,
+  type SystemHealthSummary,
+} from "@/lib/healthService";
+import {
+  Area,
+  AreaChart as RechartsAreaChart,
+  CartesianGrid,
+  XAxis,
+} from "recharts";
 import {
   ArrowRight,
   Building2,
@@ -19,6 +27,10 @@ import {
   Server,
   Download,
   FileSpreadsheet,
+  Trash2,
+  PlusCircle,
+  Pencil,
+  TrendingUp,
 } from "lucide-react";
 import { exportOverviewToExcel } from "@/lib/exportReportService";
 import { ExportReportDialog } from "@/components/admin/ExportReportDialog";
@@ -50,7 +62,20 @@ function trendLabel(point: TrendCountResponse) {
 function formatTrendLabel(value: unknown) {
   if (!value) return "";
   const label = String(value);
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
   const dayMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(label);
   if (dayMatch) {
@@ -94,17 +119,37 @@ function StatCard({
   const card = (
     <div className="flex h-full min-h-[128px] flex-col justify-between rounded-2xl border border-neutral-200 bg-card p-6 transition hover:border-[#00932A]/40 dark:border-border dark:hover:border-[#00932A]/40 shadow-xs">
       <div>
-        <p className="text-sm font-medium text-neutral-500 dark:text-muted-foreground">{label}</p>
-        <p className={`mt-2 text-3xl font-semibold tabular-nums sm:text-4xl ${tone}`}>{value}</p>
+        <p className="text-sm font-medium text-neutral-500 dark:text-muted-foreground">
+          {label}
+        </p>
+        <p
+          className={`mt-2 text-3xl font-semibold tabular-nums sm:text-4xl ${tone}`}
+        >
+          {value}
+        </p>
       </div>
-      {hint && <p className="mt-2 text-xs text-neutral-400 dark:text-muted-foreground">{hint}</p>}
+      {hint && (
+        <p className="mt-2 text-xs text-neutral-400 dark:text-muted-foreground">
+          {hint}
+        </p>
+      )}
     </div>
   );
 
-  return href ? <Link href={href} className="h-full block">{card}</Link> : card;
+  return href ? (
+    <Link href={href} className="h-full block">
+      {card}
+    </Link>
+  ) : (
+    card
+  );
 }
 
-function OverviewAreaChart({ data }: { data: Array<{ label: string; value: number }> }) {
+function OverviewAreaChart({
+  data,
+}: {
+  data: Array<{ label: string; value: number }>;
+}) {
   const chartData = useMemo(() => {
     if (!data || data.length === 0) {
       return [];
@@ -115,7 +160,20 @@ function OverviewAreaChart({ data }: { data: Array<{ label: string; value: numbe
       const todayVal = p.value || 0;
       const dateObj = new Date();
       const points = [];
-      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
 
       for (let i = 6; i >= 0; i--) {
         const d = new Date(dateObj);
@@ -123,7 +181,10 @@ function OverviewAreaChart({ data }: { data: Array<{ label: string; value: numbe
         const dayNum = d.getDate();
         const labelStr = `${dayNum} ${monthNames[d.getMonth()]}`;
 
-        const val = i === 0 ? todayVal : Math.max(1, Math.round(todayVal * (0.35 + (6 - i) * 0.1)));
+        const val =
+          i === 0
+            ? todayVal
+            : Math.max(1, Math.round(todayVal * (0.35 + (6 - i) * 0.1)));
         points.push({
           label: labelStr,
           signups: val,
@@ -155,10 +216,7 @@ function OverviewAreaChart({ data }: { data: Array<{ label: string; value: numbe
 
   return (
     <div className="mt-6 h-[280px] w-full">
-      <ChartContainer
-        config={chartConfig}
-        className="h-[280px] w-full"
-      >
+      <ChartContainer config={chartConfig} className="h-[280px] w-full">
         <RechartsAreaChart
           accessibilityLayer
           data={chartData}
@@ -170,7 +228,11 @@ function OverviewAreaChart({ data }: { data: Array<{ label: string; value: numbe
               <stop offset="100%" stopColor="#FEB90D" stopOpacity={0.01} />
             </linearGradient>
           </defs>
-          <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border/30" />
+          <CartesianGrid
+            vertical={false}
+            strokeDasharray="3 3"
+            className="stroke-border/30"
+          />
           <XAxis
             dataKey="label"
             tickLine={false}
@@ -180,7 +242,11 @@ function OverviewAreaChart({ data }: { data: Array<{ label: string; value: numbe
             tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
           />
           <ChartTooltip
-            cursor={{ stroke: "#FEB90D", strokeWidth: 1.5, strokeDasharray: "4 4" }}
+            cursor={{
+              stroke: "#FEB90D",
+              strokeWidth: 1.5,
+              strokeDasharray: "4 4",
+            }}
             content={
               <ChartTooltipContent
                 indicator="dot"
@@ -272,36 +338,53 @@ function ChannelAdoptionWidget() {
       </div>
 
       {isLoading ? (
-        <p className="mt-4 text-xs text-muted-foreground">Calculating adoption rates...</p>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Calculating adoption rates...
+        </p>
       ) : (
         <div className="mt-5 space-y-4">
           <div>
             <div className="flex justify-between text-xs font-medium">
               <span>Public Storefront</span>
-              <span className="tabular-nums text-muted-foreground">{storefronts} / {channels.length} ({sfPercent}%)</span>
+              <span className="tabular-nums text-muted-foreground">
+                {storefronts} / {channels.length} ({sfPercent}%)
+              </span>
             </div>
             <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
-              <div className="h-full rounded-full bg-[#00932A] transition-all duration-500" style={{ width: `${sfPercent}%` }} />
+              <div
+                className="h-full rounded-full bg-[#00932A] transition-all duration-500"
+                style={{ width: `${sfPercent}%` }}
+              />
             </div>
           </div>
 
           <div>
             <div className="flex justify-between text-xs font-medium">
               <span>Telegram Bot Connection</span>
-              <span className="tabular-nums text-muted-foreground">{telegram} / {channels.length} ({tgPercent}%)</span>
+              <span className="tabular-nums text-muted-foreground">
+                {telegram} / {channels.length} ({tgPercent}%)
+              </span>
             </div>
             <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
-              <div className="h-full rounded-full bg-[#FEB90D] transition-all duration-500" style={{ width: `${tgPercent}%` }} />
+              <div
+                className="h-full rounded-full bg-[#FEB90D] transition-all duration-500"
+                style={{ width: `${tgPercent}%` }}
+              />
             </div>
           </div>
 
           <div>
             <div className="flex justify-between text-xs font-medium">
               <span>Bakong KHQR Payment</span>
-              <span className="tabular-nums text-muted-foreground">{bakong} / {channels.length} ({bkPercent}%)</span>
+              <span className="tabular-nums text-muted-foreground">
+                {bakong} / {channels.length} ({bkPercent}%)
+              </span>
             </div>
             <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
-              <div className="h-full rounded-full bg-[#D14341] transition-all duration-500" style={{ width: `${bkPercent}%` }} />
+              <div
+                className="h-full rounded-full bg-[#D14341] transition-all duration-500"
+                style={{ width: `${bkPercent}%` }}
+              />
             </div>
           </div>
         </div>
@@ -335,19 +418,28 @@ function SystemStatusWidget() {
           href="/logs/health"
           className="flex items-center gap-1 text-xs font-medium text-[#00932A] bg-[#00932A]/10 dark:bg-[#00932A]/20 px-2.5 py-1 rounded-full transition hover:opacity-80"
         >
-          <span>{health?.overallStatus === "down" ? "Degraded" : "All Operational"}</span>
+          <span>
+            {health?.overallStatus === "down" ? "Degraded" : "All Operational"}
+          </span>
           <ArrowRight className="size-3" />
         </Link>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {services.map((s) => (
-          <div key={s.name} className="flex items-center justify-between gap-2 rounded-xl border border-border bg-background p-3 text-xs">
+          <div
+            key={s.name}
+            className="flex items-center justify-between gap-2 rounded-xl border border-border bg-background p-3 text-xs"
+          >
             <div className="flex items-center gap-2 min-w-0">
-              <span className={`size-2.5 rounded-full ${s.status === "operational" ? "bg-[#00932A]" : s.status === "degraded" ? "bg-[#FEB90D]" : "bg-[#D14341]"} animate-pulse shrink-0`} />
+              <span
+                className={`size-2.5 rounded-full ${s.status === "operational" ? "bg-[#00932A]" : s.status === "degraded" ? "bg-[#FEB90D]" : "bg-[#D14341]"} animate-pulse shrink-0`}
+              />
               <p className="font-medium text-foreground truncate">{s.name}</p>
             </div>
-            <span className="text-[11px] font-semibold text-muted-foreground shrink-0">{s.latencyMs} ms</span>
+            <span className="text-[11px] font-semibold text-muted-foreground shrink-0">
+              {s.latencyMs} ms
+            </span>
           </div>
         ))}
       </div>
@@ -368,21 +460,25 @@ function RecentBusinessesWidget() {
             Recently Registered Shops
           </h2>
           <p className="mt-1 text-xs text-neutral-400 dark:text-muted-foreground">
-            Latest businesses created on the platform.
+            Latest created businesses
           </p>
         </div>
         <Link
           href="/businesses"
-          className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+          className="flex items-center gap-1 whitespace-nowrap text-xs font-medium text-primary hover:underline"
         >
           View all <ArrowRight className="size-3" />
         </Link>
       </div>
 
       {isLoading ? (
-        <p className="mt-4 text-xs text-muted-foreground">Loading recent shops...</p>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Loading recent shops...
+        </p>
       ) : rows.length === 0 ? (
-        <p className="mt-4 text-xs text-muted-foreground">No businesses registered yet.</p>
+        <p className="mt-4 text-xs text-muted-foreground">
+          No businesses registered yet.
+        </p>
       ) : (
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-left text-sm">
@@ -397,10 +493,15 @@ function RecentBusinessesWidget() {
               {rows.map((biz) => (
                 <tr key={biz.id} className="hover:bg-muted/40 transition">
                   <td className="py-2.5 font-medium">
-                    <Link href={`/businesses/${biz.id}`} className="hover:text-primary">
+                    <Link
+                      href={`/businesses/${biz.id}`}
+                      className="hover:text-primary"
+                    >
                       {biz.name}
                     </Link>
-                    <span className="block text-xs text-muted-foreground">/{biz.slug}</span>
+                    <span className="block text-xs text-muted-foreground">
+                      /{biz.slug}
+                    </span>
                   </td>
                   <td className="py-2.5 text-xs text-muted-foreground">
                     {biz.category?.name ?? "—"}
@@ -422,8 +523,10 @@ function PlatformFeaturesWidget() {
   const { data: features = [], isLoading } = useGetPlatformFeaturesQuery();
 
   const getIcon = (feat: string) => {
-    if (feat === "STOREFRONT") return <Globe className="size-4 text-[#00932A]" />;
-    if (feat === "TELEGRAM_BOT") return <Bot className="size-4 text-[#FEB90D]" />;
+    if (feat === "STOREFRONT")
+      return <Globe className="size-4 text-[#00932A]" />;
+    if (feat === "TELEGRAM_BOT")
+      return <Bot className="size-4 text-[#FEB90D]" />;
     return <QrCode className="size-4 text-[#D14341]" />;
   };
 
@@ -436,7 +539,7 @@ function PlatformFeaturesWidget() {
             Platform Feature Status
           </h2>
           <p className="mt-1 text-xs text-neutral-400 dark:text-muted-foreground">
-            Global feature flags and channel availability.
+            Global feature flags and channel
           </p>
         </div>
         <Link
@@ -448,9 +551,13 @@ function PlatformFeaturesWidget() {
       </div>
 
       {isLoading ? (
-        <p className="mt-4 text-xs text-muted-foreground">Loading platform features...</p>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Loading platform features...
+        </p>
       ) : features.length === 0 ? (
-        <p className="mt-4 text-xs text-muted-foreground">No global features configured.</p>
+        <p className="mt-4 text-xs text-muted-foreground">
+          No global features configured.
+        </p>
       ) : (
         <ul className="mt-4 space-y-3">
           {features.map((feat) => (
@@ -461,15 +568,20 @@ function PlatformFeaturesWidget() {
               <div className="flex items-center gap-2.5">
                 {getIcon(feat.feature)}
                 <div>
-                  <span className="font-medium text-foreground">{feat.label}</span>
-                  <p className="text-xs text-muted-foreground">{feat.description}</p>
+                  <span className="font-medium text-foreground">
+                    {feat.label}
+                  </span>
+                  <p className="text-xs text-muted-foreground">
+                    {feat.description}
+                  </p>
                 </div>
               </div>
               <span
-                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${feat.enabled
+                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                  feat.enabled
                     ? "bg-[#00932A]/10 text-[#00932A] dark:bg-[#00932A]/20 dark:text-[#00932A]"
                     : "bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
-                  }`}
+                }`}
               >
                 {feat.enabled ? "Active" : "Disabled"}
               </span>
@@ -479,6 +591,28 @@ function PlatformFeaturesWidget() {
       )}
     </section>
   );
+}
+
+function activityMeta(actionType: string) {
+  if (actionType.includes("DELETED")) {
+    return {
+      icon: Trash2,
+      badgeClass: "bg-destructive/10 text-destructive",
+      barClass: "bg-destructive",
+    };
+  }
+  if (actionType.includes("CREATED")) {
+    return {
+      icon: PlusCircle,
+      badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+      barClass: "bg-emerald-500",
+    };
+  }
+  return {
+    icon: Pencil,
+    badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    barClass: "bg-amber-500",
+  };
 }
 
 function RecentAuditWidget() {
@@ -494,39 +628,57 @@ function RecentAuditWidget() {
             Recent Admin Activity
           </h2>
           <p className="mt-1 text-xs text-neutral-400 dark:text-muted-foreground">
-            Audit logs of platform administration actions.
+            Audit logs of administration actions
           </p>
         </div>
         <Link
           href="/audit-logs"
-          className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+          className="flex items-center gap-1 whitespace-nowrap text-xs font-medium text-primary hover:underline"
         >
           View all <ArrowRight className="size-3" />
         </Link>
       </div>
 
       {isLoading ? (
-        <p className="mt-4 text-xs text-muted-foreground">Loading audit logs...</p>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Loading audit logs...
+        </p>
       ) : logs.length === 0 ? (
-        <p className="mt-4 text-xs text-muted-foreground">No recent audit activity.</p>
+        <p className="mt-4 text-xs text-muted-foreground">
+          No recent audit activity.
+        </p>
       ) : (
         <ul className="mt-4 divide-y divide-border">
-          {logs.map((log) => (
-            <li key={log.id} className="py-2.5 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-foreground">
-                  {log.actionType.replace(/_/g, " ")}
-                </span>
-                <span className="text-muted-foreground">
-                  {new Date(log.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-              <p className="mt-0.5 text-muted-foreground">
-                By <span className="text-foreground">{log.actorUsername}</span>
-                {log.targetLabel ? ` on ${log.targetLabel}` : ""}
-              </p>
-            </li>
-          ))}
+          {logs.map((log) => {
+            const { icon: Icon, badgeClass, barClass } = activityMeta(log.actionType);
+
+            return (
+              <li key={log.id} className="flex gap-3 py-2.5 text-xs">
+                <span className={`mt-0.5 h-auto w-1 shrink-0 rounded-full ${barClass}`} aria-hidden />
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 font-semibold ${badgeClass}`}>
+                      <Icon className="size-3" />
+                      {log.actionType.replace(/_/g, " ")}
+                    </span>
+                    <span className="shrink-0 text-muted-foreground">
+                      {new Date(log.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-muted-foreground">
+                    By <span className="font-semibold text-foreground">{log.actorUsername}</span>
+                    {log.targetLabel ? (
+                      <>
+                        {" on "}
+                        <span className="font-semibold text-foreground">{log.targetLabel}</span>
+                      </>
+                    ) : null}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>
@@ -543,7 +695,10 @@ function OverviewSkeleton() {
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex h-full min-h-[128px] flex-col justify-between rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border shadow-xs">
+            <div
+              key={i}
+              className="flex h-full min-h-[128px] flex-col justify-between rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border shadow-xs"
+            >
               <div>
                 <div className="h-4 w-32 rounded bg-neutral-200 dark:bg-neutral-800" />
                 <div className="mt-2 h-9 w-16 rounded bg-neutral-200 dark:bg-neutral-800" />
@@ -561,7 +716,10 @@ function OverviewSkeleton() {
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex h-full min-h-[128px] flex-col justify-between rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border shadow-xs">
+            <div
+              key={i}
+              className="flex h-full min-h-[128px] flex-col justify-between rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border shadow-xs"
+            >
               <div>
                 <div className="h-4 w-32 rounded bg-neutral-200 dark:bg-neutral-800" />
                 <div className="mt-2 h-9 w-16 rounded bg-neutral-200 dark:bg-neutral-800" />
@@ -622,7 +780,10 @@ function OverviewSkeleton() {
       {/* Regional Density & Risk Radar Skeletons */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {[...Array(2)].map((_, i) => (
-          <section key={i} className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border">
+          <section
+            key={i}
+            className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border"
+          >
             <div className="h-5 w-48 rounded bg-neutral-200 dark:bg-neutral-800" />
             <div className="mt-1 h-3.5 w-72 rounded bg-neutral-200/70 dark:bg-neutral-800/70" />
             <div className="mt-5 h-48 rounded-xl bg-neutral-100 dark:bg-neutral-900/50" />
@@ -633,7 +794,10 @@ function OverviewSkeleton() {
       {/* Management Widgets Skeletons */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {[...Array(3)].map((_, i) => (
-          <section key={i} className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border">
+          <section
+            key={i}
+            className="rounded-2xl border border-neutral-200 bg-card p-6 dark:border-border"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <div className="h-5 w-40 rounded bg-neutral-200 dark:bg-neutral-800" />
@@ -643,7 +807,10 @@ function OverviewSkeleton() {
             </div>
             <div className="mt-5 space-y-3">
               {[...Array(4)].map((_, j) => (
-                <div key={j} className="h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900/50" />
+                <div
+                  key={j}
+                  className="h-10 rounded-xl bg-neutral-100 dark:bg-neutral-900/50"
+                />
               ))}
             </div>
           </section>
@@ -670,7 +837,8 @@ export default function OverviewPage() {
             Platform Overview
           </h1>
           <p className="mt-1.5 text-sm text-neutral-500 sm:text-[15px] dark:text-muted-foreground">
-            Comprehensive platform health, registration metrics, feature controls, and administrative activity.
+            Comprehensive platform health, registration metrics, feature
+            controls, and administrative activity.
           </p>
         </div>
 
@@ -692,111 +860,134 @@ export default function OverviewPage() {
 
         {error && (
           <p className="mt-8 text-sm text-red-600 dark:text-destructive">
-            Request failed{"status" in error ? ` with status ${error.status}` : ""}.
+            Request failed
+            {"status" in error ? ` with status ${error.status}` : ""}.
           </p>
         )}
 
         {data && (
           <>
-          {/* Key Platform Stats */}
-          <h2 className="mt-8 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-[var(--muted-foreground)]">
-            Platform Key Metrics
-          </h2>
-          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard
-              label="Total Businesses"
-              value={data.totalBusinesses}
-              hint="Registered on platform"
-              accent="green"
-              href="/businesses"
-            />
-            <StatCard
-              label="New Signups (30d)"
-              value={data.newBusinessesLast30Days}
-              hint="Newly registered shops"
-              accent="green"
-              href="/businesses"
-            />
-            <StatCard
-              label="Live Storefronts"
-              value={data.storefrontsPublished}
-              hint="Published to directory"
-              accent="amber"
-              href="/channels"
-            />
-            <StatCard
-              label="Telegram Bots"
-              value={data.telegramBotsConnected}
-              hint="Connected and active"
-              accent="green"
-              href="/channels"
-            />
-          </div>
-
-          {/* Account Status Overview */}
-          <h2 className="mt-10 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-muted-foreground">
-            Shop Status Breakdown
-          </h2>
-          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard label="Active Shops" value={data.activeBusinesses} hint="Operating normally" accent="green" href="/businesses" />
-            <StatCard
-              label="Suspended Shops"
-              value={data.suspendedBusinesses}
-              hint="Suspended by admin"
-              accent="amber"
-              href="/businesses"
-            />
-            <StatCard label="Closed Shops" value={data.closedBusinesses} hint="Closed by merchant" accent="red" href="/businesses" />
-            <StatCard label="Deleted Accounts" value={data.deletedBusinesses} hint="Marked as deleted" accent="red" href="/businesses" />
-          </div>
-
-          {/* Analytics Charts & Adoption Rates */}
-          <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-5">
-            <section className="rounded-2xl border border-neutral-200 bg-card p-6 lg:col-span-3 dark:border-border dark:text-card-foreground">
-              <h2 className="text-sm font-semibold text-neutral-900 dark:text-foreground">
-                Sign ups by day
-              </h2>
-              <p className="mt-1 text-xs text-neutral-400 dark:text-muted-foreground">
-                New businesses registered across the platform each day.
-              </p>
-              <OverviewAreaChart
-                data={(data.businessGrowth ?? []).map((point: TrendCountResponse) => ({
-                  label: trendLabel(point),
-                  value: point.count,
-                }))}
+            {/* Key Platform Stats */}
+            <h2 className="mt-8 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-[var(--muted-foreground)]">
+              Platform Key Metrics
+            </h2>
+            <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              <StatCard
+                label="Total Businesses"
+                value={data.totalBusinesses}
+                hint="Registered on platform"
+                accent="green"
+                href="/businesses"
               />
-            </section>
+              <StatCard
+                label="New Signups (30d)"
+                value={data.newBusinessesLast30Days}
+                hint="Newly registered shops"
+                accent="green"
+                href="/businesses"
+              />
+              <StatCard
+                label="Live Storefronts"
+                value={data.storefrontsPublished}
+                hint="Published to directory"
+                accent="amber"
+                href="/channels"
+              />
+              <StatCard
+                label="Telegram Bots"
+                value={data.telegramBotsConnected}
+                hint="Connected and active"
+                accent="green"
+                href="/channels"
+              />
+            </div>
 
-            <section className="rounded-2xl border border-neutral-200 bg-card p-6 lg:col-span-2 dark:border-border dark:text-card-foreground">
-              <h2 className="text-sm font-semibold text-neutral-900 dark:text-foreground">
-                Shops by Category
-              </h2>
-              <p className="mt-1 text-xs text-neutral-400 dark:text-muted-foreground">
-                Distribution of shops across business categories.
-              </p>
-              <CategoryBreakdown data={data.businessesByCategory ?? []} />
-            </section>
-          </div>
+            {/* Account Status Overview */}
+            <h2 className="mt-10 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-muted-foreground">
+              Shop Status Breakdown
+            </h2>
+            <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              <StatCard
+                label="Active Shops"
+                value={data.activeBusinesses}
+                hint="Operating normally"
+                accent="green"
+                href="/businesses"
+              />
+              <StatCard
+                label="Suspended Shops"
+                value={data.suspendedBusinesses}
+                hint="Suspended by admin"
+                accent="amber"
+                href="/businesses"
+              />
+              <StatCard
+                label="Closed Shops"
+                value={data.closedBusinesses}
+                hint="Closed by merchant"
+                accent="red"
+                href="/businesses"
+              />
+              <StatCard
+                label="Deleted Accounts"
+                value={data.deletedBusinesses}
+                hint="Marked as deleted"
+                accent="red"
+                href="/businesses"
+              />
+            </div>
 
-          {/* Channel Integration Rates */}
-          <div className="mt-6">
-            <ChannelAdoptionWidget />
-          </div>
+            {/* Analytics Charts & Adoption Rates */}
+            <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-5">
+              <section className="rounded-2xl border border-neutral-200 bg-card p-6 lg:col-span-3 dark:border-border dark:text-card-foreground">
+                <h2 className="flex items-center gap-2 text-sm font-semibold text-neutral-900 dark:text-foreground">
+                  <TrendingUp className="size-4 text-primary" />
+                  Sign ups by day
+                </h2>
+                <p className="mt-1 text-xs text-neutral-400 dark:text-muted-foreground">
+                  New businesses registered across the platform each day.
+                </p>
+                <OverviewAreaChart
+                  data={(data.businessGrowth ?? []).map(
+                    (point: TrendCountResponse) => ({
+                      label: trendLabel(point),
+                      value: point.count,
+                    }),
+                  )}
+                />
+              </section>
 
-          {/* Regional Density & Risk Radar Widgets */}
-          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <RegionalGrowthWidget />
-            <MerchantHealthRadarWidget />
-          </div>
+              <section className="rounded-2xl border border-neutral-200 bg-card p-6 lg:col-span-2 dark:border-border dark:text-card-foreground">
+                <h2 className="flex items-center gap-2 text-sm font-semibold text-neutral-900 dark:text-foreground">
+                  <Layers className="size-4 text-primary" />
+                  Shops by Category
+                </h2>
+                <p className="mt-1 text-xs text-neutral-400 dark:text-muted-foreground">
+                  Distribution of shops across business categories.
+                </p>
+                <CategoryBreakdown data={data.businessesByCategory ?? []} />
+              </section>
+            </div>
 
-          {/* Management Widgets */}
-          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <RecentBusinessesWidget />
-            <PlatformFeaturesWidget />
-            <RecentAuditWidget />
-          </div>
-        </>
-      )}
+            {/* Channel Integration Rates */}
+            <div className="mt-8">
+              <ChannelAdoptionWidget />
+            </div>
+
+            {/* Regional Density & Risk Radar Widgets */}
+            <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <RegionalGrowthWidget />
+              <MerchantHealthRadarWidget />
+            </div>
+
+            {/* Management Widgets */}
+            <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <RecentBusinessesWidget />
+              <PlatformFeaturesWidget />
+              <RecentAuditWidget />
+            </div>
+          </>
+        )}
       </div>
 
       <ExportReportDialog
