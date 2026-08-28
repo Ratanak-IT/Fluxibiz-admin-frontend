@@ -14,6 +14,7 @@ import {
 } from "@/features/businessManagement/businessAdminApi";
 import type { BusinessResponse } from "@/lib/types/adminTypes";
 import { ReasonDialog } from "./ReasonDialog";
+import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type ReasonAction = "suspend" | "disable" | "close";
+type DialogAction = ReasonAction | "delete";
 
 const DIALOG_COPY: Record<ReasonAction, { title: string; description: string; confirm: string }> = {
   suspend: {
@@ -43,17 +45,28 @@ const DIALOG_COPY: Record<ReasonAction, { title: string; description: string; co
 };
 
 export function BusinessRowActions({ business }: { business: BusinessResponse }) {
-  const [dialog, setDialog] = useState<ReasonAction | null>(null);
+  const [dialog, setDialog] = useState<DialogAction | null>(null);
 
   const [activate] = useActivateBusinessMutation();
   const [enable] = useEnableBusinessMutation();
   const [reopen] = useReopenBusinessMutation();
-  const [remove] = useDeleteBusinessMutation();
+  const [remove, removeState] = useDeleteBusinessMutation();
   const [suspend, suspendState] = useSuspendBusinessMutation();
   const [disable, disableState] = useDisableBusinessMutation();
   const [close, closeState] = useCloseBusinessMutation();
 
   const busy = suspendState.isLoading || disableState.isLoading || closeState.isLoading;
+
+  const confirmDelete = async () => {
+    try {
+      await remove(business.id).unwrap();
+      toast.success(`"${business.name}" deleted.`);
+    } catch {
+      toast.error(`Failed to delete "${business.name}".`);
+    }
+
+    setDialog(null);
+  };
 
   const runWithReason = async (reason: string) => {
     const payload = { businessId: business.id, reason };
@@ -146,33 +159,14 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
 
           <DropdownMenuItem
             className="text-red-600 focus:text-red-600 dark:text-red-500 dark:focus:text-red-500"
-            onClick={() => {
-              toast(`Delete "${business.name}"?`, {
-                description: "This marks the account as deleted.",
-                action: {
-                  label: "Delete",
-                  onClick: async () => {
-                    try {
-                      await remove(business.id).unwrap();
-                      toast.success(`"${business.name}" deleted.`);
-                    } catch {
-                      toast.error(`Failed to delete "${business.name}".`);
-                    }
-                  },
-                },
-                cancel: {
-                  label: "Cancel",
-                  onClick: () => {},
-                },
-              });
-            }}
+            onClick={() => setDialog("delete")}
           >
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {dialog && (
+      {dialog && dialog !== "delete" && (
         <ReasonDialog
           title={DIALOG_COPY[dialog].title}
           description={DIALOG_COPY[dialog].description}
@@ -180,6 +174,21 @@ export function BusinessRowActions({ business }: { business: BusinessResponse })
           busy={busy}
           onCancel={() => setDialog(null)}
           onConfirm={runWithReason}
+        />
+      )}
+
+      {dialog === "delete" && (
+        <DeleteConfirmDialog
+          title={`Delete ${business.name}?`}
+          description={
+            <>
+              Are you sure you want to delete <strong className="text-foreground">{business.name}</strong>? This
+              action cannot be undone.
+            </>
+          }
+          busy={removeState.isLoading}
+          onCancel={() => setDialog(null)}
+          onConfirm={confirmDelete}
         />
       )}
     </>
