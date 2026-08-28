@@ -141,7 +141,7 @@ export default function PlatformStaffPage() {
         >
           <thead className="sticky top-0 z-10 bg-card border-b border-border shadow-2xs text-xs sm:text-sm font-bold text-foreground">
             <tr>
-              {!cols.isHidden("person") && <th className="px-4 py-3.5 sm:px-6 bg-card first:rounded-tl-2xl">Person</th>}
+              {!cols.isHidden("person") && <th className="px-4 py-3.5 sm:px-6 bg-card first:rounded-tl-2xl">Staff</th>}
               {!cols.isHidden("canDo") && <th className="px-4 py-3.5 sm:px-6 bg-card">Can do</th>}
               {!cols.isHidden("status") && <th className="px-4 py-3.5 sm:px-6 bg-card">Status</th>}
               {!cols.isHidden("actions") && <th className="w-24 px-4 py-3.5 text-right sm:px-6 bg-card last:rounded-tr-2xl">Actions</th>}
