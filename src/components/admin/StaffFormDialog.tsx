@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { PermissionPicker } from "./PermissionPicker";
 import type { PlatformUserResponse } from "@/lib/types/adminTypes";
 import { isHiddenRole } from "@/lib/permissionCatalog";
@@ -59,11 +60,21 @@ export function StaffFormDialog({
   <div
     role="dialog"
     aria-modal="true"
-    className="max-h-[90vh] w-full overflow-y-auto rounded-t-2xl border border-border bg-card p-6 shadow-xl sm:max-w-lg sm:rounded-2xl"
+    className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl border border-border bg-card p-6 shadow-xl sm:max-w-lg sm:rounded-2xl"
   >
-    <h2 className="text-lg font-semibold text-card-foreground">
-      {editing ? `Permissions for ${user?.username}` : "New staff member"}
-    </h2>
+    <div className="flex items-center justify-between gap-3">
+      <h2 className="text-lg font-semibold text-card-foreground">
+        {editing ? `Permissions for ${user?.username}` : "New staff member"}
+      </h2>
+      <button
+        type="button"
+        onClick={onCancel}
+        aria-label="Close dialog"
+        className="rounded-full p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition shrink-0"
+      >
+        <X className="size-4" />
+      </button>
+    </div>
     <p className="mt-1 text-sm text-muted-foreground">
       {editing
         ? "Ticking a box takes effect the next time they sign in."

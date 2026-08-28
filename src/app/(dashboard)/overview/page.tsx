@@ -686,16 +686,18 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {isLoading && <OverviewSkeleton />}
+      {/* Main Content Area - Scrollable */}
+      <div className="mt-6 max-h-[calc(100dvh-9.5rem)] min-h-[300px] overflow-y-auto pr-1 pb-4">
+        {isLoading && <OverviewSkeleton />}
 
-      {error && (
-        <p className="mt-8 text-sm text-red-600 dark:text-destructive">
-          Request failed{"status" in error ? ` with status ${error.status}` : ""}.
-        </p>
-      )}
+        {error && (
+          <p className="mt-8 text-sm text-red-600 dark:text-destructive">
+            Request failed{"status" in error ? ` with status ${error.status}` : ""}.
+          </p>
+        )}
 
-      {data && (
-        <>
+        {data && (
+          <>
           {/* Key Platform Stats */}
           <h2 className="mt-8 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-[var(--muted-foreground)]">
             Platform Key Metrics
@@ -795,6 +797,7 @@ export default function OverviewPage() {
           </div>
         </>
       )}
+      </div>
 
       <ExportReportDialog
         open={exportDialogOpen}

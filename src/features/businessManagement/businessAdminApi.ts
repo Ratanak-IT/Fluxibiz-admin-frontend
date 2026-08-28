@@ -7,6 +7,7 @@ import {
 } from "@/lib/api/infinitePage";
 import type {
   AdminAuditLogResponse,
+  BackfillProvincesResponse,
   BusinessFeatureResponse,
   FeatureToggleRequest,
   BusinessChannelResponse,
@@ -144,6 +145,12 @@ export const businessAdminApi = baseApi.injectEndpoints({
     deleteBusiness: builder.mutation<BusinessResponse, string>({
       query: (businessId) => ({ url: `${ADMIN}/businesses/${businessId}`, method: "DELETE" }),
       invalidatesTags: ["Business", "Dashboard", "AuditLog"],
+    }),
+
+    /** One-time: matches every business's old free-text cityOrProvince against the fixed 25-province list. Re-runnable — already-matched businesses are skipped. */
+    backfillProvinces: builder.mutation<BackfillProvincesResponse, void>({
+      query: () => ({ url: `${ADMIN}/businesses/backfill-provinces`, method: "POST" }),
+      invalidatesTags: ["Business", "AuditLog"],
     }),
 
     getBusinessCategories: builder.query<BusinessCategoryResponse[], void>({
@@ -311,6 +318,7 @@ export const {
   useCloseBusinessMutation,
   useReopenBusinessMutation,
   useDeleteBusinessMutation,
+  useBackfillProvincesMutation,
   useGetAuditLogsQuery,
   useGetAuditLogsInfiniteQuery,
   useGetBusinessFeaturesQuery,

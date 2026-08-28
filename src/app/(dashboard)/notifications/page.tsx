@@ -151,8 +151,8 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      {/* List */}
-      <div className="mt-6 space-y-3">
+      {/* List - Scrollable Area */}
+      <div className="mt-6 max-h-[calc(100dvh-15rem)] overflow-y-auto pr-1 pb-4 rounded-2xl space-y-3">
         {isLoading && notifications.length === 0 && (
           <p className="text-sm text-muted-foreground py-8 text-center">
             Loading notifications from backend API...

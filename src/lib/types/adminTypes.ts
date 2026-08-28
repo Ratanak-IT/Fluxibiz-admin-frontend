@@ -54,6 +54,17 @@ export interface StatusActionRequest {
   reason?: string;
 }
 
+/** Result of the one-time cityOrProvince -> provinceName auto-match backfill. */
+export interface BackfillProvincesResponse {
+  matchedCount: number;
+  unmatchedCount: number;
+  unmatched: Array<{
+    id: string;
+    name: string;
+    cityOrProvince: string;
+  }>;
+}
+
 export interface CategoryCountResponse {
   categoryName: string;
   businessCount: number;
