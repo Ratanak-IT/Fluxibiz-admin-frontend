@@ -54,7 +54,7 @@ export default function AppShell({
         <div className="flex min-h-dvh gap-0 lg:min-h-[calc(100dvh-2rem)]">
           <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
 
-          <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex min-w-0 flex-1 flex-col lg:h-[calc(100dvh-2rem)] lg:overflow-y-auto">
             <Header
               managerName={managerName}
               onOpenNav={() => setNavOpen(true)}

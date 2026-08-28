@@ -136,6 +136,11 @@ export const NAVIGATION: NavSection[] = [
       {
         label: "Staff Members",
         href: "/users",
+        exact: true,
+      },
+      {
+        label: "Roles & Permissions",
+        href: "/users/roles",
       },
     ],
   },

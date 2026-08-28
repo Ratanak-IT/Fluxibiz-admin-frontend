@@ -10,45 +10,55 @@ export interface PermissionGroup {
   options: PermissionOption[];
 }
 
+/**
+ * Codes must match `PermissionCode` in the backend exactly (kebab:action
+ * strings, not the old SCREAMING_SNAKE Keycloak realm-role names) and be
+ * flagged `platformStaffAssignable = true` there — anything else is rejected
+ * with "Unknown permission" or "Permission cannot be assigned to platform
+ * staff" by `KeycloakRoleAdapter`. Business-scoped codes (order:create,
+ * item:read, ...) live in the business dashboard's own catalog instead.
+ */
 export const PERMISSION_GROUPS: PermissionGroup[] = [
   {
     key: "businesses",
     title: "Businesses",
     options: [
-      { role: "BUSINESS_READ", label: "View businesses", hint: "See the shop list and each shop's details" },
-      { role: "BUSINESS_WRITE", label: "Edit businesses", hint: "Change shop records" },
-      { role: "BUSINESS_SUSPEND", label: "Suspend and activate", hint: "Block a shop from trading, or let it back in" },
-      { role: "BUSINESS_CLOSE", label: "Close and reopen", hint: "Take a shop out of the public directory" },
-      { role: "BUSINESS_DELETE", label: "Delete", hint: "Mark a shop as deleted" },
+      { role: "admin-business:read", label: "View businesses", hint: "See the shop list and each shop's details" },
+      { role: "admin-business:manage", label: "Manage businesses", hint: "Suspend, close, reopen or otherwise change a shop" },
+      { role: "admin-business:delete", label: "Delete businesses", hint: "Mark a shop as deleted" },
     ],
   },
   {
     key: "catalog",
     title: "Shared catalog",
     options: [
-      { role: "CATEGORY_READ", label: "View categories", hint: "The list shop owners choose from" },
-      { role: "CATEGORY_WRITE", label: "Manage categories", hint: "Add, rename and remove categories" },
-      { role: "UNIT_READ", label: "View units", hint: "Shared measures such as kilogram and box" },
-      { role: "UNIT_WRITE", label: "Manage units", hint: "Add, rename and remove units" },
+      { role: "admin-category:read", label: "View categories", hint: "The list shop owners choose from" },
+      { role: "admin-category:create", label: "Create categories", hint: "Add a new category" },
+      { role: "admin-category:update", label: "Edit categories", hint: "Rename or change a category" },
+      { role: "admin-category:delete", label: "Delete categories", hint: "Remove a category" },
+      { role: "admin-unit:read", label: "View units", hint: "Shared measures such as kilogram and box" },
+      { role: "admin-unit:create", label: "Create units", hint: "Add a new unit" },
+      { role: "admin-unit:update", label: "Edit units", hint: "Rename or change a unit" },
+      { role: "admin-unit:delete", label: "Delete units", hint: "Remove a unit" },
     ],
   },
   {
     key: "insight",
     title: "Reporting",
     options: [
-      { role: "DASHBOARD_READ", label: "View dashboard", hint: "Platform totals and growth" },
-      { role: "AUDIT_READ", label: "View audit log", hint: "Who changed what, and why" },
+      { role: "admin-dashboard:read", label: "View dashboard", hint: "Platform totals and growth" },
+      { role: "admin-audit:read", label: "View audit log", hint: "Who changed what, and why" },
     ],
   },
   {
     key: "platform",
-    title: "Platform administration",
+    title: "Role management",
     options: [
-      { role: "USER_READ", label: "View staff", hint: "See colleagues and what they may do" },
-      { role: "USER_WRITE", label: "Manage staff", hint: "Create colleagues and change their permissions" },
-      { role: "ROLE_READ", label: "View roles", hint: "See the permission names that exist" },
-      { role: "ROLE_WRITE", label: "Manage roles", hint: "Add or remove permission names themselves" },
-      { role: "PLATFORM_FEATURE_WRITE", label: "Platform-wide feature switches", hint: "Turn a feature off for every shop at once" },
+      { role: "role:read", label: "View roles", hint: "See the roles and permissions that exist" },
+      { role: "role:create", label: "Create roles", hint: "Add a new role" },
+      { role: "role:update", label: "Edit roles", hint: "Change what a role can do" },
+      { role: "role:delete", label: "Delete roles", hint: "Remove a role" },
+      { role: "role:assign", label: "Assign roles", hint: "Give a role to a staff member" },
     ],
   },
 ];
