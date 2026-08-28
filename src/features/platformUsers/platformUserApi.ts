@@ -1,58 +1,84 @@
 import { baseApi } from "@/lib/baseApi";
 import type {
-  PlatformUserRequest,
-  PlatformUserResponse,
-  RealmRoleResponse,
+  CreateStaffRequest,
+  PlatformRolePage,
+  PlatformRoleRequest,
+  PlatformRoleResponse,
+  StaffResponse,
+  StaffStatus,
+  UpdateStaffRequest,
 } from "@/lib/types/adminTypes";
 
-const ADMIN = "/api/v1/admin";
+const PLATFORM = "/api/v1/platform";
 
 export const platformUserApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getRealmRoles: builder.query<RealmRoleResponse[], void>({
-      query: () => `${ADMIN}/roles`,
+    getPlatformRoles: builder.query<PlatformRoleResponse[], void>({
+      query: () => ({ url: `${PLATFORM}/roles`, params: { page: 0, size: 100 } }),
+      transformResponse: (response: PlatformRolePage) => response.content,
       providesTags: ["Role"],
     }),
 
-    getPlatformUsers: builder.query<PlatformUserResponse[], { keyword?: string } | void>({
-      query: (params) => ({
-        url: `${ADMIN}/users`,
-        params: params?.keyword ? { keyword: params.keyword, max: 50 } : { max: 50 },
-      }),
+    getPlatformRolesPage: builder.query<PlatformRolePage, { page: number; size: number }>({
+      query: ({ page, size }) => ({ url: `${PLATFORM}/roles`, params: { page, size } }),
+      providesTags: ["Role"],
+    }),
+
+    getPlatformUsers: builder.query<StaffResponse[], void>({
+      query: () => `${PLATFORM}/staff`,
       providesTags: ["PlatformUser"],
     }),
 
-    createPlatformUser: builder.mutation<PlatformUserResponse, PlatformUserRequest>({
-      query: (body) => ({ url: `${ADMIN}/users`, method: "POST", body }),
+    createPlatformUser: builder.mutation<void, CreateStaffRequest>({
+      query: (body) => ({ url: `${PLATFORM}/staff`, method: "POST", body }),
       invalidatesTags: ["PlatformUser", "AuditLog"],
     }),
 
-    replaceUserRoles: builder.mutation<
-      PlatformUserResponse,
-      { userId: string; roles: string[] }
-    >({
-      query: ({ userId, roles }) => ({
-        url: `${ADMIN}/users/${userId}/roles`,
-        method: "PUT",
-        body: { roles },
-      }),
+    updatePlatformUser: builder.mutation<void, { userId: string; body: UpdateStaffRequest }>({
+      query: ({ userId, body }) => ({ url: `${PLATFORM}/staff/${userId}`, method: "PUT", body }),
       invalidatesTags: ["PlatformUser", "AuditLog"],
     }),
 
-    setUserEnabled: builder.mutation<PlatformUserResponse, { userId: string; enabled: boolean }>({
-      query: ({ userId, enabled }) => ({
-        url: `${ADMIN}/users/${userId}/${enabled ? "enable" : "disable"}`,
+    setUserStatus: builder.mutation<void, { userId: string; status: StaffStatus }>({
+      query: ({ userId, status }) => ({
+        url: `${PLATFORM}/staff/${userId}/status`,
         method: "PATCH",
+        body: { status },
       }),
       invalidatesTags: ["PlatformUser", "AuditLog"],
+    }),
+
+    deletePlatformUser: builder.mutation<void, string>({
+      query: (userId) => ({ url: `${PLATFORM}/staff/${userId}`, method: "DELETE" }),
+      invalidatesTags: ["PlatformUser", "AuditLog"],
+    }),
+
+    createPlatformRole: builder.mutation<void, PlatformRoleRequest>({
+      query: (body) => ({ url: `${PLATFORM}/roles`, method: "POST", body }),
+      invalidatesTags: ["Role", "AuditLog"],
+    }),
+
+    updatePlatformRole: builder.mutation<void, { roleId: string; body: PlatformRoleRequest }>({
+      query: ({ roleId, body }) => ({ url: `${PLATFORM}/roles/${roleId}`, method: "PUT", body }),
+      invalidatesTags: ["Role", "PlatformUser", "AuditLog"],
+    }),
+
+    deletePlatformRole: builder.mutation<void, string>({
+      query: (roleId) => ({ url: `${PLATFORM}/roles/${roleId}`, method: "DELETE" }),
+      invalidatesTags: ["Role", "PlatformUser", "AuditLog"],
     }),
   }),
 });
 
 export const {
-  useGetRealmRolesQuery,
+  useGetPlatformRolesQuery,
+  useGetPlatformRolesPageQuery,
   useGetPlatformUsersQuery,
   useCreatePlatformUserMutation,
-  useReplaceUserRolesMutation,
-  useSetUserEnabledMutation,
+  useUpdatePlatformUserMutation,
+  useSetUserStatusMutation,
+  useDeletePlatformUserMutation,
+  useCreatePlatformRoleMutation,
+  useUpdatePlatformRoleMutation,
+  useDeletePlatformRoleMutation,
 } = platformUserApi;
