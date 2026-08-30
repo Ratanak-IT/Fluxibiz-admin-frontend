@@ -173,32 +173,56 @@ export interface BusinessCategoryUpsertRequest {
   icon?: string | null;
 }
 
-export interface RealmRoleResponse {
+export type StaffStatus = "ACTIVE" | "INACTIVE";
+
+export interface PlatformRoleResponse {
   id: string;
   name: string;
-  description: string | null;
-  protectedRole: boolean;
+  permissions: string[];
 }
 
-export interface PlatformUserResponse {
+export interface PlatformRoleRequest {
+  name: string;
+  permissions: string[];
+}
+
+export interface PlatformRolePage {
+  content: PlatformRoleResponse[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface StaffResponse {
   id: string;
   username: string;
-  email: string | null;
-  firstName: string | null;
-  lastName: string | null;
-  enabled: boolean;
-  emailVerified: boolean;
-  roles: string[];
-  createdAt: string | null;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  gender: string;
+  status: StaffStatus;
+  roleId: string | null;
 }
 
-export interface PlatformUserRequest {
+export interface CreateStaffRequest {
   username: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  temporaryPassword?: string;
-  roles: string[];
+  password: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  gender: string;
+  roleId?: string;
+}
+
+export interface UpdateStaffRequest {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  gender: string;
+  roleId?: string;
 }
 
 export type BusinessFeature = "STOREFRONT" | "TELEGRAM_BOT" | "KHQR_PAYMENT";
