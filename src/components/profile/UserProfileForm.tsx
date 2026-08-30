@@ -600,7 +600,7 @@ function UserProfileEditor({ profile }: { profile: UserProfile }) {
           type="button"
           onClick={() => setShowImageModal(false)}
           aria-label="Close preview"
-          className="absolute top-4 right-4 z-10 grid size-9 place-items-center rounded-full bg-black/60 text-white transition hover:bg-black/80 focus:outline-none"
+          className="absolute top-4 right-4 z-10 grid size-9 place-items-center rounded-full bg-muted/80 text-muted-foreground transition hover:bg-accent hover:text-foreground focus:outline-none"
         >
           <X className="size-5" />
         </button>

@@ -146,3 +146,10 @@
   height: 0px !important;
   background: transparent !important;
 }
+
+/* Position Sonner toast close button at the right end of the toast */
+[data-sonner-toast] [data-close-button] {
+  left: auto !important;
+  right: 0 !important;
+  transform: translate(35%, -35%) !important;
+}

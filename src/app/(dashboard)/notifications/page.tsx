@@ -134,27 +134,41 @@ export default function NotificationsPage() {
           )}
         </div>
 
-        {/* Category Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 text-xs">
-          {(["ALL", "BUSINESS", "CHANNEL", "SECURITY", "SYSTEM"] as const).map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setCategoryFilter(cat)}
-              className={`rounded-full px-3.5 py-1.5 transition font-semibold ${
-                categoryFilter === cat
-                  ? "bg-primary text-primary-foreground"
-                  : "border border-border bg-card text-foreground hover:bg-accent"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+        {/* Category Pills & Severity Filter */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 text-xs min-w-0">
+          <div className="flex items-center gap-1.5 shrink-0">
+            {(["ALL", "BUSINESS", "CHANNEL", "SECURITY", "SYSTEM"] as const).map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategoryFilter(cat)}
+                className={`shrink-0 rounded-full px-3.5 py-1.5 transition font-semibold ${
+                  categoryFilter === cat
+                    ? "bg-primary text-primary-foreground"
+                    : "border border-border bg-card text-foreground hover:bg-accent"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          <select
+            value={severityFilter}
+            onChange={(e) => setSeverityFilter(e.target.value as any)}
+            className="rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-semibold text-foreground outline-none transition focus:border-primary cursor-pointer shrink-0"
+          >
+            <option value="ALL">All Severity</option>
+            <option value="CRITICAL">Critical</option>
+            <option value="WARNING">Warning</option>
+            <option value="INFO">Info</option>
+            <option value="SUCCESS">Success</option>
+          </select>
         </div>
       </div>
 
-      {/* List */}
-      <div className="mt-6 space-y-3">
+      {/* List - Scrollable Area */}
+      <div className="mt-6 max-h-[calc(100dvh-15rem)] overflow-y-auto pr-1 pb-4 rounded-2xl space-y-3">
         {isLoading && notifications.length === 0 && (
           <p className="text-sm text-muted-foreground py-8 text-center">
             Loading notifications from backend API...

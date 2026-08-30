@@ -57,7 +57,7 @@ function errorMessage(error: unknown): string {
 }
 
 const COLUMNS: ColumnDef[] = [
-  { id: "shop", label: "Shop" },
+  { id: "shop", label: "Shop", locked: true },
   { id: "storefront", label: "Store Menu" },
   { id: "telegram", label: "Telegram" },
   { id: "khqr", label: "KHQR" },
@@ -121,7 +121,6 @@ export default function ChannelsPage() {
     });
   }, [channels, keyword, filter]);
 
-  // Reset to showing strictly 10 items when keyword or filter changes
   useEffect(() => {
     setPage(1);
   }, [keyword, filter]);
@@ -164,8 +163,7 @@ export default function ChannelsPage() {
         trading figures.
       </p>
 
-      {/* Toolbar: Search, Filters, Column Picker all in ONE single row */}
-      <div className="mt-7 flex flex-row items-center justify-between gap-3 overflow-x-auto pb-1 flex-nowrap">
+      <div className="mt-7 flex flex-row items-center justify-between gap-3 flex-nowrap">
         <div className="relative min-w-[200px] flex-1 max-w-sm shrink-0 sm:shrink">
           <Search
             className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
@@ -184,7 +182,6 @@ export default function ChannelsPage() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0 flex-nowrap">
-          {/* Mobile dropdown filter */}
           <div className="relative sm:hidden" ref={filterRef}>
             <button
               type="button"
@@ -231,8 +228,7 @@ export default function ChannelsPage() {
             )}
           </div>
 
-          {/* Desktop/Tablet filter pills */}
-          <div className="hidden items-center gap-2 sm:flex flex-nowrap">
+          <div className="hidden items-center gap-2 overflow-x-auto pb-1 sm:flex flex-nowrap">
             {FILTERS.map((option) => (
               <button
                 key={option.value}
@@ -256,179 +252,215 @@ export default function ChannelsPage() {
         </div>
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
-        <div className="overflow-x-auto">
-          <table
-            className={`w-full text-left text-sm ${cols.tableClassName}`}
-            style={{ minWidth: cols.minWidthRem(52) }}
-          >
-            <thead className="bg-muted/70 text-xs sm:text-sm font-bold text-foreground border-b border-border">
-              <tr>
-                {!cols.isHidden("shop") && <th className="px-6 py-4">Shop</th>}
-                {!cols.isHidden("storefront") && <th className="px-6 py-4">Store Menu</th>}
-                {!cols.isHidden("telegram") && <th className="px-6 py-4">Telegram</th>}
-                {!cols.isHidden("khqr") && <th className="px-6 py-4">KHQR</th>}
-                {!cols.isHidden("registered") && <th className="px-6 py-4">Registered</th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border text-sm">
-              {isLoading && (
-                <AdminLoadingState label="Loading sales channels..." compact colSpan={5} />
-              )}
-
-              {error && !isLoading && (
-                <AdminApiErrorFallback error={error} compact colSpan={5} />
-              )}
-
-              {!isLoading && !error && rows.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground sm:py-14">
-                    No shop matches this filter.
-                  </td>
-                </tr>
-              )}
-
-              {rows.map((row) => {
-                const logoUrl =
-                  row.logo ||
-                  row.thumbnail ||
-                  businessLogoMap[row.businessId]?.logo ||
-                  businessLogoMap[row.businessId]?.thumbnail;
-
-                return (
-                  <tr
-                    key={row.businessId}
-                    className="transition hover:bg-accent/40"
+      <div className="mt-6 max-h-[calc(100dvh-15rem)] overflow-auto rounded-2xl border border-border bg-card shadow-xs">
+        <table
+          className={`w-full text-left text-sm ${cols.tableClassName}`}
+          style={{ minWidth: cols.minWidthRem(52) }}
+        >
+          <thead className="sticky top-0 z-10 bg-card border-b border-border shadow-2xs text-xs sm:text-sm font-bold text-foreground">
+            <tr>
+              {!cols.isHidden("shop") && <th className="px-6 py-4 bg-card first:rounded-tl-2xl">Shop</th>}
+              {!cols.isHidden("storefront") && (
+                <th className="bg-card p-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilter("storefront");
+                      setPage(0);
+                    }}
+                    className={`w-full px-6 py-4 text-left transition hover:text-primary ${filter === "storefront" ? "text-primary" : ""}`}
                   >
-                    {!cols.isHidden("shop") && (
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          {logoUrl ? (
-                            <img
-                              src={logoUrl}
-                              alt={row.businessName}
-                              className="h-12 w-12 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl object-cover shadow-xs bg-muted"
-                            />
-                          ) : (
-                            <div className="flex h-12 w-12 min-w-[48px] min-h-[48px] shrink-0 items-center justify-center rounded-2xl bg-muted font-bold text-foreground text-lg shadow-xs">
-                              {row.businessName ? row.businessName.charAt(0).toUpperCase() : "S"}
-                            </div>
-                          )}
-                          <div>
-                            <Link
-                              href={`/businesses/${row.businessId}`}
-                              className="font-semibold text-foreground hover:text-primary transition-colors"
-                            >
-                              {row.businessName}
-                            </Link>
-                            <span className="block text-xs text-muted-foreground font-mono">
-                              /{row.slug}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-                    )}
+                    Store Menu
+                  </button>
+                </th>
+              )}
+              {!cols.isHidden("telegram") && (
+                <th className="bg-card p-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilter("telegram");
+                      setPage(0);
+                    }}
+                    className={`w-full px-6 py-4 text-left transition hover:text-primary ${filter === "telegram" ? "text-primary" : ""}`}
+                  >
+                    Telegram
+                  </button>
+                </th>
+              )}
+              {!cols.isHidden("khqr") && (
+                <th className="bg-card p-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilter("bakong");
+                      setPage(0);
+                    }}
+                    className={`w-full px-6 py-4 text-left transition hover:text-primary ${filter === "bakong" ? "text-primary" : ""}`}
+                  >
+                    KHQR
+                  </button>
+                </th>
+              )}
+              {!cols.isHidden("registered") && <th className="px-6 py-4 bg-card last:rounded-tr-2xl">Registered</th>}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border text-sm">
+            {isLoading && (
+              <AdminLoadingState label="Loading sales channels..." compact colSpan={5} />
+            )}
 
-                    {!cols.isHidden("storefront") && (
-                      <td className="px-6 py-4">
-                        <Flag
-                          on={row.storefrontPublished}
-                          onLabel="Live"
-                          offLabel="Not published"
-                        />
-                        {row.storefrontUrl && (
-                          <a
-                            href={row.storefrontUrl}
-                            target="_blank"
-                            rel="noreferrer noopener"
-                            className="mt-1 flex items-center gap-1 text-xs text-primary hover:underline"
-                          >
-                            <ExternalLink className="size-3" aria-hidden />
-                            <span className="max-w-56 truncate">{row.storefrontUrl}</span>
-                          </a>
-                        )}
-                      </td>
-                    )}
+            {error && !isLoading && (
+              <AdminApiErrorFallback error={error} compact colSpan={5} />
+            )}
 
-                    {!cols.isHidden("telegram") && (
-                      <td className="px-6 py-4">
-                        {row.telegramConnected ? (
-                          <>
-                            <Flag
-                              on={row.telegramActive && !telegramOffPlatformWide}
-                              onLabel={
-                                telegramOffPlatformWide
-                                  ? "Off (platform-wide)"
-                                  : row.telegramActive
-                                    ? "Active"
-                                    : "Paused"
-                              }
-                              offLabel="Off (platform-wide)"
-                            />
-                            <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground font-mono">
-                              <Send className="size-3" aria-hidden />
-                              @{row.telegramBotUsername ?? "unknown"}
-                            </span>
-                          </>
+            {!isLoading && !error && rows.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground sm:py-14">
+                  No shop matches this filter.
+                </td>
+              </tr>
+            )}
+
+            {rows.map((row) => {
+              const logoUrl =
+                row.logo ||
+                row.thumbnail ||
+                businessLogoMap[row.businessId]?.logo ||
+                businessLogoMap[row.businessId]?.thumbnail;
+
+              return (
+                <tr
+                  key={row.businessId}
+                  className="transition hover:bg-accent/40"
+                >
+                  {!cols.isHidden("shop") && (
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        {logoUrl ? (
+                          <img
+                            src={logoUrl}
+                            alt={row.businessName}
+                            className="h-12 w-12 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl object-cover shadow-xs bg-muted"
+                          />
                         ) : (
-                          <Flag on={false} onLabel="" offLabel="No bot" />
+                          <div className="flex h-12 w-12 min-w-[48px] min-h-[48px] shrink-0 items-center justify-center rounded-2xl bg-muted font-bold text-foreground text-lg shadow-xs">
+                            {row.businessName ? row.businessName.charAt(0).toUpperCase() : "S"}
+                          </div>
                         )}
-                      </td>
-                    )}
+                        <div>
+                          <Link
+                            href={`/businesses/${row.businessId}`}
+                            className="font-semibold text-foreground hover:text-primary transition-colors"
+                          >
+                            {row.businessName}
+                          </Link>
+                          <span className="block text-xs text-muted-foreground font-mono">
+                            /{row.slug}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  )}
 
-                    {!cols.isHidden("khqr") && (
-                      <td className="px-6 py-4">
-                        {row.bakongConfigured ? (
+                  {!cols.isHidden("storefront") && (
+                    <td className="px-6 py-4">
+                      <Flag
+                        on={row.storefrontPublished}
+                        onLabel="Live"
+                        offLabel="Not published"
+                      />
+                      {row.storefrontUrl && (
+                        <a
+                          href={row.storefrontUrl}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="mt-1 flex items-center gap-1 text-xs text-primary hover:underline"
+                        >
+                          <ExternalLink className="size-3" aria-hidden />
+                          <span className="max-w-56 truncate">{row.storefrontUrl}</span>
+                        </a>
+                      )}
+                    </td>
+                  )}
+
+                  {!cols.isHidden("telegram") && (
+                    <td className="px-6 py-4">
+                      {row.telegramConnected ? (
+                        <>
                           <Flag
-                            on={row.bakongActive && !bakongOffPlatformWide}
+                            on={row.telegramActive && !telegramOffPlatformWide}
                             onLabel={
-                              bakongOffPlatformWide
+                              telegramOffPlatformWide
                                 ? "Off (platform-wide)"
-                                : row.bakongActive
+                                : row.telegramActive
                                   ? "Active"
-                                  : "Configured"
+                                  : "Paused"
                             }
                             offLabel="Off (platform-wide)"
                           />
-                        ) : (
-                          <Flag on={false} onLabel="" offLabel="Not set up" />
-                        )}
-                      </td>
-                    )}
+                          <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground font-mono">
+                            <Send className="size-3" aria-hidden />
+                            @{row.telegramBotUsername ?? "unknown"}
+                          </span>
+                        </>
+                      ) : (
+                        <Flag on={false} onLabel="" offLabel="No bot" />
+                      )}
+                    </td>
+                  )}
 
-                    {!cols.isHidden("registered") && (
-                      <td className="px-6 py-4 text-muted-foreground">
-                        {row.registeredAt ? row.registeredAt.slice(0, 10) : "—"}
-                      </td>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                  {!cols.isHidden("khqr") && (
+                    <td className="px-6 py-4">
+                      {row.bakongConfigured ? (
+                        <Flag
+                          on={row.bakongActive && !bakongOffPlatformWide}
+                          onLabel={
+                            bakongOffPlatformWide
+                              ? "Off (platform-wide)"
+                              : row.bakongActive
+                                ? "Active"
+                                : "Configured"
+                          }
+                          offLabel="Off (platform-wide)"
+                        />
+                      ) : (
+                        <Flag on={false} onLabel="" offLabel="Not set up" />
+                      )}
+                    </td>
+                  )}
+
+                  {!cols.isHidden("registered") && (
+                    <td className="px-6 py-4 text-muted-foreground">
+                      {row.registeredAt ? row.registeredAt.slice(0, 10) : "—"}
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+
+        <div
+          ref={sentinelRef}
+          className="flex flex-col items-center gap-3 py-6 text-sm"
+        >
+          {hasMore && (
+            <button
+              type="button"
+              onClick={() => setPage((prev) => prev + 1)}
+              className="rounded-full border border-border px-5 py-2 text-foreground transition hover:bg-accent hover:text-accent-foreground font-medium"
+            >
+              Load more ({rows.length} of {filteredRows.length})
+            </button>
+          )}
+
+          {!hasMore && rows.length > 0 && (
+            <span className="text-xs text-muted-foreground">
+              Showing all {rows.length} shop channels
+            </span>
+          )}
         </div>
-      </div>
-
-      {/* scroll sentinel + status footer */}
-      <div
-        ref={sentinelRef}
-        className="mt-5 flex flex-col items-center gap-3 py-6 text-sm"
-      >
-        {hasMore && (
-          <button
-            type="button"
-            onClick={() => setPage((prev) => prev + 1)}
-            className="rounded-full border border-border px-5 py-2 text-foreground transition hover:bg-accent hover:text-accent-foreground font-medium"
-          >
-            Load more ({rows.length} of {filteredRows.length})
-          </button>
-        )}
-
-        {!hasMore && rows.length > 0 && (
-          <span className="text-xs text-muted-foreground">
-            Showing all {rows.length} shop channels
-          </span>
-        )}
       </div>
     </div>
   );

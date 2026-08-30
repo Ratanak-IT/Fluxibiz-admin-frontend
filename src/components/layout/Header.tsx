@@ -19,7 +19,7 @@ export default function Header({
 
   return (
     <>
-      <header className="flex flex-nowrap items-center gap-2 px-5 py-5 sm:gap-4 lg:px-8 border-b border-border/40 bg-background dark:bg-background">
+      <header className="sticky top-0 z-20 flex flex-nowrap items-center gap-2 px-5 py-5 sm:gap-4 lg:px-8 border-b border-border/40 bg-background dark:bg-background">
         <button
           type="button"
           onClick={onOpenNav}

@@ -36,6 +36,12 @@ export function ExportReportDialog({
 
   if (!open) return null;
 
+  const close = () => {
+    onOpenChange(false);
+    setCustomTitle("");
+    setCustomNotes("");
+  };
+
   const recordCount =
     defaultType === "businesses"
       ? businessData?.length ?? 0
@@ -65,7 +71,7 @@ export function ExportReportDialog({
       exportOverviewReport(overviewData, "excel", options);
     }
 
-    onOpenChange(false);
+    close();
   };
 
   return (
@@ -73,7 +79,7 @@ export function ExportReportDialog({
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/40 transition-opacity"
-        onClick={() => onOpenChange(false)}
+        onClick={() => close()}
       />
 
       {/* Dialog Card */}
@@ -95,7 +101,7 @@ export function ExportReportDialog({
           </div>
           <button
             type="button"
-            onClick={() => onOpenChange(false)}
+            onClick={() => close()}
             className="rounded-full p-2 text-muted-foreground hover:bg-accent hover:text-foreground transition"
           >
             <X className="size-4" />
@@ -121,7 +127,7 @@ export function ExportReportDialog({
                 value={customTitle}
                 onChange={(e) => setCustomTitle(e.target.value)}
                 placeholder={titleMap[defaultType]}
-                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none focus:border-primary"
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none transition focus:border-gray-400 dark:focus:border-gray-500"
               />
             </div>
 
@@ -134,7 +140,7 @@ export function ExportReportDialog({
                 value={customNotes}
                 onChange={(e) => setCustomNotes(e.target.value)}
                 placeholder="Add executive comments or notes to the Excel header..."
-                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none focus:border-primary"
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none transition focus:border-gray-400 dark:focus:border-gray-500"
               />
             </div>
           </div>
@@ -144,7 +150,7 @@ export function ExportReportDialog({
         <div className="mt-6 flex items-center justify-end gap-3 border-t border-border pt-4">
           <button
             type="button"
-            onClick={() => onOpenChange(false)}
+            onClick={() => close()}
             className="rounded-full border border-border bg-background px-5 py-2.5 text-xs font-medium text-foreground transition hover:bg-accent"
           >
             Cancel
