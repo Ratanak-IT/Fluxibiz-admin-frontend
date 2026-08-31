@@ -46,7 +46,6 @@ export async function GET() {
 
   return Response.json(
     {
-      accessToken,
       subject: claims?.sub ?? session.user.id,
       username:
         claims?.preferred_username ??

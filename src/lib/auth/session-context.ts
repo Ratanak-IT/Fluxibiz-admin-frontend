@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { tokenStore } from "./tokenStore";
 
 export type SessionContext = {
   subject: string | null;
-  accessToken: string | null;
   username: string | null;
   roles: string[];
   isSuperAdmin: boolean;
@@ -25,12 +23,6 @@ export function fetchSessionContext(options?: {
       .then((response) =>
         response.ok ? (response.json() as Promise<SessionContext>) : null
       )
-      .then((data) => {
-        if (data?.accessToken) {
-          tokenStore.setTokens(data.accessToken, "");
-        }
-        return data;
-      })
       .catch(() => null);
 
     inflight = inflight.then((value) => {

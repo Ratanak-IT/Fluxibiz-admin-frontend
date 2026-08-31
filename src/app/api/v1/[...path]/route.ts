@@ -1,16 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
+import { persistAuthCookies, resolveKeycloakAccessToken } from "@/lib/auth/keycloak-token";
 
 export const dynamic = "force-dynamic";
 
 const BACKEND_URL = (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
-const REQUEST_HEADER_ALLOWLIST = ["authorization", "content-type", "accept", "accept-language"];
+const REQUEST_HEADER_ALLOWLIST = ["content-type", "accept", "accept-language"];
 const RESPONSE_HEADER_ALLOWLIST = ["content-type", "content-disposition", "cache-control"];
 
 async function forward(request: NextRequest, path: string[]) {
   if (!BACKEND_URL) {
     return NextResponse.json({ message: "Backend API URL is not configured." }, { status: 500 });
   }
+
+  // The bearer token is resolved here, server-side, from the httpOnly session
+  // cookie — it never comes from (or is trusted from) the browser, so the
+  // client never needs to hold or send it.
+  let accessToken: string | null;
+  let setCookies: string[];
+  try {
+    const resolved = await resolveKeycloakAccessToken(request.headers);
+    accessToken = resolved.accessToken;
+    setCookies = resolved.setCookies;
+  } catch {
+    return NextResponse.json({ message: "Not authenticated." }, { status: 401 });
+  }
+
+  if (!accessToken) {
+    return NextResponse.json({ message: "Not authenticated." }, { status: 401 });
+  }
+
+  await persistAuthCookies(setCookies);
 
   const targetUrl = `${BACKEND_URL}/api/v1/${path.join("/")}${request.nextUrl.search}`;
 
@@ -19,6 +39,7 @@ async function forward(request: NextRequest, path: string[]) {
     const value = request.headers.get(name);
     if (value) headers.set(name, value);
   }
+  headers.set("authorization", `Bearer ${accessToken}`);
 
   const hasBody = !["GET", "HEAD"].includes(request.method);
 

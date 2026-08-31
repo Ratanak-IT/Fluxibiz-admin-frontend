@@ -3,7 +3,6 @@
 import { Client, Message, StompSubscription } from "@stomp/stompjs";
 import { toast } from "sonner";
 import { playNotificationSound } from "./audio-alert";
-import { tokenStore } from "./auth/tokenStore";
 import type {
   AdminNotification,
   AdminNotificationType,
@@ -55,7 +54,7 @@ class NotificationSocketService {
     }
   }
 
-  public connect(): void {
+  public async connect(): Promise<void> {
     if (typeof window === "undefined") return;
     if (this.client?.active || this.isConnecting) return;
 
@@ -64,7 +63,23 @@ class NotificationSocketService {
 
     this.isConnecting = true;
 
-    const token = tokenStore.getAccessToken();
+    // Fetched fresh for this connection only — never persisted to
+    // sessionStorage/localStorage. This is the one place a token has to
+    // reach the browser at all: STOMP connects straight to the backend and
+    // can't be routed through our own `/api/v1/...` proxy.
+    let token: string | null = null;
+    try {
+      const response = await fetch("/api/ws-token", { cache: "no-store" });
+      if (response.ok) {
+        const data = (await response.json()) as { accessToken?: string };
+        token = data.accessToken ?? null;
+      }
+    } catch {
+      // fall through and connect without auth; the server will reject it
+    }
+
+    if (!this.isConnecting) return; // disconnected while we were fetching
+
     const connectHeaders: Record<string, string> = {};
     if (token) {
       connectHeaders["Authorization"] = `Bearer ${token}`;

@@ -1,33 +1,14 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { authClient } from "@/lib/auth/auth-client";
-import { isTokenValid, tokenStore } from "@/lib/auth/tokenStore";
 
+// No token handling here on purpose: every request goes to our own
+// `/api/v1/...` route handler (same origin), which resolves the bearer token
+// server-side from the httpOnly session cookie and attaches it itself. The
+// browser only ever carries that httpOnly cookie — it never sees, stores, or
+// sends an access/refresh token.
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: "",
   credentials: "include",
-  prepareHeaders: async (headers) => {
-    let token = tokenStore.getAccessToken();
-
-    if (!isTokenValid(token) && typeof window !== "undefined") {
-      try {
-        const { data } = await authClient.getAccessToken({
-          providerId: "keycloak",
-        });
-        if (data?.accessToken) {
-          token = data.accessToken;
-          tokenStore.setTokens(token, "");
-        }
-      } catch {
-        // ignore
-      }
-    }
-
-    if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
-    }
-    return headers;
-  },
 });
 
 const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
@@ -35,23 +16,12 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
   api,
   extraOptions
 ) => {
-  let result = await rawBaseQuery(args, api, extraOptions);
+  const result = await rawBaseQuery(args, api, extraOptions);
 
   if (result.error?.status === 401 && typeof window !== "undefined") {
-    tokenStore.clear();
-    try {
-      const { data } = await authClient.getAccessToken({
-        providerId: "keycloak",
-      });
-      if (data?.accessToken) {
-        tokenStore.setTokens(data.accessToken, "");
-        result = await rawBaseQuery(args, api, extraOptions);
-      } else {
-        window.location.href = "/login";
-      }
-    } catch {
-      window.location.href = "/login";
-    }
+    // The session itself is gone (expired refresh token, signed out
+    // elsewhere, ...) — nothing left to retry client-side.
+    window.location.href = "/login";
   }
 
   return result;
