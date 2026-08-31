@@ -102,11 +102,23 @@ export const HIDDEN_ROLES = [
   "BUSINESS_STAFF",
   "CUSTOMER",
   "GLOBAL_USER",
+  "GLOBLE_CUSTOMER",
 ];
 
 export function isHiddenRole(role: string): boolean {
   return HIDDEN_ROLES.some((hidden) => role === hidden || role.startsWith("default-roles"));
 }
+
+/**
+ * Roles that must never grant platform access no matter what — checked
+ * before the allow-list below. `hasAnyPlatformPermission` is already
+ * allow-list based (only SUPER_ADMIN or an explicit admin-assignable
+ * permission passes), so a shop owner or shopper account was always
+ * rejected here regardless of this list. This exists as a second,
+ * explicit line of defense: these specific account types must be denied
+ * even if the permission catalog ever changes shape.
+ */
+export const EXPLICITLY_DENIED_ROLES = ["BUSINESS", "GLOBLE_CUSTOMER"];
 
 export function labelForRole(role: string): string {
   for (const group of PERMISSION_GROUPS) {
@@ -121,6 +133,7 @@ export function allPermissionRoles(): string[] {
 }
 
 export function hasAnyPlatformPermission(roles: string[]): boolean {
+  if (roles.some((role) => EXPLICITLY_DENIED_ROLES.includes(role))) return false;
   if (roles.includes(SUPER_ADMIN_ROLE)) return true;
   return allPermissionRoles().some((permission) => roles.includes(permission));
 }

@@ -39,7 +39,18 @@ export async function POST(request: NextRequest) {
     process.env.BETTER_AUTH_URL?.trim().replace(/\/+$/, "") ||
     request.nextUrl.origin;
 
-  const landingUrl = `${baseUrl}/login`;
+  // `/login` immediately restarts the Keycloak OAuth flow on mount — right
+  // for a voluntary "sign out / switch account" click, but a forbidden
+  // account landing there would just get bounced straight back into
+  // Keycloak's login form and re-authenticate into the same forbidden
+  // state. `/logged-out` doesn't auto-retry, so an account this session
+  // was force-ended for lands somewhere that actually explains why instead
+  // of looping them back through login.
+  const reason = request.nextUrl.searchParams.get("reason");
+  const landingUrl =
+    reason === "forbidden"
+      ? `${baseUrl}/logged-out?reason=forbidden`
+      : `${baseUrl}/login`;
 
   const idToken = await readIdToken(requestHeaders);
   const setCookies = await clearSession(requestHeaders);
