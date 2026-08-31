@@ -5,6 +5,8 @@ export interface PermissionOption {
 }
 
 export interface PermissionGroup {
+  /** Matches a `NavSection.id` in `components/layout/navigation.ts` 1:1, so
+   *  sidebar/app-launcher visibility can be derived straight from this catalog. */
   key: string;
   title: string;
   options: PermissionOption[];
@@ -17,25 +19,36 @@ export interface PermissionGroup {
  * with "Unknown permission" or "Permission cannot be assigned to platform
  * staff" by `KeycloakRoleAdapter`. Business-scoped codes (order:create,
  * item:read, ...) live in the business dashboard's own catalog instead.
+ *
+ * Groups mirror the 7 admin sidebar sections exactly (`key` === `NavSection.id`)
+ * so a staff member's assigned permissions map directly onto which app tiles
+ * and sidebar sections they see.
  */
 export const PERMISSION_GROUPS: PermissionGroup[] = [
   {
     key: "businesses",
-    title: "Businesses",
+    title: "Business Management",
     options: [
       { role: "admin-business:read", label: "View businesses", hint: "See the shop list and each shop's details" },
       { role: "admin-business:manage", label: "Manage businesses", hint: "Suspend, close, reopen or otherwise change a shop" },
       { role: "admin-business:delete", label: "Delete businesses", hint: "Mark a shop as deleted" },
-    ],
-  },
-  {
-    key: "catalog",
-    title: "Shared catalog",
-    options: [
       { role: "admin-category:read", label: "View categories", hint: "The list shop owners choose from" },
       { role: "admin-category:create", label: "Create categories", hint: "Add a new category" },
       { role: "admin-category:update", label: "Edit categories", hint: "Rename or change a category" },
       { role: "admin-category:delete", label: "Delete categories", hint: "Remove a category" },
+    ],
+  },
+  {
+    key: "overview",
+    title: "Overview Dashboard",
+    options: [
+      { role: "admin-dashboard:read", label: "View dashboard", hint: "Platform totals and growth" },
+    ],
+  },
+  {
+    key: "units",
+    title: "Units",
+    options: [
       { role: "admin-unit:read", label: "View units", hint: "Shared measures such as kilogram and box" },
       { role: "admin-unit:create", label: "Create units", hint: "Add a new unit" },
       { role: "admin-unit:update", label: "Edit units", hint: "Rename or change a unit" },
@@ -43,22 +56,37 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
     ],
   },
   {
-    key: "insight",
-    title: "Reporting",
+    key: "channels",
+    title: "Shop Channels",
     options: [
-      { role: "admin-dashboard:read", label: "View dashboard", hint: "Platform totals and growth" },
+      { role: "admin-channel:read", label: "View channels", hint: "See the sales channels shops can adopt" },
+      { role: "admin-channel:manage", label: "Manage channels", hint: "Add, edit or remove a sales channel" },
+    ],
+  },
+  {
+    key: "audit",
+    title: "Audit Log",
+    options: [
       { role: "admin-audit:read", label: "View audit log", hint: "Who changed what, and why" },
     ],
   },
   {
-    key: "platform",
-    title: "Role management",
+    key: "users",
+    title: "Platform Staff",
     options: [
       { role: "role:read", label: "View roles", hint: "See the roles and permissions that exist" },
       { role: "role:create", label: "Create roles", hint: "Add a new role" },
       { role: "role:update", label: "Edit roles", hint: "Change what a role can do" },
       { role: "role:delete", label: "Delete roles", hint: "Remove a role" },
       { role: "role:assign", label: "Assign roles", hint: "Give a role to a staff member" },
+    ],
+  },
+  {
+    key: "settings",
+    title: "Settings",
+    options: [
+      { role: "admin-platform-feature:read", label: "View platform features", hint: "See which features are switched on" },
+      { role: "admin-platform-feature:update", label: "Manage platform features", hint: "Switch a platform feature on or off" },
     ],
   },
 ];
@@ -90,4 +118,22 @@ export function labelForRole(role: string): string {
 
 export function allPermissionRoles(): string[] {
   return PERMISSION_GROUPS.flatMap((group) => group.options.map((option) => option.role));
+}
+
+export function hasAnyPlatformPermission(roles: string[]): boolean {
+  if (roles.includes(SUPER_ADMIN_ROLE)) return true;
+  return allPermissionRoles().some((permission) => roles.includes(permission));
+}
+
+/**
+ * Whether the given roles/permissions grant access to a sidebar section.
+ * SUPER_ADMIN always passes. A section with no matching entry in
+ * `PERMISSION_GROUPS` (e.g. "account") has no permission of its own and is
+ * open to any signed-in staff member.
+ */
+export function canAccessSection(roles: string[], sectionId: string): boolean {
+  if (roles.includes(SUPER_ADMIN_ROLE)) return true;
+  const group = PERMISSION_GROUPS.find((candidate) => candidate.key === sectionId);
+  if (!group) return true;
+  return group.options.some((option) => roles.includes(option.role));
 }

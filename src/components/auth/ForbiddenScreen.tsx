@@ -29,14 +29,14 @@ export default function ForbiddenScreen({
         </p>
 
         <p className="mt-3 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
-          This admin console requires the{" "}
+          Your account does not have the{" "}
           <code className="rounded bg-neutral-100 px-1 py-0.5 font-mono text-red-600 dark:bg-neutral-800 dark:text-red-400">
             SUPER_ADMIN
           </code>{" "}
-          realm role in Keycloak.
+          role or any platform staff permission in Keycloak yet.
         </p>
 
-        {/* {roles.length > 0 && (
+        {roles.length > 0 && (
           <div className="mt-4 rounded-lg bg-neutral-50 p-3 text-left dark:bg-neutral-800/50">
             <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-400">
               Your assigned roles
@@ -52,7 +52,7 @@ export default function ForbiddenScreen({
               ))}
             </div>
           </div>
-        )} */}
+        )}
 
         <button
           type="button"

@@ -9,6 +9,7 @@ import {
   sectionEntryHref,
   type NavSection,
 } from "@/components/layout/navigation";
+import { canAccessSection } from "@/lib/permissionCatalog";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import UserMenu from "@/components/layout/UserMenu";
 import BrandLogo from "@/components/brand/BrandLogo";
@@ -23,11 +24,19 @@ type Opening = {
   size: number;
 };
 
-export default function AppLauncher({ managerName }: { managerName: string }) {
+export default function AppLauncher({
+  managerName,
+  roles,
+}: {
+  managerName: string;
+  roles: string[];
+}) {
   const router = useRouter();
   const [opening, setOpening] = useState<Opening | null>(null);
 
-  const apps = NAVIGATION.filter((section) => section.app);
+  const apps = NAVIGATION.filter(
+    (section) => section.app && canAccessSection(roles, section.id),
+  );
 
   useEffect(() => {
     if (!opening) return;

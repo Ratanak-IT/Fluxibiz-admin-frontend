@@ -4,7 +4,7 @@ import { authClient } from "@/lib/auth/auth-client";
 import { isTokenValid, tokenStore } from "@/lib/auth/tokenStore";
 
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL,
+  baseUrl: "",
   credentials: "include",
   prepareHeaders: async (headers) => {
     let token = tokenStore.getAccessToken();
