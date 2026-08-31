@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ADMIN_MODULES, type AdminModule } from "@/lib/adminModules";
 import { decodeToken, tokenStore } from "@/lib/auth/tokenStore";
-import { SUPER_ADMIN_ROLE } from "@/lib/permissionCatalog";
+import { FULL_ACCESS_ROLES } from "@/lib/permissionCatalog";
 
 function ModuleTile({ module }: { module: AdminModule }) {
   const Icon = module.icon;
@@ -51,7 +51,7 @@ function ModuleTile({ module }: { module: AdminModule }) {
 
 export default function DashboardPage() {
   const roles = decodeToken(tokenStore.getAccessToken() ?? "")?.realm_access?.roles ?? [];
-const isSuperAdmin = roles.includes(SUPER_ADMIN_ROLE);
+const isSuperAdmin = roles.some((role) => FULL_ACCESS_ROLES.includes(role));
 
 const visibleModules = ADMIN_MODULES.filter(
   (module) => !module.requires || isSuperAdmin || roles.includes(module.requires),

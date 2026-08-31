@@ -93,6 +93,16 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
 
 export const SUPER_ADMIN_ROLE = "SUPER_ADMIN";
 
+/**
+ * A second realm role with the exact same full-access rights as
+ * SUPER_ADMIN. Kept as its own constant (rather than folded into
+ * SUPER_ADMIN_ROLE) so any place naming the platform's top role stays
+ * accurate about there being two, not one, spelled-out account types.
+ */
+export const GLOBAL_ADMIN_ROLE = "GLOBLE_ADMIN";
+
+export const FULL_ACCESS_ROLES = [SUPER_ADMIN_ROLE, GLOBAL_ADMIN_ROLE];
+
 export const HIDDEN_ROLES = [
   "USER",
   "offline_access",
@@ -109,15 +119,6 @@ export function isHiddenRole(role: string): boolean {
   return HIDDEN_ROLES.some((hidden) => role === hidden || role.startsWith("default-roles"));
 }
 
-/**
- * Roles that must never grant platform access no matter what — checked
- * before the allow-list below. `hasAnyPlatformPermission` is already
- * allow-list based (only SUPER_ADMIN or an explicit admin-assignable
- * permission passes), so a shop owner or shopper account was always
- * rejected here regardless of this list. This exists as a second,
- * explicit line of defense: these specific account types must be denied
- * even if the permission catalog ever changes shape.
- */
 export const EXPLICITLY_DENIED_ROLES = ["BUSINESS", "GLOBLE_CUSTOMER"];
 
 export function labelForRole(role: string): string {
@@ -133,19 +134,24 @@ export function allPermissionRoles(): string[] {
 }
 
 export function hasAnyPlatformPermission(roles: string[]): boolean {
+  // Full access wins outright, even for an account that also happens to
+  // carry BUSINESS/GLOBLE_CUSTOMER alongside it (e.g. a shared test
+  // account, or a platform admin who is separately also a shop owner) —
+  // the deny-list exists to stop accounts that have *only* a shopper/owner
+  // role from getting in, not to override an explicit admin grant.
+  if (roles.some((role) => FULL_ACCESS_ROLES.includes(role))) return true;
   if (roles.some((role) => EXPLICITLY_DENIED_ROLES.includes(role))) return false;
-  if (roles.includes(SUPER_ADMIN_ROLE)) return true;
   return allPermissionRoles().some((permission) => roles.includes(permission));
 }
 
 /**
  * Whether the given roles/permissions grant access to a sidebar section.
- * SUPER_ADMIN always passes. A section with no matching entry in
+ * SUPER_ADMIN/GLOBLE_ADMIN always pass. A section with no matching entry in
  * `PERMISSION_GROUPS` (e.g. "account") has no permission of its own and is
  * open to any signed-in staff member.
  */
 export function canAccessSection(roles: string[], sectionId: string): boolean {
-  if (roles.includes(SUPER_ADMIN_ROLE)) return true;
+  if (roles.some((role) => FULL_ACCESS_ROLES.includes(role))) return true;
   const group = PERMISSION_GROUPS.find((candidate) => candidate.key === sectionId);
   if (!group) return true;
   return group.options.some((option) => roles.includes(option.role));

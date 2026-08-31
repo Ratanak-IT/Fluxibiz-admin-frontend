@@ -3,7 +3,7 @@ import "server-only";
 import { headers } from "next/headers";
 import { jwtDecode } from "jwt-decode";
 import { resolveKeycloakAccessToken } from "./keycloak-token";
-import { SUPER_ADMIN_ROLE } from "@/lib/permissionCatalog";
+import { FULL_ACCESS_ROLES } from "@/lib/permissionCatalog";
 
 interface AccessTokenClaims {
   sub?: string;
@@ -41,7 +41,7 @@ export async function getServerIdentity(): Promise<ServerIdentity | null> {
       roles,
       username:
         claims.preferred_username ?? claims.email ?? claims.name ?? "Unknown account",
-      isSuperAdmin: roles.includes(SUPER_ADMIN_ROLE),
+      isSuperAdmin: roles.some((role) => FULL_ACCESS_ROLES.includes(role)),
     };
   } catch (error) {
     console.error("[auth] getServerIdentity failed:", error);

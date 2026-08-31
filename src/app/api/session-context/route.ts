@@ -5,7 +5,7 @@ import {
   resolveKeycloakAccessToken,
 } from "@/lib/auth/keycloak-token";
 import { jwtDecode } from "jwt-decode";
-import { SUPER_ADMIN_ROLE } from "@/lib/permissionCatalog";
+import { FULL_ACCESS_ROLES } from "@/lib/permissionCatalog";
 
 interface AccessTokenClaims {
   sub?: string;
@@ -54,7 +54,7 @@ export async function GET() {
         session.user.name ??
         "Administrator",
       roles,
-      isSuperAdmin: roles.includes(SUPER_ADMIN_ROLE),
+      isSuperAdmin: roles.some((role) => FULL_ACCESS_ROLES.includes(role)),
     },
     { headers: { "Cache-Control": "no-store" } }
   );
