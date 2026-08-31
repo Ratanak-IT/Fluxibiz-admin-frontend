@@ -4,6 +4,7 @@ import AppShell from "@/components/layout/AppShell";
 import { auth } from "@/lib/auth/auth";
 import { getServerIdentity } from "@/lib/auth/getServerIdentity";
 import ForbiddenScreen from "@/components/auth/ForbiddenScreen";
+import { hasAnyPlatformPermission } from "@/lib/permissionCatalog";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -21,7 +22,7 @@ export default async function DashboardLayout({
 
   const identity = await getServerIdentity();
 
-  if (!identity?.isSuperAdmin) {
+  if (!identity || !hasAnyPlatformPermission(identity.roles)) {
     return (
       <ForbiddenScreen
         username={identity?.username ?? session.user.email ?? "Unknown account"}
