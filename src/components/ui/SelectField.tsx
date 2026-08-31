@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 export type SelectOption = { value: string; label: string };
@@ -30,38 +30,32 @@ export function SelectField({
   className?: string;
   size?: "sm" | "default";
 }) {
+  // Radix only learns a value's label once its `SelectItem` has actually been
+  // rendered (i.e. the dropdown has been opened at least once), so on first
+  // paint `<SelectValue>` has nothing to show. Look the label up ourselves
+  // from `options` so the trigger is correct immediately, every time.
+  const selectedLabel = value !== undefined ? options.find((option) => option.value === value)?.label : undefined;
+
   return (
-    <div className="relative">
-      <select
+    <Select name={name} value={value} defaultValue={defaultValue} onValueChange={onValueChange} disabled={disabled}>
+      <SelectTrigger
         id={id}
-        name={name}
-        disabled={disabled}
         aria-invalid={invalid}
-        value={value}
-        defaultValue={defaultValue}
-        onChange={(event) => onValueChange?.(event.target.value)}
         className={cn(
-          "w-full appearance-none rounded-xl border border-border bg-card pr-9 pl-3.5 text-foreground outline-none transition focus-visible:border-gray-400 dark:focus-visible:border-gray-600 focus-visible:ring-1 focus-visible:ring-gray-400/20 shadow-xs disabled:opacity-60",
           size === "sm" ? "h-9 text-xs sm:text-sm" : "h-10 text-sm",
           invalid && "border-destructive",
           className,
         )}
       >
-        {placeholder && (
-          <option value="" disabled>
-            {placeholder}
-          </option>
-        )}
+        <SelectValue placeholder={placeholder}>{selectedLabel}</SelectValue>
+      </SelectTrigger>
+      <SelectContent>
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
+          <SelectItem key={option.value} value={option.value}>
             {option.label}
-          </option>
+          </SelectItem>
         ))}
-      </select>
-      <ChevronDown
-        className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-        aria-hidden
-      />
-    </div>
+      </SelectContent>
+    </Select>
   );
 }
