@@ -16,7 +16,6 @@ export type NavLink = {
   label: string;
   href: string;
   exact?: boolean;
-  permission?: string;
   badge?: number;
 };
 
@@ -26,7 +25,6 @@ export type NavSection = {
   icon: LucideIcon;
   href?: string;
   exact?: boolean;
-  permission?: string;
   children?: NavLink[];
   app?: {
     label: string;

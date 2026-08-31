@@ -133,6 +133,7 @@ export default function RolesAndPermissionsPage() {
     <div className="flex flex-col gap-5">
       {panel && (
         <RolePanel
+          key={panel === "new" ? "new" : panel.id}
           role={panel === "new" ? undefined : panel}
           busy={busy}
           error={panelError}

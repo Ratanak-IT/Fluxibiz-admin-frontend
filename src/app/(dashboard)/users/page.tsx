@@ -274,6 +274,7 @@ export default function PlatformStaffPage() {
     <div className="flex flex-col gap-5">
       {panel && (
         <StaffFormPanel
+          key={panel === "new" ? "new" : panel.id}
           user={panel === "new" ? undefined : panel}
           roles={roles}
           busy={busy}
