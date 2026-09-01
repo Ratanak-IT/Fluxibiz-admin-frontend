@@ -1,11 +1,38 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ShieldAlert } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import { CommandPalette } from "@/components/admin/CommandPalette";
 import { AdminPlatformTourModal } from "@/components/admin/AdminPlatformTourModal";
+import { NAVIGATION, isSectionActive } from "@/components/layout/navigation";
+import { canAccessSection } from "@/lib/permissionCatalog";
+import { useSessionContext } from "@/lib/auth/session-context";
+
+function SectionForbidden({ sectionLabel }: { sectionLabel: string }) {
+  return (
+    <div className="grid min-h-[60dvh] place-items-center px-4 py-12">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
+        <div className="mx-auto grid size-12 place-items-center rounded-full bg-destructive/10 text-destructive">
+          <ShieldAlert className="size-6" aria-hidden />
+        </div>
+        <h1 className="mt-4 text-xl font-semibold tracking-tight text-foreground">Not authorised</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Your account doesn&apos;t have permission for <strong className="text-foreground">{sectionLabel}</strong>.
+        </p>
+        <Link
+          href="/apps"
+          className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+        >
+          Back to apps
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 export default function AppShell({
   managerName,
@@ -16,6 +43,7 @@ export default function AppShell({
 }) {
   const pathname = usePathname();
   const [navOpen, setNavOpen] = useState(false);
+  const session = useSessionContext();
 
   const chromeless = pathname === "/apps";
 
@@ -41,6 +69,10 @@ export default function AppShell({
     return <div className="min-h-dvh bg-[#f5f5f5]">{children}</div>;
   }
 
+  const activeSection = NAVIGATION.find((section) => isSectionActive(section, pathname));
+  const forbidden =
+    session !== null && activeSection !== undefined && !canAccessSection(session.roles, activeSection.id);
+
   return (
     <div className="min-h-dvh bg-background lg:p-4">
       <a
@@ -61,7 +93,11 @@ export default function AppShell({
             />
 
             <main id="main-content" className="flex-1 px-5 pb-8 lg:px-8 dark:bg-background">
-              {children}
+              {forbidden ? (
+                <SectionForbidden sectionLabel={activeSection?.app?.label ?? activeSection?.label ?? "this section"} />
+              ) : (
+                children
+              )}
             </main>
           </div>
         </div>
