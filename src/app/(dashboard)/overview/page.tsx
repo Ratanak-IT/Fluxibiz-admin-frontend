@@ -50,6 +50,8 @@ import {
   useGetBusinessChannelsQuery,
 } from "@/features/businessManagement/businessAdminApi";
 import { StatusPill } from "@/components/admin/StatusPill";
+import { useSessionContext } from "@/lib/auth/session-context";
+import { hasPermission } from "@/lib/permissionCatalog";
 import type {
   CategoryCountResponse,
   TrendCountResponse,
@@ -822,11 +824,22 @@ function OverviewSkeleton() {
 
 export default function OverviewPage() {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const session = useSessionContext();
   const { data, isLoading, error } = useGetPlatformDashboardQuery(undefined, {
     pollingInterval: 5000,
     refetchOnFocus: true,
     refetchOnReconnect: true,
   });
+
+  // These widgets each call an endpoint outside the dashboard's own
+  // admin-dashboard:read permission — only mount one once we know the
+  // signed-in staff actually holds the permission it needs, so a widget
+  // never renders empty/broken from a silent 403.
+  const roles = session?.roles ?? [];
+  const canSeeChannels = session !== null && hasPermission(roles, "admin-channel:read");
+  const canSeeBusinesses = session !== null && hasPermission(roles, "admin-business:read");
+  const canSeeFeatures = session !== null && hasPermission(roles, "admin-platform-feature:read");
+  const canSeeAudit = session !== null && hasPermission(roles, "admin-audit:read");
 
   return (
     <div className="w-full pt-2">
@@ -970,22 +983,28 @@ export default function OverviewPage() {
             </div>
 
             {/* Channel Integration Rates */}
-            <div className="mt-8">
-              <ChannelAdoptionWidget />
-            </div>
+            {canSeeChannels && (
+              <div className="mt-8">
+                <ChannelAdoptionWidget />
+              </div>
+            )}
 
-            {/* Regional Density & Risk Radar Widgets */}
-            <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <RegionalGrowthWidget />
-              <MerchantHealthRadarWidget />
-            </div>
+            {/* Regional Density & Risk Radar Widgets — both read the business list */}
+            {canSeeBusinesses && (
+              <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <RegionalGrowthWidget />
+                <MerchantHealthRadarWidget />
+              </div>
+            )}
 
             {/* Management Widgets */}
-            <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-              <RecentBusinessesWidget />
-              <PlatformFeaturesWidget />
-              <RecentAuditWidget />
-            </div>
+            {(canSeeBusinesses || canSeeFeatures || canSeeAudit) && (
+              <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+                {canSeeBusinesses && <RecentBusinessesWidget />}
+                {canSeeFeatures && <PlatformFeaturesWidget />}
+                {canSeeAudit && <RecentAuditWidget />}
+              </div>
+            )}
           </>
         )}
       </div>

@@ -13,6 +13,8 @@ import { Flag, StatusPill } from "@/components/admin/StatusPill";
 
 import { AdminApiErrorFallback } from "@/components/common/AdminApiErrorFallback";
 import { AdminLoadingState } from "@/components/common/AdminLoadingState";
+import { useSessionContext } from "@/lib/auth/session-context";
+import { hasPermission } from "@/lib/permissionCatalog";
 
 function Field({ label, value, breakAll = false }: { label: string; value?: string | null; breakAll?: boolean }) {
   return (
@@ -28,8 +30,11 @@ function Field({ label, value, breakAll = false }: { label: string; value?: stri
 export default function BusinessDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
 
+  const session = useSessionContext();
+  const canSeeAudit = session !== null && hasPermission(session.roles, "admin-audit:read");
+
   const { data: business, isLoading, error, refetch } = useGetBusinessQuery(id);
-  const { data: logs } = useGetAuditLogsQuery({ targetId: id, size: 8 });
+  const { data: logs } = useGetAuditLogsQuery({ targetId: id, size: 8 }, { skip: !canSeeAudit });
 
   if (isLoading) {
     return (
@@ -164,33 +169,35 @@ export default function BusinessDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Audit Logs History */}
-      <section className="mt-6 sm:mt-8 rounded-3xl border border-border bg-card p-5 sm:p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <h2 className="text-base font-bold text-foreground">Recent Admin Activity</h2>
-          <Link href="/audit-logs/businesses" className="text-xs font-bold text-primary hover:underline">
-            View All Activity →
-          </Link>
-        </div>
+      {canSeeAudit && (
+        <section className="mt-6 sm:mt-8 rounded-3xl border border-border bg-card p-5 sm:p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h2 className="text-base font-bold text-foreground">Recent Admin Activity</h2>
+            <Link href="/audit-logs/businesses" className="text-xs font-bold text-primary hover:underline">
+              View All Activity →
+            </Link>
+          </div>
 
-        {logs?.content?.length ? (
-          <ul className="mt-4 divide-y divide-border">
-            {logs.content.map((log) => (
-              <li key={log.id} className="py-3 text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                <div>
-                  <span className="font-semibold text-foreground">{log.actionType.replace(/_/g, " ").toLowerCase()}</span>
-                  <span className="text-muted-foreground"> by {log.actorUsername}</span>
-                  {log.reason && <p className="mt-1 text-xs text-muted-foreground bg-muted p-2 rounded-lg">{log.reason}</p>}
-                </div>
-                <span className="text-xs text-muted-foreground shrink-0">{new Date(log.createdAt).toLocaleString()}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-4 text-xs text-muted-foreground">
-            No admin activity recorded for this business yet.
-          </p>
-        )}
-      </section>
+          {logs?.content?.length ? (
+            <ul className="mt-4 divide-y divide-border">
+              {logs.content.map((log) => (
+                <li key={log.id} className="py-3 text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <div>
+                    <span className="font-semibold text-foreground">{log.actionType.replace(/_/g, " ").toLowerCase()}</span>
+                    <span className="text-muted-foreground"> by {log.actorUsername}</span>
+                    {log.reason && <p className="mt-1 text-xs text-muted-foreground bg-muted p-2 rounded-lg">{log.reason}</p>}
+                  </div>
+                  <span className="text-xs text-muted-foreground shrink-0">{new Date(log.createdAt).toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-4 text-xs text-muted-foreground">
+              No admin activity recorded for this business yet.
+            </p>
+          )}
+        </section>
+      )}
 
       {/* Bottom Back Button */}
       <div className="mt-6 sm:mt-8 flex justify-start">

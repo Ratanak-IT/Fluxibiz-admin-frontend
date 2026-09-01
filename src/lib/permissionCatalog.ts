@@ -156,3 +156,15 @@ export function canAccessSection(roles: string[], sectionId: string): boolean {
   if (!group) return true;
   return group.options.some((option) => roles.includes(option.role));
 }
+
+/**
+ * Whether the given roles/permissions grant one specific permission code.
+ * For widgets that call an endpoint outside their section's own permission
+ * (e.g. the Overview dashboard's Channel Integration Rates widget, which
+ * needs `admin-channel:read`, not `admin-dashboard:read`) — check this
+ * instead of `canAccessSection`, which only knows about whole sections.
+ */
+export function hasPermission(roles: string[], permission: string): boolean {
+  if (roles.some((role) => FULL_ACCESS_ROLES.includes(role))) return true;
+  return roles.includes(permission);
+}

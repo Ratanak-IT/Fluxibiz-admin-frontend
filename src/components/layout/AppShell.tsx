@@ -8,8 +8,8 @@ import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import { CommandPalette } from "@/components/admin/CommandPalette";
 import { AdminPlatformTourModal } from "@/components/admin/AdminPlatformTourModal";
-import { NAVIGATION, isSectionActive } from "@/components/layout/navigation";
-import { canAccessSection } from "@/lib/permissionCatalog";
+import { NAVIGATION, sectionIdForPath } from "@/components/layout/navigation";
+import { canAccessSection, FULL_ACCESS_ROLES } from "@/lib/permissionCatalog";
 import { useSessionContext } from "@/lib/auth/session-context";
 
 function SectionForbidden({ sectionLabel }: { sectionLabel: string }) {
@@ -69,9 +69,17 @@ export default function AppShell({
     return <div className="min-h-dvh bg-[#f5f5f5]">{children}</div>;
   }
 
-  const activeSection = NAVIGATION.find((section) => isSectionActive(section, pathname));
+  const sectionId = sectionIdForPath(pathname);
+  const activeSection = sectionId ? NAVIGATION.find((section) => section.id === sectionId) : undefined;
+
   const forbidden =
-    session !== null && activeSection !== undefined && !canAccessSection(session.roles, activeSection.id);
+    session !== null &&
+    sectionId !== undefined &&
+    (sectionId === null
+      ? !session.roles.some((role) => FULL_ACCESS_ROLES.includes(role))
+      : !canAccessSection(session.roles, sectionId));
+
+  const forbiddenLabel = activeSection?.app?.label ?? activeSection?.label ?? "this area";
 
   return (
     <div className="min-h-dvh bg-background lg:p-4">
@@ -93,11 +101,7 @@ export default function AppShell({
             />
 
             <main id="main-content" className="flex-1 px-5 pb-8 lg:px-8 dark:bg-background">
-              {forbidden ? (
-                <SectionForbidden sectionLabel={activeSection?.app?.label ?? activeSection?.label ?? "this section"} />
-              ) : (
-                children
-              )}
+              {forbidden ? <SectionForbidden sectionLabel={forbiddenLabel} /> : children}
             </main>
           </div>
         </div>

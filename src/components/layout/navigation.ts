@@ -205,6 +205,37 @@ export function isSectionActive(section: NavSection, pathname: string): boolean 
     : pathname === section.href || pathname.startsWith(`${section.href}/`);
 }
 
+/**
+ * Paths that need a permission check but aren't (and shouldn't become) their
+ * own visible sidebar link — e.g. `/channels/manage` is reached from inside
+ * the Shop Channels page, not a nav entry of its own. `sectionId: null` means
+ * the area has no PermissionCode of its own yet, so it's restricted to
+ * SUPER_ADMIN/GLOBLE_ADMIN until one exists.
+ */
+const EXTRA_ROUTE_PERMISSIONS: { prefix: string; sectionId: string | null }[] = [
+  { prefix: "/channels/manage", sectionId: "channels" },
+  { prefix: "/settings/webhooks", sectionId: "settings" },
+  { prefix: "/categories", sectionId: "businesses" },
+  { prefix: "/logs", sectionId: null },
+  { prefix: "/subscriptions", sectionId: null },
+];
+
+/**
+ * Resolves which permission section (if any) gates a path. Returns:
+ * - a section id — the path needs `canAccessSection(roles, id)`
+ * - `null` — the path has no permission of its own yet; SUPER_ADMIN/GLOBLE_ADMIN only
+ * - `undefined` — the path is open to any signed-in staff member (e.g. /account)
+ */
+export function sectionIdForPath(pathname: string): string | null | undefined {
+  const navSection = NAVIGATION.find((section) => isSectionActive(section, pathname));
+  if (navSection) return navSection.id;
+
+  const extra = EXTRA_ROUTE_PERMISSIONS.find(
+    (entry) => pathname === entry.prefix || pathname.startsWith(`${entry.prefix}/`),
+  );
+  return extra ? extra.sectionId : undefined;
+}
+
 export type PageTitle = {
   app: string;
   page?: string;

@@ -58,6 +58,12 @@ function errorMessage(error: unknown): string | undefined {
   return status ? `Request failed with status ${status}.` : "Request failed.";
 }
 
+function roleNamesFor(roleIds: string[], roleNameById: Map<string, string>): string {
+  return roleIds
+    .map((id) => roleNameById.get(id) ?? "Unknown role")
+    .join(", ");
+}
+
 const COLUMNS: ColumnDef[] = [
   { id: "person", label: "Person" },
   { id: "canDo", label: "Can do" },
@@ -137,8 +143,8 @@ export default function PlatformStaffPage() {
     if (roleFilter !== "ALL") {
       list =
         roleFilter === "NO_ROLE"
-          ? list.filter((user) => !user.roleId)
-          : list.filter((user) => user.roleId === roleFilter);
+          ? list.filter((user) => user.roleIds.length === 0)
+          : list.filter((user) => user.roleIds.includes(roleFilter));
     }
 
     if (statusFilter !== "ALL") {
@@ -154,12 +160,8 @@ export default function PlatformStaffPage() {
           valA = `${a.firstName} ${a.lastName}`.toLowerCase();
           valB = `${b.firstName} ${b.lastName}`.toLowerCase();
         } else if (sortColumn === "role") {
-          valA = (
-            a.roleId ? roleNameById.get(a.roleId) || "" : ""
-          ).toLowerCase();
-          valB = (
-            b.roleId ? roleNameById.get(b.roleId) || "" : ""
-          ).toLowerCase();
+          valA = roleNamesFor(a.roleIds, roleNameById).toLowerCase();
+          valB = roleNamesFor(b.roleIds, roleNameById).toLowerCase();
         } else if (sortColumn === "status") {
           valA = a.status.toLowerCase();
           valB = b.status.toLowerCase();
@@ -203,7 +205,7 @@ export default function PlatformStaffPage() {
             lastName: values.lastName,
             phoneNumber: values.phoneNumber,
             gender: values.gender,
-            roleId: values.roleId || undefined,
+            roleIds: values.roleIds,
           })
         : panel
           ? await updateUser({
@@ -213,7 +215,7 @@ export default function PlatformStaffPage() {
                 lastName: values.lastName,
                 phoneNumber: values.phoneNumber,
                 gender: values.gender,
-                roleId: values.roleId || undefined,
+                roleIds: values.roleIds,
               },
             })
           : undefined;
@@ -461,8 +463,8 @@ export default function PlatformStaffPage() {
 
                     {!cols.isHidden("canDo") && (
                       <td className="py-4 pr-4 text-sm text-muted-foreground">
-                        {user.roleId
-                          ? (roleNameById.get(user.roleId) ?? "Unknown role")
+                        {user.roleIds.length > 0
+                          ? roleNamesFor(user.roleIds, roleNameById)
                           : "No role"}
                       </td>
                     )}

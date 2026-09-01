@@ -22,6 +22,21 @@ import {
   useUpdateBusinessCategoryMutation,
 } from "@/features/businessManagement/businessAdminApi";
 
+function apiErrorMessage(error: unknown, fallback: string): string {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "data" in error &&
+    typeof error.data === "object" &&
+    error.data !== null &&
+    "message" in error.data &&
+    typeof error.data.message === "string"
+  ) {
+    return error.data.message;
+  }
+  return fallback;
+}
+
 interface EditorState {
   mode: "create" | "edit";
   categoryId?: string;
@@ -141,8 +156,8 @@ export default function CategoriesPage() {
         toast.success(`Category "${editor.name}" updated.`);
       }
       setEditor(null);
-    } catch {
-      toast.error("Failed to save category.");
+    } catch (error) {
+      toast.error(apiErrorMessage(error, "Failed to save category."));
     }
   };
 
@@ -155,8 +170,8 @@ export default function CategoriesPage() {
           try {
             await remove(id).unwrap();
             toast.success(`Category "${name}" deleted.`);
-          } catch {
-            toast.error("Failed to delete category.");
+          } catch (error) {
+            toast.error(apiErrorMessage(error, "Failed to delete category."));
           }
         },
       },

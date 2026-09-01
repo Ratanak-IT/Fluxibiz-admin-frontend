@@ -17,10 +17,8 @@ export interface StaffFormValues {
   lastName: string;
   phoneNumber: string;
   gender: string;
-  roleId: string;
+  roleIds: string[];
 }
-
-const NO_ROLE = "__none";
 
 const genderLabels: Record<(typeof userProfileGenders)[number], string> = {
   MALE: "Male",
@@ -153,12 +151,14 @@ export function StaffFormPanel({
   const [lastName, setLastName] = useState(user?.lastName ?? "");
   const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber ?? "");
   const [gender, setGender] = useState(user?.gender ?? "");
-  const [roleId, setRoleId] = useState(user?.roleId ?? NO_ROLE);
+  const [roleIds, setRoleIds] = useState<string[]>(user?.roleIds ?? []);
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const passwordHintShown = useRef(false);
 
   const editing = Boolean(user);
   const markTouched = (field: string) => setTouched((prev) => (prev.has(field) ? prev : new Set(prev).add(field)));
+  const toggleRole = (id: string) =>
+    setRoleIds((prev) => (prev.includes(id) ? prev.filter((roleId) => roleId !== id) : [...prev, id]));
 
   const errors = validateFields({
     editing,
@@ -275,21 +275,37 @@ export function StaffFormPanel({
           />
         </FormField>
 
-        <FormField
-          label="Role"
-          htmlFor="staff-role"
-          hint={roles.length === 0 ? "Create a role first to assign one." : undefined}
-        >
-          <SelectField
-            id="staff-role"
-            value={roleId}
-            onValueChange={setRoleId}
-            options={[
-              { value: NO_ROLE, label: "No role" },
-              ...roles.map((role) => ({ value: role.id, label: role.name })),
-            ]}
-          />
-        </FormField>
+        <div className="sm:col-span-2">
+          <FormField
+            label="Roles"
+            htmlFor="staff-roles"
+            hint={roles.length === 0 ? "Create a role first to assign one." : "Select as many as apply."}
+          >
+            <div
+              id="staff-roles"
+              className="flex max-h-48 flex-col gap-1 overflow-y-auto rounded-xl border border-border bg-card p-2"
+            >
+              {roles.length === 0 ? (
+                <p className="px-2 py-1.5 text-sm text-muted-foreground">No roles yet.</p>
+              ) : (
+                roles.map((role) => (
+                  <label
+                    key={role.id}
+                    className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 transition hover:bg-accent"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={roleIds.includes(role.id)}
+                      onChange={() => toggleRole(role.id)}
+                      className="size-4 shrink-0 rounded accent-primary"
+                    />
+                    <span className="text-sm text-foreground">{role.name}</span>
+                  </label>
+                ))
+              )}
+            </div>
+          </FormField>
+        </div>
       </div>
 
       {!error && hasErrors && (
@@ -314,7 +330,7 @@ export function StaffFormPanel({
               lastName: lastName.trim(),
               phoneNumber: phoneNumber.trim(),
               gender,
-              roleId: roleId === NO_ROLE ? "" : roleId,
+              roleIds,
             })
           }
         >

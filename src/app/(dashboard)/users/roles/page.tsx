@@ -84,7 +84,9 @@ export default function RolesAndPermissionsPage() {
   const assignedCounts = useMemo(() => {
     const counts = new Map<string, number>();
     for (const user of users) {
-      if (user.roleId) counts.set(user.roleId, (counts.get(user.roleId) ?? 0) + 1);
+      for (const roleId of user.roleIds) {
+        counts.set(roleId, (counts.get(roleId) ?? 0) + 1);
+      }
     }
     return counts;
   }, [users]);

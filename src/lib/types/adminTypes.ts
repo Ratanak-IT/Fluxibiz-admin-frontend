@@ -203,7 +203,7 @@ export interface StaffResponse {
   phoneNumber: string;
   gender: string;
   status: StaffStatus;
-  roleId: string | null;
+  roleIds: string[];
 }
 
 export interface CreateStaffRequest {
@@ -214,7 +214,7 @@ export interface CreateStaffRequest {
   lastName: string;
   phoneNumber: string;
   gender: string;
-  roleId?: string;
+  roleIds?: string[];
 }
 
 export interface UpdateStaffRequest {
@@ -222,7 +222,7 @@ export interface UpdateStaffRequest {
   lastName: string;
   phoneNumber: string;
   gender: string;
-  roleId?: string;
+  roleIds?: string[];
 }
 
 export type BusinessFeature = "STOREFRONT" | "TELEGRAM_BOT" | "KHQR_PAYMENT";
