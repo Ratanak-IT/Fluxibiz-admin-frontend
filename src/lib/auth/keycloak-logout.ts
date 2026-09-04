@@ -61,7 +61,7 @@ export async function keycloakLogoutUrl({
   const clientId =
     process.env.KEYCLOAK_CLIENT_ID ||
     process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID ||
-    "fluxipos-client";
+    "fluxipos-admin";
 
   // Always send client_id so Keycloak knows which client is logging out
   url.searchParams.set("client_id", clientId);

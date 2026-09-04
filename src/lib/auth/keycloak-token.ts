@@ -233,7 +233,7 @@ async function refreshWithKeycloak(
   const clientId =
     process.env.KEYCLOAK_CLIENT_ID ||
     process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID ||
-    "fluxipos-client";
+    "fluxipos-admin";
   const clientSecret = process.env.KEYCLOAK_CLIENT_SECRET;
 
   const body = new URLSearchParams({

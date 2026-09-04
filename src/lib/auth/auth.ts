@@ -5,7 +5,7 @@ import { genericOAuth, keycloak } from "better-auth/plugins/generic-oauth";
 const keycloakClientId =
   process.env.KEYCLOAK_CLIENT_ID ||
   process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID ||
-  "fluxipos-client";
+  "fluxipos-admin";
 
 const keycloakIssuer =
   process.env.KEYCLOAK_ISSUER ||
